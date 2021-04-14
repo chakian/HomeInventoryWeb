@@ -31,7 +31,15 @@ namespace WebUI
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDatabaseDeveloperPageExceptionFilter();
-            services.AddDefaultIdentity<HomeInv.Persistence.Dbo.User>(options => options.SignIn.RequireConfirmedAccount = false)
+            services.AddDefaultIdentity<HomeInv.Persistence.Dbo.User>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 3;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+            })
                 .AddEntityFrameworkStores<HomeInventoryDbContext>();
             services.AddRazorPages();
         }

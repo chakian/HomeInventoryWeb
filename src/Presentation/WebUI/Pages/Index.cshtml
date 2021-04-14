@@ -1,4 +1,6 @@
 ﻿@page
+@inject SignInManager<HomeInv.Persistence.Dbo.User> SignInManager
+@inject UserManager<HomeInv.Persistence.Dbo.User> UserManager
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -8,3 +10,8 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <a class="nav-link text-dark" asp-area="" asp-page="/Home/Create">Create Home</a>
+}
