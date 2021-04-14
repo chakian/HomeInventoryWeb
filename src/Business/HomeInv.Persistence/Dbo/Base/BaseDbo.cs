@@ -6,5 +6,6 @@ namespace HomeInv.Persistence.Dbo
     {
         [Key]
         public string Id { get; set; }
+        public bool IsActive { get; set; }
     }
 }
