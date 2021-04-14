@@ -10,5 +10,7 @@ namespace HomeInv.Persistence
             : base(options)
         {
         }
+
+        public virtual DbSet<Home> Homes { get; set; }
     }
 }
