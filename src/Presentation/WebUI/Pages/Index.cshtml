@@ -11,7 +11,7 @@
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 
-@if (SignInManager.IsSignedIn(User))
+@if (!SignInManager.IsSignedIn(User))
 {
-    <a class="nav-link text-dark" asp-area="" asp-page="/Home/Create">Create Home</a>
+    <p>Selam, üye olun hemen.</p>
 }

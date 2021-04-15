@@ -10,14 +10,29 @@ namespace WebUI.Base
     public class BasePageModel<T> : PageModel
     {
         protected readonly ILogger<T> logger;
-        protected readonly HomeInventoryDbContext dbContext;
         protected readonly IHomeService homeService;
 
-        public BasePageModel(ILogger<T> logger, HomeInventoryDbContext dbContext, IHomeService homeService)
+        public BasePageModel(ILogger<T> logger, IHomeService homeService)
         {
             this.logger = logger;
-            this.dbContext = dbContext;
             this.homeService = homeService;
+        }
+
+        protected string UserId
+        {
+            get
+            {
+                string id = "";
+                if (User != null && User.Identity.IsAuthenticated)
+                {
+                    var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+                    if (claim != null)
+                    {
+                        id = claim.Value;
+                    }
+                }
+                return id;
+            }
         }
 
         public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
