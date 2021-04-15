@@ -1,20 +1,17 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# Genel Bilgi
+Evimize devamlı bir şeyler alıyoruz. Bazen bir dolap alıyoruz ve sonra ne zaman aldığımızı görmek istiyoruz. Bazen ise en son ne zaman çamaşır deterjanı aldık da hemen yine bitti diye düşünüyoruz. Bu projeye başlama motivasyonum, evdeki eşyaların ve tüketim malzemelerinin takibini kolaylaştırmak; ve devamında da deterjan ortalama 1 ay gidiyorsa ve 1 aydır yenisini almadıysam bildirim ile bana hatırlatacak bir sistem hazırlamak.
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+# Ortam Kurulumu
+Ortam kurulumu son derece basittir. Kodu bilgisayarınıza alıp Visual Studio ile açarsanız, derleme sırasında Nuget üzerinden gerekli paketler indirilir.
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+Veritabanı olarak SqlServer kullandığım için bilgisayarınızda SqlServer kurulu olmalıdır. Eğer farklı bir veritabanı kullanacaksanız, istediğiniz bir veritabanı ile değiştirebilirsiniz. Startup.cs içerisinde gerekli değişikliği yapmanız gerekir. Ayrıca, eğer Entity Framework Identity tarafından desteklenmeyen bir veritabanı kullanacaksanız, Authentication ve Authorization işlemlerini kendiniz yazmanız gerekir.
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+# Derleme ve Testler
+Derleme için ek bir ihtiyaç bulunmamaktadır. Visual Studio içinden derleyebilirsiniz.
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+Testler için ise, yine Visual Studio'nun Test Explorer penceresini kullanarak tüm testleri koşturabilirsiniz.
+
+# Destek
+Bu uygulamanın geliştirmesine katkıda bulunmak isterseniz teknik konularla ilgili yardımcı olabilirim. Yapmanız gereken: kodu kendi kullanıcı hesabınıza Forklamak ve geliştirmelerinizi Pull Request ile göndermek. 
+
+Issues bölümünü mümkün olduğunca aktif tutuyorum. Oradaki "Help Wanted" veya "Good First Issue" olarak etiketlenmiş maddelere göz atabilirsiniz.
