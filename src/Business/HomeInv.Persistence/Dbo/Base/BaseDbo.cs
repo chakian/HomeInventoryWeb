@@ -5,7 +5,7 @@ namespace HomeInv.Persistence.Dbo
     public class BaseDbo
     {
         [Key]
-        public string Id { get; set; }
+        public int Id { get; set; }
         public bool IsActive { get; set; }
     }
 }
