@@ -1,3 +1,5 @@
+using HomeInv.Business;
+using HomeInv.Common.Interfaces.Services;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -42,6 +44,8 @@ namespace WebUI
             })
                 .AddEntityFrameworkStores<HomeInventoryDbContext>();
             services.AddRazorPages();
+
+            services.AddScoped<IHomeService, HomeService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
