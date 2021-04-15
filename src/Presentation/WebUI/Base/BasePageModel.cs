@@ -1,21 +1,25 @@
-﻿using HomeInv.Common.Interfaces.Services;
+﻿using HomeInv.Business;
+using HomeInv.Common.Interfaces.Services;
+using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.Persistence;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Security.Claims;
 
 namespace WebUI.Base
 {
-    public class BasePageModel<T> : PageModel
+    public abstract class BasePageModel<T> : PageModel
     {
+        private readonly HomeInventoryDbContext dbContext;
         protected readonly ILogger<T> logger;
-        protected readonly IHomeService homeService;
 
-        public BasePageModel(ILogger<T> logger, IHomeService homeService)
+        public BasePageModel(ILogger<T> logger, HomeInventoryDbContext dbContext)
         {
             this.logger = logger;
-            this.homeService = homeService;
+            this.dbContext = dbContext;
         }
 
         protected string UserId
@@ -35,14 +39,43 @@ namespace WebUI.Base
             }
         }
 
+        public IActionResult OnPost()
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return Page();
+                }
+
+                dbContext.Database.BeginTransaction();
+                var result = OnModelPost();
+                dbContext.Database.CommitTransaction();
+
+                return result;
+            }
+            catch
+            {
+                dbContext.Database.RollbackTransaction();
+
+                return Page();
+            }
+        }
+
+        protected virtual IActionResult OnModelPost()
+        {
+            throw new NotImplementedException();
+        }
+
         public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
         {
             if(User != null && User.Identity.IsAuthenticated)
             {
-                string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                var homes = homeService.GetHomesOfUser(userId);
+                IHomeService homeService = new HomeService(dbContext);
+                GetHomesOfUserRequest request = new GetHomesOfUserRequest { UserId = UserId };
+                var homesResponse = homeService.GetHomesOfUser(request);
                 string homePath = "/Home/Create";
-                if ((homes == null || homes.Count == 0) && context.ActionDescriptor.ViewEnginePath != homePath)
+                if (homesResponse.Homes.Count == 0 && context.ActionDescriptor.ViewEnginePath != homePath)
                 {
                     context.Result = RedirectToPage(homePath);
                 }
