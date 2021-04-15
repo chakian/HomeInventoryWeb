@@ -1,4 +1,5 @@
 ﻿using HomeInv.Common.Interfaces.Services;
+using HomeInv.Common.ServiceContracts;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using System;
@@ -13,11 +14,11 @@ namespace HomeInv.Business.Base
             context = _context;
         }
 
-        protected T CreateNewAuditableObject<T>(string userId, bool isActive = true)
+        protected T CreateNewAuditableObject<T>(BaseRequest request, bool isActive = true)
             where T : BaseAuditableDbo, new()
         {
             T dbo = new T();
-            dbo.InsertUserId = userId;
+            dbo.InsertUserId = request.RequestUserId;
             dbo.InsertTime = DateTime.UtcNow;
             dbo.IsActive = isActive;
             return dbo;

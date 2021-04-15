@@ -1,6 +1,7 @@
 ﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Home;
+using HomeInv.Common.ServiceContracts.HomeUser;
 using System;
 using System.Linq;
 using Xunit;
@@ -24,24 +25,24 @@ namespace HomeInv.Business.Tests
                 Name = "seed 1",
                 Description = "seed desc 1"
             };
-            var home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[0] });
-            homeUserService.InsertHomeUser(home.HomeEntity.Id, userIds[0], "owner");
+            var home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[0] });
+            homeUserService.InsertHomeUser(new InsertHomeUserRequest() { HomeId = home.HomeEntity.Id, UserId = userIds[0], Role = "owner", RequestUserId = userIds[0] });
 
             homeEntity = new HomeEntity()
             {
                 Name = "seed 2",
                 Description = "seed desc 2"
             };
-            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[1] });
-            homeUserService.InsertHomeUser(home.HomeEntity.Id, userIds[1], "owner");
+            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[1] });
+            homeUserService.InsertHomeUser(new InsertHomeUserRequest() { HomeId = home.HomeEntity.Id, UserId = userIds[1], Role = "owner", RequestUserId = userIds[0] });
 
             homeEntity = new HomeEntity()
             {
                 Name = "seed 3",
                 Description = "seed desc 3"
             };
-            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[2] });
-            homeUserService.InsertHomeUser(home.HomeEntity.Id, userIds[2], "owner");
+            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[2] });
+            homeUserService.InsertHomeUser(new InsertHomeUserRequest() { HomeId = home.HomeEntity.Id, UserId = userIds[2], Role = "owner", RequestUserId = userIds[0] });
         }
 
         [Fact]
@@ -55,10 +56,10 @@ namespace HomeInv.Business.Tests
             var role = "owner";
 
             // act
-            var actual = homeUserService.InsertHomeUser(homeId, userId, role);
+            var actual = homeUserService.InsertHomeUser(new InsertHomeUserRequest() { HomeId = homeId, UserId = userId, Role = role, RequestUserId = userIds[0] });
 
             // assert
-            Assert.True(actual);
+            Assert.True(actual.IsSuccessful);
         }
 
         [Fact]
@@ -72,10 +73,10 @@ namespace HomeInv.Business.Tests
             var role = "owner";
 
             // act
-            var actual = homeUserService.InsertHomeUser(homeId, userId, role);
+            var actual = homeUserService.InsertHomeUser(new InsertHomeUserRequest() { HomeId = homeId, UserId = userId, Role = role, RequestUserId = userIds[0] });
 
             // assert
-            Assert.False(actual);
+            Assert.False(actual.IsSuccessful);
         }
     }
 }

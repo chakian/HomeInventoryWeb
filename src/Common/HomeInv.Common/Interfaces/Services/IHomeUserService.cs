@@ -1,7 +1,9 @@
-﻿namespace HomeInv.Common.Interfaces.Services
+﻿using HomeInv.Common.ServiceContracts.HomeUser;
+
+namespace HomeInv.Common.Interfaces.Services
 {
     public interface IHomeUserService : IServiceBase
     {
-        bool InsertHomeUser(int homeId, string userId, string role);
+        InsertHomeUserResponse InsertHomeUser(InsertHomeUserRequest request);
     }
 }

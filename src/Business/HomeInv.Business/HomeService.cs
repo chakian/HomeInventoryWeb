@@ -4,7 +4,6 @@ using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,7 +18,7 @@ namespace HomeInv.Business
         public CreateHomeResponse CreateHome(CreateHomeRequest request)
         {
             CreateHomeResponse response = new CreateHomeResponse();
-            Home home = CreateNewAuditableObject<Home>(request.UserId);
+            Home home = CreateNewAuditableObject<Home>(request);
             home.Name = request.HomeEntity.Name;
             home.Description = request.HomeEntity.Description;
             
@@ -49,7 +48,7 @@ namespace HomeInv.Business
         public GetHomesOfUserResponse GetHomesOfUser(GetHomesOfUserRequest request)
         {
             GetHomesOfUserResponse response = new GetHomesOfUserResponse();
-            var homes = GetHomesOfUserInternal(request.UserId);
+            var homes = GetHomesOfUserInternal(request.RequestUserId);
             List<HomeEntity> homeEntities = new List<HomeEntity>();
             foreach (var home in homes)
             {

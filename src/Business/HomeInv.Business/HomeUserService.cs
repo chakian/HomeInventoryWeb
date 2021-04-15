@@ -1,10 +1,8 @@
 ﻿using HomeInv.Business.Base;
-using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
+using HomeInv.Common.ServiceContracts.HomeUser;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace HomeInv.Business
@@ -15,22 +13,24 @@ namespace HomeInv.Business
         {
         }
 
-        public bool InsertHomeUser(int homeId, string userId, string role)
+        public InsertHomeUserResponse InsertHomeUser(InsertHomeUserRequest request)
         {
-            if(context.HomeUsers.Any(q=>q.HomeId==homeId && q.UserId == userId))
+            InsertHomeUserResponse response = new InsertHomeUserResponse();
+            if (context.HomeUsers.Any(q => q.HomeId == request.HomeId && q.UserId == request.UserId))
             {
-                return false;
+                response.AddError("Bu kullanıcı zaten bu evde mevcut");
+                return response;
             }
 
-            HomeUser homeUser = CreateNewAuditableObject<HomeUser>(userId);
-            homeUser.HomeId = homeId;
-            homeUser.UserId = userId;
-            homeUser.Role = role;
+            HomeUser homeUser = CreateNewAuditableObject<HomeUser>(request);
+            homeUser.HomeId = request.HomeId;
+            homeUser.UserId = request.UserId;
+            homeUser.Role = request.Role;
 
             context.HomeUsers.Add(homeUser);
             context.SaveChanges();
 
-            return true;
+            return response;
         }
     }
 }

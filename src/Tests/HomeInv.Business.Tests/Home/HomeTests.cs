@@ -23,21 +23,21 @@ namespace HomeInv.Business.Tests
                 Name = "seed 1",
                 Description = "seed desc 1"
             };
-            var home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[0] });
+            var home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[0] });
 
             homeEntity = new HomeEntity()
             {
                 Name = "seed 2",
                 Description = "seed desc 2"
             };
-            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[1] });
+            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[1] });
 
             homeEntity = new HomeEntity()
             {
                 Name = "seed 3",
                 Description = "seed desc 3"
             };
-            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[2] });
+            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[2] });
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace HomeInv.Business.Tests
             };
 
             // act
-            var request = new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[0] };
+            var request = new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[0] };
             var actual = homeService.CreateHome(request);
             var expected = context.Homes.Find(4);
             string actualInsertUserId = expected.InsertUserId;
@@ -74,12 +74,12 @@ namespace HomeInv.Business.Tests
                 Name = "test home 1",
                 Description = "test desc 1"
             };
-            var request = new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[0] };
+            var request = new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[0] };
             homeService.CreateHome(request);
 
             // act
             var expected = context.Homes.Where(q => q.InsertUserId == userIds[0]);
-            var request2 = new GetHomesOfUserRequest() { UserId = userIds[0] };
+            var request2 = new GetHomesOfUserRequest() { RequestUserId = userIds[0] };
             var actual = homeService.GetHomesOfUser(request2);
 
             // assert
@@ -96,7 +96,7 @@ namespace HomeInv.Business.Tests
             context.SaveChanges();
 
             // act
-            var request2 = new GetHomesOfUserRequest() { UserId = userIds[0] };
+            var request2 = new GetHomesOfUserRequest() { RequestUserId = userIds[0] };
             var actual = homeService.GetHomesOfUser(request2);
 
             // assert

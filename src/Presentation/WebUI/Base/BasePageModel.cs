@@ -72,7 +72,7 @@ namespace WebUI.Base
             if(User != null && User.Identity.IsAuthenticated)
             {
                 IHomeService homeService = new HomeService(dbContext);
-                GetHomesOfUserRequest request = new GetHomesOfUserRequest { UserId = UserId };
+                GetHomesOfUserRequest request = new GetHomesOfUserRequest { RequestUserId = UserId };
                 var homesResponse = homeService.GetHomesOfUser(request);
                 string homePath = "/Home/Create";
                 if (homesResponse.Homes.Count == 0 && context.ActionDescriptor.ViewEnginePath != homePath)

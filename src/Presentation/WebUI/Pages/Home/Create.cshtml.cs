@@ -1,6 +1,7 @@
 using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Home;
+using HomeInv.Common.ServiceContracts.HomeUser;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -28,13 +29,20 @@ namespace WebUI.Pages.Home
 
         protected override IActionResult OnModelPost()
         {
-            var request = new CreateHomeRequest()
+            var createHomeRequest = new CreateHomeRequest()
             {
                 HomeEntity = Home,
-                UserId = UserId
+                RequestUserId = UserId
             };
-            var home = homeService.CreateHome(request);
-            homeUserService.InsertHomeUser(home.HomeEntity.Id, UserId, "owner");
+            var home = homeService.CreateHome(createHomeRequest);
+            var insertHomeUserRequest = new InsertHomeUserRequest()
+            {
+                HomeId = home.HomeEntity.Id,
+                UserId = UserId,
+                Role = "owner",
+                RequestUserId = UserId
+            };
+            homeUserService.InsertHomeUser(insertHomeUserRequest);
 
             return RedirectToPage("/Index");
         }
