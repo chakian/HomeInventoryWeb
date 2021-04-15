@@ -1,6 +1,7 @@
 ﻿using HomeInv.Business.Base;
 using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
+using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using System;
@@ -15,17 +16,18 @@ namespace HomeInv.Business
         {
         }
 
-        public HomeEntity CreateHome(HomeEntity homeEntity, string userId)
+        public CreateHomeResponse CreateHome(CreateHomeRequest request)
         {
-            Home home = CreateNewAuditableObject<Home>(userId);
-            home.Name = homeEntity.Name;
-            home.Description = homeEntity.Description;
+            CreateHomeResponse response = new CreateHomeResponse();
+            Home home = CreateNewAuditableObject<Home>(request.UserId);
+            home.Name = request.HomeEntity.Name;
+            home.Description = request.HomeEntity.Description;
             
             context.Homes.Add(home);
             context.SaveChanges();
-            
-            homeEntity.Id = home.Id;
-            return homeEntity;
+
+            response.HomeEntity = ConvertHomeToHomeEntity(home);
+            return response;
         }
 
         private IQueryable<Home> GetHomesOfUserInternal(string userId)
@@ -44,15 +46,17 @@ namespace HomeInv.Business
             };
         }
 
-        public List<HomeEntity> GetHomesOfUser(string userId)
+        public GetHomesOfUserResponse GetHomesOfUser(GetHomesOfUserRequest request)
         {
-            var homes = GetHomesOfUserInternal(userId);
+            GetHomesOfUserResponse response = new GetHomesOfUserResponse();
+            var homes = GetHomesOfUserInternal(request.UserId);
             List<HomeEntity> homeEntities = new List<HomeEntity>();
             foreach (var home in homes)
             {
                 homeEntities.Add(ConvertHomeToHomeEntity(home));
             }
-            return homeEntities;
+            response.Homes = homeEntities;
+            return response;
         }
     }
 }
