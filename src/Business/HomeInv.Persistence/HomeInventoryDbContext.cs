@@ -12,5 +12,6 @@ namespace HomeInv.Persistence
         }
 
         public virtual DbSet<Home> Homes { get; set; }
+        public virtual DbSet<HomeUser> HomeUsers { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
+using HomeInv.Common.ServiceContracts.Home;
 using System;
 using System.Linq;
 using Xunit;
@@ -22,21 +23,21 @@ namespace HomeInv.Business.Tests
                 Name = "seed 1",
                 Description = "seed desc 1"
             };
-            homeService.CreateHome(homeEntity, userIds[0]);
+            var home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[0] });
 
             homeEntity = new HomeEntity()
             {
                 Name = "seed 2",
                 Description = "seed desc 2"
             };
-            homeService.CreateHome(homeEntity, userIds[1]);
+            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[1] });
 
             homeEntity = new HomeEntity()
             {
                 Name = "seed 3",
                 Description = "seed desc 3"
             };
-            homeService.CreateHome(homeEntity, userIds[2]);
+            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[2] });
         }
 
         [Fact]
@@ -52,12 +53,14 @@ namespace HomeInv.Business.Tests
             };
 
             // act
-            var expected = homeService.CreateHome(homeEntity, userIds[0]);
-            var actual = context.Homes.Find(4);
+            var request = new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[0] };
+            var actual = homeService.CreateHome(request);
+            var expected = context.Homes.Find(4);
+            string actualInsertUserId = expected.InsertUserId;
 
             // assert
-            Assert.Equal(expected.Name, actual.Name);
-            Assert.Equal(userIds[0], actual.InsertUserId);
+            Assert.Equal(expected.Name, actual.HomeEntity.Name);
+            Assert.Equal(userIds[0], actualInsertUserId);
         }
 
         [Fact]
@@ -71,14 +74,16 @@ namespace HomeInv.Business.Tests
                 Name = "test home 1",
                 Description = "test desc 1"
             };
-            homeService.CreateHome(homeEntity, userIds[0]);
+            var request = new CreateHomeRequest() { HomeEntity = homeEntity, UserId = userIds[0] };
+            homeService.CreateHome(request);
 
             // act
             var expected = context.Homes.Where(q => q.InsertUserId == userIds[0]);
-            var actual = homeService.GetHomesOfUser(userIds[0]);
+            var request2 = new GetHomesOfUserRequest() { UserId = userIds[0] };
+            var actual = homeService.GetHomesOfUser(request2);
 
             // assert
-            Assert.Equal(expected.Count(), actual.Count());
+            Assert.Equal(expected.Count(), actual.Homes.Count());
         }
 
         [Fact]
@@ -91,10 +96,11 @@ namespace HomeInv.Business.Tests
             context.SaveChanges();
 
             // act
-            var actual = homeService.GetHomesOfUser(userIds[0]);
+            var request2 = new GetHomesOfUserRequest() { UserId = userIds[0] };
+            var actual = homeService.GetHomesOfUser(request2);
 
             // assert
-            Assert.Empty(actual);
+            Assert.Empty(actual.Homes);
         }
     }
 }

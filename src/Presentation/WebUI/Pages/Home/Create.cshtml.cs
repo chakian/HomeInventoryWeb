@@ -1,5 +1,7 @@
 using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
+using HomeInv.Common.ServiceContracts.Home;
+using HomeInv.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebUI.Base;
@@ -8,8 +10,12 @@ namespace WebUI.Pages.Home
 {
     public class CreateModel : BasePageModel<CreateModel>
     {
-        public CreateModel(ILogger<CreateModel> logger, IHomeService homeService) : base(logger, homeService)
+        readonly IHomeService homeService;
+        readonly IHomeUserService homeUserService;
+        public CreateModel(ILogger<CreateModel> logger, HomeInventoryDbContext dbContext, IHomeService homeService, IHomeUserService homeUserService) : base(logger, dbContext)
         {
+            this.homeUserService = homeUserService;
+            this.homeService = homeService;
         }
 
         [BindProperty]
@@ -20,14 +26,15 @@ namespace WebUI.Pages.Home
             return Page();
         }
 
-        public IActionResult OnPostAsync()
+        protected override IActionResult OnModelPost()
         {
-            if (!ModelState.IsValid)
+            var request = new CreateHomeRequest()
             {
-                return Page();
-            }
-
-            homeService.CreateHome(Home, UserId);
+                HomeEntity = Home,
+                UserId = UserId
+            };
+            var home = homeService.CreateHome(request);
+            homeUserService.InsertHomeUser(home.HomeEntity.Id, UserId, "owner");
 
             return RedirectToPage("/Index");
         }
