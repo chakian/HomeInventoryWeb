@@ -52,10 +52,11 @@ namespace HomeInv.Business.Tests
 
             // act
             var expected = homeService.CreateHome(homeEntity, userIds[0]);
-            var actual = context.Homes.Find(1);
+            var actual = context.Homes.Find(4);
 
             // assert
             Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(userIds[0], actual.InsertUserId);
         }
     }
 }

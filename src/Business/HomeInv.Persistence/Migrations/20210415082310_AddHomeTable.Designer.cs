@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeInv.Persistence.Migrations
 {
     [DbContext(typeof(HomeInventoryDbContext))]
-    [Migration("20210414142254_AddHomeTable")]
+    [Migration("20210415082310_AddHomeTable")]
     partial class AddHomeTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,8 +23,10 @@ namespace HomeInv.Persistence.Migrations
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.Home", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -34,6 +36,9 @@ namespace HomeInv.Persistence.Migrations
 
                     b.Property<string>("InsertUserId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");

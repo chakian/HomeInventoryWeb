@@ -1,12 +1,8 @@
 ﻿using HomeInv.Business.Base;
 using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
-using HomeInv.Common.Settings;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
-using Microsoft.Extensions.Options;
-using System;
-using System.Linq;
 
 namespace HomeInv.Business
 {
