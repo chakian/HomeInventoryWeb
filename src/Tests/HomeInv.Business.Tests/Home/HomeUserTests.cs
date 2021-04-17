@@ -1,6 +1,4 @@
-﻿using HomeInv.Common.Entities;
-using HomeInv.Common.Interfaces.Services;
-using HomeInv.Common.ServiceContracts.Home;
+﻿using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.HomeUser;
 using System;
 using System.Linq;
@@ -16,33 +14,6 @@ namespace HomeInv.Business.Tests
 
         protected override void SeedData()
         {
-            var context = GetContext();
-            IHomeService homeService = new HomeService(context);
-            IHomeUserService homeUserService = new HomeUserService(context);
-
-            HomeEntity homeEntity = new HomeEntity()
-            {
-                Name = "seed 1",
-                Description = "seed desc 1"
-            };
-            var home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[0] });
-            homeUserService.InsertHomeUser(new InsertHomeUserRequest() { HomeId = home.HomeEntity.Id, UserId = userIds[0], Role = "owner", RequestUserId = userIds[0] });
-
-            homeEntity = new HomeEntity()
-            {
-                Name = "seed 2",
-                Description = "seed desc 2"
-            };
-            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[1] });
-            homeUserService.InsertHomeUser(new InsertHomeUserRequest() { HomeId = home.HomeEntity.Id, UserId = userIds[1], Role = "owner", RequestUserId = userIds[0] });
-
-            homeEntity = new HomeEntity()
-            {
-                Name = "seed 3",
-                Description = "seed desc 3"
-            };
-            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[2] });
-            homeUserService.InsertHomeUser(new InsertHomeUserRequest() { HomeId = home.HomeEntity.Id, UserId = userIds[2], Role = "owner", RequestUserId = userIds[0] });
         }
 
         [Fact]

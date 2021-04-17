@@ -49,6 +49,41 @@ namespace HomeInv.Business.Tests
                 Email = "test1@ab.cd",
                 PasswordHash = Guid.NewGuid().ToString()
             });
+
+            var homeId = context.Homes.Add(new Persistence.Dbo.Home()
+            {
+                Name = "seed 1",
+                Description = "seed desc 1"
+            }).Entity.Id;
+            context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
+            {
+                HomeId = homeId,
+                UserId = userIds[0],
+                Role = "owner"
+            });
+            homeId = context.Homes.Add(new Persistence.Dbo.Home()
+            {
+                Name = "seed 2",
+                Description = "seed desc 2"
+            }).Entity.Id;
+            context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
+            {
+                HomeId = homeId,
+                UserId = userIds[1],
+                Role = "owner"
+            });
+            homeId = context.Homes.Add(new Persistence.Dbo.Home()
+            {
+                Name = "seed 3",
+                Description = "seed desc 3"
+            }).Entity.Id;
+            context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
+            {
+                HomeId = homeId,
+                UserId = userIds[2],
+                Role = "owner"
+            });
+
             context.SaveChanges();
 
             SeedData();

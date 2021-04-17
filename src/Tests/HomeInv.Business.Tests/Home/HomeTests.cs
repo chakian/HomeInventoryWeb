@@ -15,29 +15,6 @@ namespace HomeInv.Business.Tests
 
         protected override void SeedData()
         {
-            var context = GetContext();
-            IHomeService homeService = new HomeService(context);
-
-            HomeEntity homeEntity = new HomeEntity()
-            {
-                Name = "seed 1",
-                Description = "seed desc 1"
-            };
-            var home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[0] });
-
-            homeEntity = new HomeEntity()
-            {
-                Name = "seed 2",
-                Description = "seed desc 2"
-            };
-            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[1] });
-
-            homeEntity = new HomeEntity()
-            {
-                Name = "seed 3",
-                Description = "seed desc 3"
-            };
-            home = homeService.CreateHome(new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[2] });
         }
 
         [Fact]
