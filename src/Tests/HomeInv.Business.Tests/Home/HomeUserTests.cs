@@ -24,7 +24,14 @@ namespace HomeInv.Business.Tests
             var context = GetContext();
             IHomeUserService homeUserService = new HomeUserService(context);
             var homeId = context.Homes.First().Id;
-            var userId = userIds[1];
+            string userId = Guid.NewGuid().ToString();
+            context.Users.Add(new Persistence.Dbo.User()
+            {
+                Id = userId,
+                UserName = "testuser@ab.cd",
+                Email = "testuser@ab.cd",
+                PasswordHash = Guid.NewGuid().ToString()
+            });
             var role = "owner";
 
             // act
