@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ItemNameExists" xml:space="preserve">
+    <value>Bu evde, bu isimde bir nesne zaten var!</value>
+  </data>
   <data name="UserAlreadyHasAHome" xml:space="preserve">
     <value>Bu kullanıcının mevcut bir evi bulunuyor!</value>
   </data>

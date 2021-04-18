@@ -1,4 +1,5 @@
-﻿using HomeInv.Common.Interfaces.Services;
+﻿using HomeInv.Common.Entities;
+using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
@@ -29,6 +30,15 @@ namespace HomeInv.Business.Base
         {
             dbo.UpdateUserId = userId;
             dbo.UpdateTime = DateTime.UtcNow;
+        }
+
+        protected U ConvertBaseDboToEntityBase<T, U>(T dbo)
+            where T : BaseDbo
+            where U : EntityBase, new()
+        {
+            U entity = new U();
+            entity.Id = dbo.Id;
+            return entity;
         }
     }
 }

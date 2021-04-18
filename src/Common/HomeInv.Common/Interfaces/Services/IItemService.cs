@@ -1,18 +1,13 @@
-﻿using HomeInv.Common.Entities;
-using System.Linq;
+﻿using HomeInv.Common.ServiceContracts.Item;
 
 namespace HomeInv.Common.Interfaces.Services
 {
     public interface IItemService : IServiceBase
     {
-        IQueryable<Item> GetAllItems(bool includeInactive);
+        //GetAllItemsInHomeResponse GetAllItemsInHome(GetAllItemsInHomeRequest request, bool includeInactive);
 
-        Item GetItem(string id);
+        //GetItemResponse GetItem(GetItemRequest);
 
-        string CreateItem(Item newItem);
-
-        void EditItem(string id, Item editedItem);
-
-        void DeleteItem(string id);
+        CreateItemResponse CreateItem(CreateItemRequest request);
     }
 }

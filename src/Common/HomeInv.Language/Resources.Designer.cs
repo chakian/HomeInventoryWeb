@@ -61,6 +61,15 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bu evde, bu isimde bir nesne zaten var!.
+        /// </summary>
+        public static string ItemNameExists {
+            get {
+                return ResourceManager.GetString("ItemNameExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bu kullanıcının mevcut bir evi bulunuyor!.
         /// </summary>
         public static string UserAlreadyHasAHome {
