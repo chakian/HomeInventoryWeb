@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common\HomeInv.Common\HomeInv.Common.csproj" />
+    <ProjectReference Include="..\..\Common\HomeInv.Language\HomeInv.Language.csproj" />
     <ProjectReference Include="..\HomeInv.Persistence\HomeInv.Persistence.csproj" />
   </ItemGroup>
 

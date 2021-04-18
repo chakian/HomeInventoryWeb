@@ -66,6 +66,11 @@ namespace HomeInv.Common.ServiceContracts
                     Warning = 2,
                     Error = 3
                 }
+
+                public override string ToString()
+                {
+                    return Text;
+                }
             }
         }
         #endregion OperationResult

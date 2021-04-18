@@ -1,6 +1,7 @@
 ﻿using HomeInv.Business.Base;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.HomeUser;
+using HomeInv.Language;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using System.Linq;
@@ -18,7 +19,12 @@ namespace HomeInv.Business
             InsertHomeUserResponse response = new InsertHomeUserResponse();
             if (context.HomeUsers.Any(q => q.HomeId == request.HomeId && q.UserId == request.UserId))
             {
-                response.AddError("Bu kullanıcı zaten bu evde mevcut");
+                response.AddError(Resources.UserIsAlreadyInThatHome);
+                return response;
+            }
+            else if (context.HomeUsers.Any(q => q.UserId == request.UserId))
+            {
+                response.AddError(Resources.UserAlreadyHasAHome);
                 return response;
             }
 
