@@ -5,11 +5,12 @@
 }
 
 <h1>Evlerim</h1>
+<h4><a asp-page="Create">Yeni Ev Oluştur</a></h4>
 <hr />
 
-<div class="row">
-    <div class="col-6">Evin Adı</div>
-    <div class="col-6">Evin Açıklaması</div>
+<div class="row border-bottom">
+    <div class="col-6 font-weight-bold">Evin Adı</div>
+    <div class="col-6 font-weight-bold">Evin Açıklaması</div>
 </div>
 @foreach (var home in Model.Homes)
 {
