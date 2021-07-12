@@ -13,7 +13,10 @@ namespace WebUI.Pages.Home
     {
         readonly IHomeService homeService;
         readonly IHomeUserService homeUserService;
-        public CreateModel(ILogger<CreateModel> logger, HomeInventoryDbContext dbContext, IHomeService homeService, IHomeUserService homeUserService) : base(logger, dbContext)
+        public CreateModel(ILogger<CreateModel> logger, 
+            HomeInventoryDbContext dbContext, 
+            IHomeService<HomeInv.Persistence.Dbo.BaseDbo> homeService, 
+            IHomeUserService homeUserService) : base(logger, dbContext)
         {
             this.homeUserService = homeUserService;
             this.homeService = homeService;

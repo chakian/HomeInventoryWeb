@@ -71,7 +71,7 @@ namespace WebUI.Base
         {
             if(User != null && User.Identity.IsAuthenticated)
             {
-                IHomeService homeService = new HomeService(dbContext);
+                var homeService = new HomeService(dbContext);
                 GetHomesOfUserRequest request = new GetHomesOfUserRequest { RequestUserId = UserId };
                 var homesResponse = homeService.GetHomesOfUser(request);
                 string homePath = "/Home/Create";

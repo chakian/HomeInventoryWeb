@@ -1,0 +1,20 @@
+﻿@page
+@model WebUI.Pages.Home.ListModel
+@{
+    ViewData["Title"] = "Evlerim";
+}
+
+<h1>Evlerim</h1>
+<hr />
+
+<div class="row">
+    <div class="col-6">Evin Adı</div>
+    <div class="col-6">Evin Açıklaması</div>
+</div>
+@foreach (var home in Model.Homes)
+{
+    <div class="row">
+        <div class="col-6">@(home.Name)</div>
+        <div class="col-6">@(home.Description)</div>
+    </div>
+}
