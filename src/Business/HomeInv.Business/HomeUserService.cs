@@ -1,4 +1,5 @@
 ﻿using HomeInv.Business.Base;
+using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.HomeUser;
 using HomeInv.Language;
@@ -8,10 +9,15 @@ using System.Linq;
 
 namespace HomeInv.Business
 {
-    public class HomeUserService : ServiceBase, IHomeUserService
+    public class HomeUserService : AuditableServiceBase<HomeUser, HomeUserEntity>, IHomeUserService<HomeUser>
     {
         public HomeUserService(HomeInventoryDbContext _context) : base(_context)
         {
+        }
+
+        public override HomeUserEntity ConvertDboToEntity(HomeUser dbo)
+        {
+            throw new System.NotImplementedException();
         }
 
         public InsertHomeUserResponse InsertHomeUser(InsertHomeUserRequest request)
@@ -28,7 +34,7 @@ namespace HomeInv.Business
                 return response;
             }
 
-            HomeUser homeUser = CreateNewAuditableObject<HomeUser>(request);
+            HomeUser homeUser = CreateNewAuditableObject(request);
             homeUser.HomeId = request.HomeId;
             homeUser.UserId = request.UserId;
             homeUser.Role = request.Role;

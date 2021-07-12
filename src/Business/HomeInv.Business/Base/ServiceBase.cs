@@ -4,41 +4,62 @@ using HomeInv.Common.ServiceContracts;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using System;
+using System.Linq;
 
 namespace HomeInv.Business.Base
 {
-    public abstract class ServiceBase : IServiceBase
+    public abstract class AuditableServiceBase<D, E> : ServiceBase<D, E>, IAuditableServiceBase<D, E>
+        where D : BaseAuditableDbo, new()
+        where E : EntityBase, new()
     {
-        protected readonly HomeInventoryDbContext context;
-        public ServiceBase(HomeInventoryDbContext _context)
+        public AuditableServiceBase(HomeInventoryDbContext _context) : base(_context)
         {
-            context = _context;
         }
 
-        protected T CreateNewAuditableObject<T>(BaseRequest request, bool isActive = true)
-            where T : BaseAuditableDbo, new()
+        public D CreateNewAuditableObject(BaseRequest request, bool isActive = true)
         {
-            T dbo = new T();
+            D dbo = new D();
             dbo.InsertUserId = request.RequestUserId;
             dbo.InsertTime = DateTime.UtcNow;
             dbo.IsActive = isActive;
             return dbo;
         }
 
-        protected void UpdateAuditableObject<T>(T dbo, string userId)
-            where T : BaseAuditableDbo
+        public void UpdateAuditableObject(D dbo, string userId)
         {
             dbo.UpdateUserId = userId;
             dbo.UpdateTime = DateTime.UtcNow;
         }
 
-        protected U ConvertBaseDboToEntityBase<T, U>(T dbo)
-            where T : BaseDbo
-            where U : EntityBase, new()
+        public E ConvertBaseDboToEntityBase(D dbo)
         {
-            U entity = new U();
+            E entity = new E();
             entity.Id = dbo.Id;
             return entity;
+        }
+    }
+    public abstract class ServiceBase<D, E> : ServiceBase, IServiceBase<D, E>
+        where D : BaseDbo
+        where E : EntityBase, new()
+    {
+        public ServiceBase(HomeInventoryDbContext _context) : base(_context)
+        {
+        }
+
+        public IQueryable<D> GetAllActiveAsQueryable()
+        {
+            return context.Set<D>().Where(set => set.IsActive);
+        }
+
+        public abstract E ConvertDboToEntity(D dbo);
+    }
+
+    public abstract class ServiceBase : IServiceBase
+    {
+        protected readonly HomeInventoryDbContext context;
+        public ServiceBase(HomeInventoryDbContext _context)
+        {
+            context = _context;
         }
     }
 }

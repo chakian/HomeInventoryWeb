@@ -6,4 +6,9 @@ namespace HomeInv.Common.Interfaces.Services
     {
         InsertHomeUserResponse InsertHomeUser(InsertHomeUserRequest request);
     }
+
+    public interface IHomeUserService<D> : IHomeUserService, IServiceBase<D, Entities.HomeUserEntity>
+        where D : class
+    {
+    }
 }

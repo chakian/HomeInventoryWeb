@@ -45,8 +45,15 @@ namespace WebUI
                 .AddEntityFrameworkStores<HomeInventoryDbContext>();
             services.AddRazorPages();
 
+            ConfigureInternalServices(services);
+        }
+
+        private void ConfigureInternalServices(IServiceCollection services)
+        {
             services.AddScoped<IHomeService, HomeService>();
             services.AddScoped<IHomeUserService, HomeUserService>();
+
+            //services.AddScoped<IItemService, ItemService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

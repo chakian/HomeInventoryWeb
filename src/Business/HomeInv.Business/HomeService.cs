@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace HomeInv.Business
 {
-    public class HomeService : ServiceBase, IHomeService
+    public class HomeService : AuditableServiceBase<Home, HomeEntity>, IHomeService<Home>
     {
         public HomeService(HomeInventoryDbContext _context) : base(_context)
         {
@@ -18,14 +18,14 @@ namespace HomeInv.Business
         public CreateHomeResponse CreateHome(CreateHomeRequest request)
         {
             CreateHomeResponse response = new CreateHomeResponse();
-            Home home = CreateNewAuditableObject<Home>(request);
+            Home home = CreateNewAuditableObject(request);
             home.Name = request.HomeEntity.Name;
             home.Description = request.HomeEntity.Description;
             
             context.Homes.Add(home);
             context.SaveChanges();
 
-            response.HomeEntity = ConvertHomeToHomeEntity(home);
+            response.HomeEntity = ConvertDboToEntity(home);
             return response;
         }
 
@@ -35,13 +35,13 @@ namespace HomeInv.Business
             return homes;
         }
 
-        private HomeEntity ConvertHomeToHomeEntity(Home home)
+        public override HomeEntity ConvertDboToEntity(Home dbo)
         {
             return new HomeEntity()
             {
-                Id = home.Id,
-                Name = home.Name,
-                Description = home.Description
+                Id = dbo.Id,
+                Name = dbo.Name,
+                Description = dbo.Description
             };
         }
 
@@ -52,7 +52,7 @@ namespace HomeInv.Business
             List<HomeEntity> homeEntities = new List<HomeEntity>();
             foreach (var home in homes)
             {
-                homeEntities.Add(ConvertHomeToHomeEntity(home));
+                homeEntities.Add(ConvertDboToEntity(home));
             }
             response.Homes = homeEntities;
             return response;
