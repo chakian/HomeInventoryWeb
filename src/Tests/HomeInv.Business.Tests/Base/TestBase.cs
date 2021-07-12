@@ -22,6 +22,7 @@ namespace HomeInv.Business.Tests
         private void SeedUserData()
         {
             var context = GetContext();
+            #region Prepare Users
             string userId = Guid.NewGuid().ToString();
             userIds.Add(userId);
             context.Users.Add(new Persistence.Dbo.User()
@@ -49,40 +50,73 @@ namespace HomeInv.Business.Tests
                 Email = "test1@ab.cd",
                 PasswordHash = Guid.NewGuid().ToString()
             });
+            #endregion
 
-            var homeId = context.Homes.Add(new Persistence.Dbo.Home()
+            #region Prepare Homes
+            var homeId1 = context.Homes.Add(new Persistence.Dbo.Home()
             {
                 Name = "seed 1",
-                Description = "seed desc 1"
+                Description = "seed desc 1",
+                //IsActive = true
             }).Entity.Id;
-            context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
-            {
-                HomeId = homeId,
-                UserId = userIds[0],
-                Role = "owner"
-            });
-            homeId = context.Homes.Add(new Persistence.Dbo.Home()
+            var homeId2 = context.Homes.Add(new Persistence.Dbo.Home()
             {
                 Name = "seed 2",
-                Description = "seed desc 2"
+                Description = "seed desc 2",
+                //IsActive = true
             }).Entity.Id;
-            context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
-            {
-                HomeId = homeId,
-                UserId = userIds[1],
-                Role = "owner"
-            });
-            homeId = context.Homes.Add(new Persistence.Dbo.Home()
+            var homeId3 = context.Homes.Add(new Persistence.Dbo.Home()
             {
                 Name = "seed 3",
-                Description = "seed desc 3"
+                Description = "seed desc 3",
+                //IsActive = true
             }).Entity.Id;
+            #endregion
+
+            #region Prepare Home Users
             context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
             {
-                HomeId = homeId,
-                UserId = userIds[2],
-                Role = "owner"
+                HomeId = homeId1,
+                UserId = userIds[0],
+                Role = "owner",
+                //IsActive = true
             });
+            context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
+            {
+                HomeId = homeId2,
+                UserId = userIds[1],
+                Role = "owner",
+                //IsActive = true
+            });
+            context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
+            {
+                HomeId = homeId3,
+                UserId = userIds[2],
+                Role = "owner",
+                //IsActive = true
+            });
+            #endregion
+
+            #region Prepare Areas
+            //context.Areas.Add(new Persistence.Dbo.Area()
+            //{
+            //    HomeId = homeId1,
+            //    Name = "Area1",
+            //    IsActive = true
+            //});
+            //context.Areas.Add(new Persistence.Dbo.Area()
+            //{
+            //    HomeId = homeId2,
+            //    Name = "Area2",
+            //    IsActive = true
+            //});
+            //context.Areas.Add(new Persistence.Dbo.Area()
+            //{
+            //    HomeId = homeId3,
+            //    Name = "Area3",
+            //    IsActive = true
+            //});
+            #endregion
 
             context.SaveChanges();
 
