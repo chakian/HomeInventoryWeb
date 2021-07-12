@@ -21,7 +21,14 @@ namespace HomeInv.Persistence
         {
             base.OnModelCreating(builder);
 
-            AuditableEntityConfiguration.Configure(builder);
+            AuditableDboConfiguration.Configure(builder);
+
+            //builder.Entity<HomeUser>()
+            //    .HasOne(homeUser => homeUser.User)
+            //    .WithMany(user => user.HomeUsers)
+            //    .HasForeignKey(homeUser => homeUser.UserId)
+            //    .IsRequired()
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             //builder.Entity<Area>()
             //    .HasOne(area => area.Home)
@@ -37,7 +44,7 @@ namespace HomeInv.Persistence
             //    .HasOne(item => item.Category)
             //    .WithMany(category => category.Items)
             //    .IsRequired();
-            
+
             //builder.Entity<ItemStock>()
             //    .HasOne(item => item.Area)
             //    .WithMany(area => area.ItemStocks)
