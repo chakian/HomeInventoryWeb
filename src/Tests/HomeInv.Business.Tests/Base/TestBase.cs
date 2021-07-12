@@ -57,7 +57,7 @@ namespace HomeInv.Business.Tests
             {
                 Name = "seed 1",
                 Description = "seed desc 1",
-                //IsActive = true
+                IsActive = true
             }).Entity.Id;
             var homeId2 = context.Homes.Add(new Persistence.Dbo.Home()
             {
@@ -79,7 +79,7 @@ namespace HomeInv.Business.Tests
                 HomeId = homeId1,
                 UserId = userIds[0],
                 Role = "owner",
-                //IsActive = true
+                IsActive = true
             });
             context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
             {

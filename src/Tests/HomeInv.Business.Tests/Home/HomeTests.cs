@@ -46,18 +46,29 @@ namespace HomeInv.Business.Tests
             // arrange
             var context = GetContext();
             IHomeService homeService = new HomeService(context);
-            HomeEntity homeEntity = new HomeEntity()
+            var homeId = context.Homes.Add(new Persistence.Dbo.Home()
             {
                 Name = "test home 1",
-                Description = "test desc 1"
-            };
-            var request = new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[0] };
-            homeService.CreateHome(request);
-
+                Description = "test desc 1",
+                IsActive = true
+            }).Entity.Id;
+            context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
+            {
+                HomeId = homeId,
+                UserId = userIds[0],
+                Role = "owner",
+                IsActive = true
+            });
+            context.SaveChanges();
+            
             // act
-            var expected = context.Homes.Where(q => q.InsertUserId == userIds[0]);
-            var request2 = new GetHomesOfUserRequest() { RequestUserId = userIds[0] };
-            var actual = homeService.GetHomesOfUser(request2);
+            var expected = context.Homes.Join(context.HomeUsers,
+                home => home.Id,
+                homeUser => homeUser.HomeId,
+                (home, homeUser) => new { Home = home, HomeUser = homeUser })
+                .Where(homeAndUser => homeAndUser.HomeUser.UserId == userIds[0]);
+            var request = new GetHomesOfUserRequest() { RequestUserId = userIds[0] };
+            var actual = homeService.GetHomesOfUser(request);
 
             // assert
             Assert.Equal(expected.Count(), actual.Homes.Count());
@@ -69,12 +80,12 @@ namespace HomeInv.Business.Tests
             // arrange
             var context = GetContext();
             IHomeService homeService = new HomeService(context);
-            context.Homes.RemoveRange(context.Homes.Where(q => q.InsertUserId == userIds[0]));
+            context.HomeUsers.RemoveRange(context.HomeUsers.Where(q => q.UserId == userIds[0]));
             context.SaveChanges();
 
             // act
-            var request2 = new GetHomesOfUserRequest() { RequestUserId = userIds[0] };
-            var actual = homeService.GetHomesOfUser(request2);
+            var request = new GetHomesOfUserRequest() { RequestUserId = userIds[0] };
+            var actual = homeService.GetHomesOfUser(request);
 
             // assert
             Assert.Empty(actual.Homes);

@@ -4,6 +4,7 @@ using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,8 +22,9 @@ namespace HomeInv.Business
             Home home = CreateNewAuditableObject(request);
             home.Name = request.HomeEntity.Name;
             home.Description = request.HomeEntity.Description;
-            
+
             context.Homes.Add(home);
+            //context.Entry(home).State = EntityState.Added;
             context.SaveChanges();
 
             response.HomeEntity = ConvertDboToEntity(home);
@@ -31,8 +33,13 @@ namespace HomeInv.Business
 
         private IQueryable<Home> GetHomesOfUserInternal(string userId)
         {
-            var homes = context.Homes.Where(q => q.InsertUserId == userId);
-            return homes;
+            var homes = GetAllActiveAsQueryable().Join(context.HomeUsers,
+                home => home.Id,
+                homeUser => homeUser.HomeId,
+                (home, homeUser) => new { Home = home, HomeUser = homeUser })
+                .Where(homeAndUser => homeAndUser.HomeUser.UserId == userId && homeAndUser.HomeUser.IsActive);
+
+            return homes.Select(homeAndUser => homeAndUser.Home);
         }
 
         public override HomeEntity ConvertDboToEntity(Home dbo)
