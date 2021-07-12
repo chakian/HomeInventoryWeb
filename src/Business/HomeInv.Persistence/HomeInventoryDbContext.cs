@@ -11,29 +11,19 @@ namespace HomeInv.Persistence
         {
         }
 
+        public virtual DbSet<Area> Areas { get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Home> Homes { get; set; }
         public virtual DbSet<HomeUser> HomeUsers { get; set; }
-        //public virtual DbSet<Area> Areas { get; set; }
-        //public virtual DbSet<Item> Items { get; set; }
-        //public virtual DbSet<ItemStock> ItemStocks { get; set; }
+        public virtual DbSet<Item> Items { get; set; }
+        public virtual DbSet<ItemStock> ItemStocks { get; set; }
+        public virtual DbSet<SizeUnit> SizeUnits { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
             AuditableDboConfiguration.Configure(builder);
-
-            //builder.Entity<HomeUser>()
-            //    .HasOne(homeUser => homeUser.User)
-            //    .WithMany(user => user.HomeUsers)
-            //    .HasForeignKey(homeUser => homeUser.UserId)
-            //    .IsRequired()
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<Area>()
-            //    .HasOne(area => area.Home)
-            //    .WithMany(home => home.Areas)
-            //    .IsRequired();
 
             //builder.Entity<Category>()
             //    .HasOne(category => category.ParentCategory)
@@ -54,6 +44,14 @@ namespace HomeInv.Persistence
             //    .HasOne(item => item.Container)
             //    .WithMany(container => container.ContainingItems)
             //    .IsRequired(false);
+
+            builder.Entity<SizeUnit>()
+                .Property(sizeUnit => sizeUnit.ConversionMultiplierToBase)
+                .HasPrecision(28, 14);
+
+            builder.Entity<Item>()
+                .Property(item => item.Size)
+                .HasPrecision(18, 2);
 
             //builder.Entity<Transaction>()
             //    .Property(b => b.Amount)

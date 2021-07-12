@@ -4,14 +4,16 @@ using HomeInv.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HomeInv.Persistence.Migrations
 {
     [DbContext(typeof(HomeInventoryDbContext))]
-    partial class HomeInventoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210712213718_Item_Stock_Area")]
+    partial class Item_Stock_Area
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

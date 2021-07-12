@@ -8,7 +8,7 @@ namespace HomeInv.Persistence.Dbo
         public DateTime InsertTime { get; set; }
         
         public string UpdateUserId { get; set; }
-        public DateTime UpdateTime { get; set; }
+        public DateTime? UpdateTime { get; set; }
 
         #region Related Objects
         public virtual User InsertUser { get; set; }

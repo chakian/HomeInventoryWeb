@@ -17,26 +17,34 @@ namespace HomeInv.Persistence
         /// <param name="modelBuilder"></param>
         public static void Configure(ModelBuilder modelBuilder)
         {
-            //Configure<HomeUser>(modelBuilder);
-            //Configure<Item>(modelBuilder);
-            //Configure<ItemStock>(modelBuilder);
-            //Configure<Area>(modelBuilder);
+            Configure<Area>(modelBuilder);
+            Configure<Home>(modelBuilder);
+            Configure<HomeUser>(modelBuilder);
+            Configure<Item>(modelBuilder);
+            Configure<ItemStock>(modelBuilder);
         }
 
-        private static void Configure<T>(ModelBuilder modelBuilder)
+        private static void Configure<T>(ModelBuilder modelBuilder, bool isUserBindingRequired = false)
             where T : BaseAuditableDbo
         {
-            modelBuilder.Entity<T>()
-                .HasOne(s => s.InsertUser)
-                .WithMany()
-                .HasForeignKey(e => e.InsertUserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            if (isUserBindingRequired)
+            {
+                modelBuilder.Entity<T>()
+                    .HasOne(s => s.InsertUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.InsertUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                modelBuilder.Entity<T>()
+                    .HasOne(s => s.UpdateUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.UpdateUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            }
 
             modelBuilder.Entity<T>()
-                .HasOne(s => s.UpdateUser)
-                .WithMany()
-                .HasForeignKey(e => e.UpdateUserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .Property(t => t.InsertTime)
+                .HasDefaultValue(DateTime.UtcNow);
         }
     }
 }
