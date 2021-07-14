@@ -9,6 +9,7 @@ namespace HomeInv.Persistence.Dbo
         public string Name { get; set; }
 
         public string Description { get; set; }
+        //TODO: ItemPhoto
         #endregion
 
         #region Category
