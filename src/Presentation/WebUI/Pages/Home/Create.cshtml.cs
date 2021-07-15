@@ -9,7 +9,7 @@ using WebUI.Base;
 
 namespace WebUI.Pages.Home
 {
-    public class CreateModel : BasePageModel<CreateModel>
+    public class CreateModel : BaseAuthenticatedPageModel<CreateModel>
     {
         readonly IHomeService homeService;
         readonly IHomeUserService homeUserService;

@@ -3,17 +3,10 @@ using HomeInv.Common.Interfaces.Services;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WebUI
 {
@@ -43,6 +36,10 @@ namespace WebUI
                 options.Password.RequireUppercase = false;
             })
                 .AddEntityFrameworkStores<HomeInventoryDbContext>();
+
+            services.AddSession();
+            //services.AddMemoryCache();
+
             services.AddRazorPages();
 
             ConfigureInternalServices(services);
@@ -52,7 +49,7 @@ namespace WebUI
         {
             services.AddScoped<IHomeService, HomeService>();
             services.AddScoped<IHomeUserService, HomeUserService>();
-
+            services.AddScoped<ICategoryService, CategoryService>();
             //services.AddScoped<IItemService, ItemService>();
         }
 
@@ -75,6 +72,8 @@ namespace WebUI
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseSession();
 
             app.UseRouting();
 

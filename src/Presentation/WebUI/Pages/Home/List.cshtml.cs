@@ -9,7 +9,7 @@ using WebUI.Base;
 
 namespace WebUI.Pages.Home
 {
-    public class ListModel : BasePageModel<ListModel>
+    public class ListModel : BaseAuthenticatedPageModel<ListModel>
     {
         readonly IHomeService homeService;
         public ListModel(ILogger<ListModel> logger, HomeInventoryDbContext dbContext, IHomeService homeService) : base(logger, dbContext)

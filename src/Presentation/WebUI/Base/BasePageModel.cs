@@ -1,12 +1,15 @@
 ﻿using HomeInv.Business;
+using HomeInv.Common.Constants;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.Persistence;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Security.Claims;
 
 namespace WebUI.Base
@@ -78,6 +81,11 @@ namespace WebUI.Base
                 if (homesResponse.Homes.Count == 0 && context.ActionDescriptor.ViewEnginePath != homePath)
                 {
                     context.Result = RedirectToPage(homePath);
+                }
+                else
+                {
+                    //TODO: Find default home and write to session
+                    context.HttpContext.Session.SetInt32(SessionKeys.DEFAULT_HOME_ID, 2);
                 }
             }
             base.OnPageHandlerExecuting(context);
