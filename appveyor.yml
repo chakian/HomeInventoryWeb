@@ -1,0 +1,29 @@
+image: Visual Studio 2019
+configuration: Release
+platform: Any CPU
+
+before_build:
+- cmd: nuget restore src/HomeInventoryWebApi.sln
+
+build:
+  project: src/HomeInventoryWebApi.sln
+  publish_wap: true
+  verbosity: minimal
+
+after_build:
+- ps: >-
+    dotnet publish --self-contained -r win-x86 -o publish/WebUI -c Release src\Presentation\WebUI/WebUI.csproj
+
+    7z a WebUI.zip .\publish\WebUI\*
+
+    appveyor PushArtifact WebUI.zip
+deploy:
+ - provider: Environment
+   name: Stok - Test
+   on:
+     branch: staging
+
+ - provider: Environment
+   name: Stok - LIVE
+   on:
+     branch: master
