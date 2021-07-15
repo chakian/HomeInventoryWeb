@@ -84,8 +84,11 @@ namespace WebUI.Base
                 }
                 else
                 {
-                    //TODO: Find default home and write to session
-                    context.HttpContext.Session.SetInt32(SessionKeys.DEFAULT_HOME_ID, 2);
+                    if (!context.HttpContext.Session.Keys.Contains(SessionKeys.DEFAULT_HOME_ID))
+                    {
+                        //TODO: Find default home and write to session
+                        context.HttpContext.Session.SetInt32(SessionKeys.DEFAULT_HOME_ID, homesResponse.Homes.First().Id);
+                    }
                 }
             }
             base.OnPageHandlerExecuting(context);

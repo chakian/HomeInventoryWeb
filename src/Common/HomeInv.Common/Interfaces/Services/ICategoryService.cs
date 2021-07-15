@@ -15,6 +15,7 @@ namespace HomeInv.Common.Interfaces.Services
     public interface ICategoryService : IServiceBase
     {
         CreateCategoryResponse CreateCategory(CreateCategoryRequest request);
-        GetCategoriesOfHomeResponse GetCategoriesOfHome(GetCategoriesOfHomeRequest request);
+        GetCategoriesOfHomeResponse GetCategoriesOfHome_Hierarchial(GetCategoriesOfHomeRequest request);
+        GetCategoriesOfHomeResponse GetCategoriesOfHome_Ordered(GetCategoriesOfHomeRequest request);
     }
 }

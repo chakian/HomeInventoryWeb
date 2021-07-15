@@ -1,0 +1,15 @@
+﻿<div class="row">
+    <div class="col-6">@(category.Name)</div>
+    <div class="col-6">@(category.Description)</div>
+</div>
+@if (category.HasChild)
+{
+    foreach (var child in category.Children)
+    {
+        <ListItem category="child" />
+    }
+}
+
+@code {
+    [Parameter] public HomeInv.Common.Entities.CategoryEntity category { get; set; }
+}

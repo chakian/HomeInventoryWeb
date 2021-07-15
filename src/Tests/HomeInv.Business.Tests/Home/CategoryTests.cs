@@ -35,9 +35,12 @@ namespace HomeInv.Business.Tests
             ICategoryService categoryService = new CategoryService(context);
             var request = new CreateCategoryRequest()
             {
-                CategoryName = categoryName,
-                Description = description,
-                ParentCategoryId = null,
+                CategoryEntity=new CategoryEntity()
+                {
+                    Name = categoryName,
+                    Description = description,
+                    ParentCategoryId = null
+                },
                 HomeId = home.Id,
                 RequestUserId = userIds[0]
             };
@@ -77,9 +80,12 @@ namespace HomeInv.Business.Tests
             ICategoryService categoryService = new CategoryService(context);
             var request = new CreateCategoryRequest()
             {
-                CategoryName = categoryName,
-                Description = description,
-                ParentCategoryId = null,
+                CategoryEntity = new CategoryEntity()
+                {
+                    Name = categoryName,
+                    Description = description,
+                    ParentCategoryId = null
+                },
                 HomeId = home.Id,
                 RequestUserId = userIds[0]
             };
@@ -127,7 +133,7 @@ namespace HomeInv.Business.Tests
             };
 
             // act
-            var actual = categoryService.GetCategoriesOfHome(request);
+            var actual = categoryService.GetCategoriesOfHome_Ordered(request);
 
             // assert
             Assert.NotNull(actual);
@@ -168,7 +174,7 @@ namespace HomeInv.Business.Tests
             };
 
             // act
-            var actual = categoryService.GetCategoriesOfHome(request);
+            var actual = categoryService.GetCategoriesOfHome_Ordered(request);
 
             // assert
             Assert.NotNull(actual);

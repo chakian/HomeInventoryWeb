@@ -1,0 +1,18 @@
+﻿@page
+@model WebUI.Pages.Category.ListModel
+@{
+    ViewData["Title"] = "Kategoriler";
+}
+
+<h1>Kategoriler</h1>
+<h4><a asp-page="Create">Yeni Kategori</a></h4>
+<hr />
+
+<div class="row border-bottom">
+    <div class="col-6 font-weight-bold">Kategori</div>
+    <div class="col-6 font-weight-bold">Açıklama</div>
+</div>
+@foreach (var category in Model.Categories)
+{
+    @(await Html.RenderComponentAsync<ListItem>( RenderMode.Static, new { category = category }))
+}
