@@ -44,7 +44,7 @@ namespace HomeInv.Persistence
 
             modelBuilder.Entity<T>()
                 .Property(t => t.InsertTime)
-                .HasDefaultValue(DateTime.UtcNow);
+                .HasDefaultValueSql("getdate()");
         }
     }
 }

@@ -12,5 +12,7 @@ namespace HomeInv.Persistence.Dbo
         //public virtual IEnumerable<Area> Areas { get; set; }
 
         public virtual IEnumerable<HomeUser> HomeUsers { get; set; }
+        
+        public virtual IEnumerable<Category> Categories { get; set; }
     }
 }

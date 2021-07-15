@@ -18,10 +18,9 @@ namespace HomeInv.Business.Base
 
         public D CreateNewAuditableObject(BaseRequest request, bool isActive = true)
         {
-            D dbo = new D();
+            D dbo = CreateNewObject(isActive);
             dbo.InsertUserId = request.RequestUserId;
             dbo.InsertTime = DateTime.UtcNow;
-            dbo.IsActive = isActive;
             return dbo;
         }
 
@@ -39,7 +38,7 @@ namespace HomeInv.Business.Base
         }
     }
     public abstract class ServiceBase<D, E> : ServiceBase, IServiceBase<D, E>
-        where D : BaseDbo
+        where D : BaseDbo, new()
         where E : EntityBase, new()
     {
         public ServiceBase(HomeInventoryDbContext _context) : base(_context)
@@ -49,6 +48,13 @@ namespace HomeInv.Business.Base
         public IQueryable<D> GetAllActiveAsQueryable()
         {
             return context.Set<D>().Where(set => set.IsActive);
+        }
+
+        public D CreateNewObject(bool isActive = true)
+        {
+            D dbo = new D();
+            dbo.IsActive = isActive;
+            return dbo;
         }
 
         public abstract E ConvertDboToEntity(D dbo);
