@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace HomeInv.Common.Entities
 {
@@ -10,5 +11,7 @@ namespace HomeInv.Common.Entities
 
         public bool HasParent { get; set; }
         public bool HasChild { get; set; }
+
+        public List<CategoryEntity> Children { get; set; }
     }
 }

@@ -61,6 +61,33 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ev seçimi olmadan kategori kaydedilemez!.
+        /// </summary>
+        public static string Category_HomeIsMandatory {
+            get {
+                return ResourceManager.GetString("Category_HomeIsMandatory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aynı isimde başka bir kategori mevcut.
+        /// </summary>
+        public static string Category_SameNameExists {
+            get {
+                return ResourceManager.GetString("Category_SameNameExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ev seçimi zorunludur..
+        /// </summary>
+        public static string HomeSelectionIsMandatory {
+            get {
+                return ResourceManager.GetString("HomeSelectionIsMandatory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bu evde, bu isimde bir nesne zaten var!.
         /// </summary>
         public static string ItemNameExists {

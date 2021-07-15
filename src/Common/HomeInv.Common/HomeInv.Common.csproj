@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="ServiceContracts\Category\" />
     <Folder Include="ServiceContracts\ItemStock\" />
   </ItemGroup>
 
