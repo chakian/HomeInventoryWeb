@@ -9,9 +9,9 @@ namespace HomeInv.Common.Interfaces.Services
 
     public interface IItemService : IServiceBase
     {
-        //GetAllItemsInHomeResponse GetAllItemsInHome(GetAllItemsInHomeRequest request, bool includeInactive);
+        GetAllItemsInHomeResponse GetAllItemsInHome(GetAllItemsInHomeRequest request, bool includeInactive = false);
 
-        //GetItemResponse GetItem(GetItemRequest);
+        GetItemResponse GetItem(GetItemRequest request);
 
         CreateItemResponse CreateItem(CreateItemRequest request);
     }

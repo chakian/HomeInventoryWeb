@@ -50,7 +50,7 @@ namespace WebUI
             services.AddScoped<IHomeService, HomeService>();
             services.AddScoped<IHomeUserService, HomeUserService>();
             services.AddScoped<ICategoryService, CategoryService>();
-            //services.AddScoped<IItemService, ItemService>();
+            services.AddScoped<IItemService, ItemService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

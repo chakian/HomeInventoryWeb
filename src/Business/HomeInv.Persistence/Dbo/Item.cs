@@ -12,6 +12,11 @@ namespace HomeInv.Persistence.Dbo
         //TODO: ItemPhoto
         #endregion
 
+        #region Home
+        public int HomeId { get; set; }
+        public virtual Home Home { get; set; }
+        #endregion
+
         #region Category
         public int CategoryId { get; set; }
         public virtual Category Category { get; set; }

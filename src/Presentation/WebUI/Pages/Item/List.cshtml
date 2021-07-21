@@ -1,0 +1,18 @@
+﻿@page
+@model WebUI.Pages.Item.ListModel
+@{
+    ViewData["Title"] = "İtemler";
+}
+
+<h1>İtemler</h1>
+<h4><a asp-page="Create">Yeni İtem</a></h4>
+<hr />
+
+<div class="row border-bottom">
+    <div class="col-6 font-weight-bold">İtem</div>
+    <div class="col-6 font-weight-bold">Açıklama</div>
+</div>
+@foreach (var item in Model.Items)
+{
+    @(await Html.RenderComponentAsync<ListItem>( RenderMode.Static, new { item = item }))
+}

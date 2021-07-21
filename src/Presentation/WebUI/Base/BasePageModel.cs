@@ -1,15 +1,9 @@
-﻿using HomeInv.Business;
-using HomeInv.Common.Constants;
-using HomeInv.Common.Interfaces.Services;
-using HomeInv.Common.ServiceContracts.Home;
-using HomeInv.Persistence;
-using Microsoft.AspNetCore.Http;
+﻿using HomeInv.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Security.Claims;
 
 namespace WebUI.Base
@@ -72,25 +66,9 @@ namespace WebUI.Base
 
         public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
         {
-            if(User != null && User.Identity.IsAuthenticated)
-            {
-                var homeService = new HomeService(dbContext);
-                GetHomesOfUserRequest request = new GetHomesOfUserRequest { RequestUserId = UserId };
-                var homesResponse = homeService.GetHomesOfUser(request);
-                string homePath = "/Home/Create";
-                if (homesResponse.Homes.Count == 0 && context.ActionDescriptor.ViewEnginePath != homePath)
-                {
-                    context.Result = RedirectToPage(homePath);
-                }
-                else
-                {
-                    if (!context.HttpContext.Session.Keys.Contains(SessionKeys.DEFAULT_HOME_ID))
-                    {
-                        //TODO: Find default home and write to session
-                        context.HttpContext.Session.SetInt32(SessionKeys.DEFAULT_HOME_ID, homesResponse.Homes.First().Id);
-                    }
-                }
-            }
+            //if(User != null && User.Identity.IsAuthenticated)
+            //{
+            //}
             base.OnPageHandlerExecuting(context);
         }
     }

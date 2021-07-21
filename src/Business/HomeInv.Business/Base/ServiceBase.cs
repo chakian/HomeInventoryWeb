@@ -29,13 +29,6 @@ namespace HomeInv.Business.Base
             dbo.UpdateUserId = userId;
             dbo.UpdateTime = DateTime.UtcNow;
         }
-
-        public E ConvertBaseDboToEntityBase(D dbo)
-        {
-            E entity = new E();
-            entity.Id = dbo.Id;
-            return entity;
-        }
     }
     public abstract class ServiceBase<D, E> : ServiceBase, IServiceBase<D, E>
         where D : BaseDbo, new()
@@ -55,6 +48,13 @@ namespace HomeInv.Business.Base
             D dbo = new D();
             dbo.IsActive = isActive;
             return dbo;
+        }
+
+        public E ConvertBaseDboToEntityBase(D dbo)
+        {
+            E entity = new E();
+            entity.Id = dbo.Id;
+            return entity;
         }
 
         public abstract E ConvertDboToEntity(D dbo);

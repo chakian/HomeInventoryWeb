@@ -53,6 +53,12 @@ namespace HomeInv.Persistence
                 .Property(item => item.Size)
                 .HasPrecision(18, 2);
 
+            builder.Entity<Item>()
+                .HasOne(item => item.Home)
+                .WithMany()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
             //builder.Entity<Transaction>()
             //    .Property(b => b.Amount)
             //    .HasColumnType("money");

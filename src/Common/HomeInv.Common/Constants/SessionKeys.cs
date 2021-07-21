@@ -2,6 +2,6 @@
 {
     public struct SessionKeys
     {
-        public const string DEFAULT_HOME_ID = "DEFAULT_HOME_ID";
+        public const string ACTIVE_HOME_ID = "ACTIVE_HOME_ID";
     }
 }
