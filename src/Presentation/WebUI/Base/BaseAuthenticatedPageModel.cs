@@ -37,8 +37,10 @@ namespace WebUI.Base
                     if (!context.HttpContext.Session.Keys.Contains(SessionKeys.ACTIVE_HOME_ID))
                     {
                         //TODO: Find currently active home and write to session
-                        SelectedHomeId = homesResponse.Homes.First().Id;
-                        context.HttpContext.Session.SetInt32(SessionKeys.ACTIVE_HOME_ID, SelectedHomeId);
+
+                        SelectedHomeId = homesResponse.Homes.FirstOrDefault()?.Id ?? 0;
+
+                        if (SelectedHomeId != 0) context.HttpContext.Session.SetInt32(SessionKeys.ACTIVE_HOME_ID, SelectedHomeId);
                     }
                     else
                     {
