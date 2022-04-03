@@ -54,7 +54,7 @@ namespace HomeInv.Business
 
         public GetHomesOfUserResponse GetHomesOfUser(GetHomesOfUserRequest request)
         {
-            GetHomesOfUserResponse response = new GetHomesOfUserResponse();
+            var response = new GetHomesOfUserResponse();
             var homes = GetHomesOfUserInternal(request.RequestUserId);
             List<HomeEntity> homeEntities = new List<HomeEntity>();
             foreach (var home in homes)
@@ -62,6 +62,16 @@ namespace HomeInv.Business
                 homeEntities.Add(ConvertDboToEntity(home));
             }
             response.Homes = homeEntities;
+            return response;
+        }
+
+        public GetSingleHomeOfUserResponse GetSingleHomeOfUser(GetSingleHomeOfUserRequest request)
+        {
+            var response = new GetSingleHomeOfUserResponse();
+            //TODO: Checking if this user belongs to requested home could be done better
+            var homes = GetHomesOfUserInternal(request.RequestUserId);
+            var home = homes.SingleOrDefault(home => home.Id == request.HomeId);
+            response.Home = ConvertDboToEntity(home);
             return response;
         }
     }

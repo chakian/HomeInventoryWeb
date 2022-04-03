@@ -12,5 +12,6 @@ namespace HomeInv.Common.Interfaces.Services
         //HomeEntity GetHomeById(int id);
         CreateHomeResponse CreateHome(CreateHomeRequest request);
         GetHomesOfUserResponse GetHomesOfUser(GetHomesOfUserRequest request);
+        GetSingleHomeOfUserResponse GetSingleHomeOfUser(GetSingleHomeOfUserRequest request);
     }
 }
