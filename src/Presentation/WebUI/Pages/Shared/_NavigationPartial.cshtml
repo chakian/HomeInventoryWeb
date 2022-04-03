@@ -1,0 +1,20 @@
+﻿@inject SignInManager<HomeInv.Persistence.Dbo.User> SignInManager
+@inject UserManager<HomeInv.Persistence.Dbo.User> UserManager
+
+<ul class="navbar-nav flex-grow-1">
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-page="/Home/List">Evler</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-page="/Category/List">Kategoriler</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-page="/Item/List">İtemler</a>
+    </li>
+    @*<li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-page="/Stock/Overview">Stok Durumları</a>
+    </li>*@
+}
+</ul>
