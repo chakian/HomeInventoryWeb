@@ -14,6 +14,7 @@ namespace HomeInv.Common.Entities
 
         public int SizeUnitId { get; set; }
         public int SizeUnitText { get; set; }
+        public decimal Size { get; set; }
 
         public bool IsExpirable { get; set; }
         public bool IsContainer { get; set; }

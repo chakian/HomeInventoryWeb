@@ -1,10 +1,10 @@
 ﻿@page
-@model WebUI.Pages.Category.CreateModel
+@model WebUI.Pages.Item.CreateModel
 @{
-    ViewData["Title"] = "Yeni Kategori";
+    ViewData["Title"] = "Yeni İtem";
 }
 
-<h1>Yeni Kategori</h1>
+<h1>Yeni İtem</h1>
 
 <hr />
 <div class="row">
@@ -12,19 +12,29 @@
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Category.ParentCategoryId" class="control-label"></label>
-                <select asp-for="Category.ParentCategoryId" asp-items="Model.AllCategories" class="form-control"></select>
-                <span asp-validation-for="Category.ParentCategoryId" class="text-danger"></span>
+                <label asp-for="Item.CategoryId" class="control-label"></label>
+                <select asp-for="Item.CategoryId" asp-items="Model.AllCategories" class="form-control"></select>
+                <span asp-validation-for="Item.CategoryId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Category.Name" class="control-label"></label>
-                <input asp-for="Category.Name" class="form-control" />
-                <span asp-validation-for="Category.Name" class="text-danger"></span>
+                <label asp-for="Item.Name" class="control-label"></label>
+                <input asp-for="Item.Name" class="form-control" />
+                <span asp-validation-for="Item.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Category.Description" class="control-label"></label>
-                <input asp-for="Category.Description" class="form-control" />
-                <span asp-validation-for="Category.Description" class="text-danger"></span>
+                <label asp-for="Item.Description" class="control-label"></label>
+                <input asp-for="Item.Description" class="form-control" />
+                <span asp-validation-for="Item.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Item.SizeUnitId" class="control-label"></label>
+                <select asp-for="Item.SizeUnitId" asp-items="Model.AllSizeUnits" class="form-control"></select>
+                <span asp-validation-for="Item.SizeUnitId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Item.Size" class="control-label"></label>
+                <input asp-for="Item.Size" class="form-control" />
+                <span asp-validation-for="Item.Size" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

@@ -7,7 +7,16 @@ namespace HomeInv.Persistence.Dbo
     public class ItemStock : BaseAuditableDbo
     {
         public int ItemId { get; set; }
+
+        public virtual Item Item { get; set; }
+
         public int Quantity { get; set; }
+
+        #region Size Properties
+        public int SizeUnitId { get; set; }
+        public virtual SizeUnit SizeUnit { get; set; }
+        public decimal Size { get; set; }
+        #endregion
 
         [Required]
         public int AreaId { get; set; }

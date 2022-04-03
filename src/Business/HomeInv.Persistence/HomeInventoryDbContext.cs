@@ -54,10 +54,32 @@ namespace HomeInv.Persistence
                 .HasPrecision(18, 2);
 
             builder.Entity<Item>()
+                .HasOne(item => item.SizeUnit)
+                .WithMany()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Item>()
                 .HasOne(item => item.Home)
                 .WithMany()
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ItemStock>()
+                .HasOne(itemStock => itemStock.SizeUnit)
+                .WithMany()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ItemStock>()
+                .HasOne(itemStock => itemStock.Item)
+                .WithMany()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ItemStock>()
+                .Property(itemStock => itemStock.Size)
+                .HasPrecision(18, 2);
 
             //builder.Entity<Transaction>()
             //    .Property(b => b.Amount)
