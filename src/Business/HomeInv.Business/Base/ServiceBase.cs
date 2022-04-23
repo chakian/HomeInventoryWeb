@@ -38,7 +38,12 @@ namespace HomeInv.Business.Base
         {
         }
 
-        public IQueryable<D> GetAllActiveAsQueryable()
+        public virtual IQueryable<D> GetAllAsQueryable()
+        {
+            return context.Set<D>().AsQueryable();
+        }
+
+        public virtual IQueryable<D> GetAllActiveAsQueryable()
         {
             return context.Set<D>().Where(set => set.IsActive);
         }

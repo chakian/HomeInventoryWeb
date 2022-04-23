@@ -16,6 +16,7 @@ namespace HomeInv.Common.Interfaces.Services
         where D : class
         where E : Entities.EntityBase
     {
+        IQueryable<D> GetAllAsQueryable();
         IQueryable<D> GetAllActiveAsQueryable();
         E ConvertDboToEntity(D dbo);
     }

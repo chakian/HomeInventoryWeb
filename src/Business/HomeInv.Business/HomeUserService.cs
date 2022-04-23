@@ -5,6 +5,8 @@ using HomeInv.Common.ServiceContracts.HomeUser;
 using HomeInv.Language;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HomeInv.Business
@@ -17,12 +19,37 @@ namespace HomeInv.Business
 
         public override HomeUserEntity ConvertDboToEntity(HomeUser dbo)
         {
-            throw new System.NotImplementedException();
+            return new HomeUserEntity()
+            {
+                Id = dbo.Id,
+                HomeId = dbo.HomeId,
+                UserId = dbo.UserId,
+                Username = dbo.User.UserName,
+                Role = dbo.Role
+            };
+        }
+
+        public GetUsersOfHomeResponse GetUsersOfHome(GetUsersOfHomeRequest request)
+        {
+            var response = new GetUsersOfHomeResponse();
+
+            var homeUsers = context.HomeUsers
+                .Where(homeUser => homeUser.UserId == request.RequestUserId)
+                .Include(user => user.User).ToList();
+            var homeUserEntities = new List<HomeUserEntity>();
+            foreach (var homeUser in homeUsers)
+            {
+                homeUserEntities.Add(ConvertDboToEntity(homeUser));
+            }
+
+            response.HomeUsers = homeUserEntities;
+
+            return response;
         }
 
         public InsertHomeUserResponse InsertHomeUser(InsertHomeUserRequest request)
         {
-            InsertHomeUserResponse response = new InsertHomeUserResponse();
+            var response = new InsertHomeUserResponse();
             if (context.HomeUsers.Any(q => q.HomeId == request.HomeId && q.UserId == request.UserId))
             {
                 response.AddError(Resources.UserIsAlreadyInThatHome);

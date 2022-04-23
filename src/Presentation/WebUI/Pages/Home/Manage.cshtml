@@ -1,0 +1,72 @@
+﻿@page
+@model WebUI.Pages.Home.ManageModel
+@{
+    ViewData["Title"] = "Ev Yönetimi";
+}
+
+<h1>Ev Yönetimi</h1>
+<h4>@Model.Home.Name</h4>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <span>Mevcut Kullanıcılar</span>
+        <table class="table">
+            <tr>
+                <td>Kullanıcı Adı</td>
+                <td>Kullanıcı Rolü</td>
+            </tr>
+            @foreach(var homeUser in Model.HomeUsers)
+            {
+                <tr>
+                    <td>@homeUser.Username</td>
+                    <td>@homeUser.Role</td>
+                </tr>
+            }
+        </table>
+    </div>
+    <div class="col-md-6">
+        <span>Kullanıcı Ara & Ekle</span>
+        <form method="get">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input name="homeId" value="@Model.Home.Id" type="hidden" />
+            <div class="form-group">
+                <input asp-for="SearchQuery" class="form-control" />
+                <span asp-validation-for="SearchQuery" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Kullanıcı Ara" class="btn btn-secondary" />
+            </div>
+        </form>
+        @if (Model.UserResult != null && Model.UserResult.Any())
+        {
+            <form method="post">
+                <table class="table">
+                    <tr>
+                        <td>#</td>
+                        <td>Kullanıcı Adı</td>
+                        <td>Kullanıcı Rolü</td>
+                    </tr>
+                    @{int index = 0;}
+                    @foreach (var homeUser in Model.UserResult)
+                    {
+                        <tr>
+                            @*<td><input asp-for="" type="checkbox"/></td>*@
+                            <td>@homeUser.Username</td>
+                            <td>@homeUser.Id</td>
+                        </tr>
+                }
+            </table>
+        </form>
+        }
+    </div>
+</div>
+
+<div>
+    <a asp-page="List">Listeye Dön</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

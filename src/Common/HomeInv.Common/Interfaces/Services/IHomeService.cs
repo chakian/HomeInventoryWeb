@@ -13,5 +13,6 @@ namespace HomeInv.Common.Interfaces.Services
         CreateHomeResponse CreateHome(CreateHomeRequest request);
         GetHomesOfUserResponse GetHomesOfUser(GetHomesOfUserRequest request);
         GetSingleHomeOfUserResponse GetSingleHomeOfUser(GetSingleHomeOfUserRequest request);
+        UpdateHomeResponse UpdateHome(UpdateHomeRequest request);
     }
 }

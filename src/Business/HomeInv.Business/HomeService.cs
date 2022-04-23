@@ -16,6 +16,25 @@ namespace HomeInv.Business
         {
         }
 
+        private IQueryable<Home> GetHomesOfUserInternal(string userId)
+        {
+            var homes = GetAllActiveAsQueryable().Join(context.HomeUsers,
+                home => home.Id,
+                homeUser => homeUser.HomeId,
+                (home, homeUser) => new { Home = home, HomeUser = homeUser })
+                .Where(homeAndUser => homeAndUser.HomeUser.UserId == userId && homeAndUser.HomeUser.IsActive);
+
+            return homes.Select(homeAndUser => homeAndUser.Home);
+        }
+
+        private Home GetSingleHomeOfUserInternal(string userId, int homeId)
+        {
+            //TODO: Checking if this user belongs to requested home could be done better
+            var homes = GetHomesOfUserInternal(userId);
+            var home = homes.SingleOrDefault(home => home.Id == homeId);
+            return home;
+        }
+
         public CreateHomeResponse CreateHome(CreateHomeRequest request)
         {
             CreateHomeResponse response = new CreateHomeResponse();
@@ -29,17 +48,6 @@ namespace HomeInv.Business
 
             response.HomeEntity = ConvertDboToEntity(home);
             return response;
-        }
-
-        private IQueryable<Home> GetHomesOfUserInternal(string userId)
-        {
-            var homes = GetAllActiveAsQueryable().Join(context.HomeUsers,
-                home => home.Id,
-                homeUser => homeUser.HomeId,
-                (home, homeUser) => new { Home = home, HomeUser = homeUser })
-                .Where(homeAndUser => homeAndUser.HomeUser.UserId == userId && homeAndUser.HomeUser.IsActive);
-
-            return homes.Select(homeAndUser => homeAndUser.Home);
         }
 
         public override HomeEntity ConvertDboToEntity(Home dbo)
@@ -68,10 +76,24 @@ namespace HomeInv.Business
         public GetSingleHomeOfUserResponse GetSingleHomeOfUser(GetSingleHomeOfUserRequest request)
         {
             var response = new GetSingleHomeOfUserResponse();
-            //TODO: Checking if this user belongs to requested home could be done better
-            var homes = GetHomesOfUserInternal(request.RequestUserId);
-            var home = homes.SingleOrDefault(home => home.Id == request.HomeId);
+            var home = GetSingleHomeOfUserInternal(request.RequestUserId, request.HomeId);
             response.Home = ConvertDboToEntity(home);
+            return response;
+        }
+
+        public UpdateHomeResponse UpdateHome(UpdateHomeRequest request)
+        {
+            var response = new UpdateHomeResponse();
+            Home home = GetSingleHomeOfUserInternal(request.RequestUserId, request.HomeEntity.Id);
+            UpdateAuditableObject(home, request.RequestUserId);
+
+            home.Name = request.HomeEntity.Name;
+            home.Description = request.HomeEntity.Description;
+
+            context.Entry(home).State = EntityState.Modified;
+            context.SaveChanges();
+
+            response.HomeEntity = ConvertDboToEntity(home);
             return response;
         }
     }
