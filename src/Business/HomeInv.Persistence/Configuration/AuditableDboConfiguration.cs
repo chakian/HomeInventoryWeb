@@ -1,10 +1,5 @@
 ﻿using HomeInv.Persistence.Dbo;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeInv.Persistence
 {
@@ -18,6 +13,7 @@ namespace HomeInv.Persistence
         public static void Configure(ModelBuilder modelBuilder)
         {
             Configure<Area>(modelBuilder);
+            Configure<AreaUser>(modelBuilder);
             Configure<Home>(modelBuilder);
             Configure<HomeUser>(modelBuilder);
             Configure<Item>(modelBuilder);
