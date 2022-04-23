@@ -88,11 +88,12 @@ namespace HomeInv.Persistence
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //builder.Entity<HomeUser>()
-            //    .HasOne(user => user.UserId)
-            //    .WithMany()
-            //    .IsRequired()
-            //    .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<HomeUser>()
+                .HasOne(user => user.User)
+                .WithMany()
+                .IsRequired()
+                .HasForeignKey(user => user.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<AreaUser>()
                 .HasOne(user => user.User)
