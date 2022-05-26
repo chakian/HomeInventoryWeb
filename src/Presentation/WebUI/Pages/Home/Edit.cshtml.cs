@@ -43,7 +43,7 @@ namespace WebUI.Pages.Home
             };
             homeService.UpdateHome(updateHomeRequest);
             
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Home/List");
         }
     }
 }
