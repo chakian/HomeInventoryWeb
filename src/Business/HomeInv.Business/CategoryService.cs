@@ -4,6 +4,7 @@ using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Category;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,10 +32,25 @@ namespace HomeInv.Business
             }
             else
             {
+                //Prevent creating categories under the same parent with the same name
                 var existingCategory = context.Categories.Where(category => category.HomeId == request.HomeId && category.Name == request.CategoryEntity.Name && category.ParentCategoryId == request.CategoryEntity.ParentCategoryId);
                 if(existingCategory != null && existingCategory.Count() > 0)
                 {
                     response.AddError(Language.Resources.Category_SameNameExists);
+                }
+
+                //Prevent creating level 3 children
+                if(request.CategoryEntity.ParentCategoryId != null && request.CategoryEntity.ParentCategoryId > 0)
+                {
+                    var parent = context.Categories.Find(request.CategoryEntity.ParentCategoryId);
+                    if(parent != null && (parent.ParentCategoryId ?? 0) > 0)
+                    {
+                        var grandparent = context.Categories.Find(parent.ParentCategoryId);
+                        if (grandparent != null && (grandparent.ParentCategoryId ?? 0) > 0)
+                        {
+                            response.AddError("Üçüncü seviyede kategori eklenemez.");
+                        }
+                    }
                 }
             }
 
@@ -77,40 +93,54 @@ namespace HomeInv.Business
                     .ThenBy(cat => cat.Id)
                     .ToList();
                 var categoryList = new List<CategoryEntity>();
-                foreach (var dbCategory in dbCategoryList)
+                foreach (var dbCategory in dbCategoryList.Where(cat => !cat.ParentCategoryId.HasValue || cat.ParentCategoryId == 0).ToList())
                 {
-                    if(!dbCategory.ParentCategoryId.HasValue || dbCategory.ParentCategoryId.Value == 0)
+                    var category = new CategoryEntity()
                     {
-                        categoryList.Add(new CategoryEntity()
-                        {
-                            Id = dbCategory.Id,
-                            Name = dbCategory.Name,
-                            Description = dbCategory.Description,
-                            HasParent = false
-                        });
-                    }
-                    else
-                    {
-                        var parentId = dbCategory.ParentCategoryId.Value;
-                        var cat = new CategoryEntity()
-                        {
-                            Id = dbCategory.Id,
-                            Name = dbCategory.Name,
-                            Description = dbCategory.Description,
-                            HasParent = true,
-                            ParentCategoryId = dbCategory.ParentCategoryId
-                        };
-                        var parent = categoryList.Find(c => c.Id == parentId);
-                        if (parent.Children == null) parent.Children = new List<CategoryEntity>();
-                        parent.Children.Add(cat);
-                        parent.HasChild = true;
-                    }
+                        Id = dbCategory.Id,
+                        Name = dbCategory.Name,
+                        Description = dbCategory.Description,
+                        HasParent = false
+                    };
+                    category.Children = GetChildrenOfCategory(dbCategoryList, category.Id);
+                    category.HasChild = category.Children != null && category.Children.Count > 0;
+                    categoryList.Add(category);
                 }
 
                 response.Categories = categoryList;
             }
 
             return response;
+        }
+
+        private List<CategoryEntity> GetChildrenOfCategory(List<Category> dbCategoryList, int parentCategoryId)
+        {
+            var childCategoryList = new List<CategoryEntity>();
+            
+            foreach (var dbCategory in dbCategoryList.Where(cat => cat.ParentCategoryId == parentCategoryId).ToList())
+            {
+                var childCategory = new CategoryEntity()
+                {
+                    Id = dbCategory.Id,
+                    Name = dbCategory.Name,
+                    Description = dbCategory.Description,
+                    HasParent = true,
+                    ParentCategoryId = dbCategory.ParentCategoryId
+                };
+                
+                childCategory.Children = GetChildrenOfCategory(dbCategoryList, childCategory.Id);
+                childCategory.HasChild = childCategory.Children != null && childCategory.Children.Count > 0;
+                childCategoryList.Add(childCategory);
+            }
+
+            if (childCategoryList.Count > 0)
+            {
+                return childCategoryList;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public GetCategoriesOfHomeResponse GetCategoriesOfHome_Ordered(GetCategoriesOfHomeRequest request)
