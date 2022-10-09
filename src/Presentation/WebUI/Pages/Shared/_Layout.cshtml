@@ -24,6 +24,24 @@
         </nav>
     </header>
     <div class="container">
+        @if (TempData["Error"] != null)
+        {
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header">HATA!</div>
+                <div class="card-body">
+                    <p class="card-text">@TempData["Error"]</p>
+                </div>
+            </div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Oley!</div>
+                <div class="card-body">
+                    <p class="card-text">@TempData["Success"]</p>
+                </div>
+            </div>
+        }
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

@@ -6,13 +6,58 @@
 
 <h1>Kategoriler</h1>
 <h4><a asp-page="Create">Yeni Kategori</a></h4>
-<hr />
 
-<div class="row border-bottom">
-    <div class="col-6 font-weight-bold">Kategori</div>
-    <div class="col-6 font-weight-bold">Açıklama</div>
-</div>
-@foreach (var category in Model.Categories)
-{
-    @(await Html.RenderComponentAsync<ListItem>( RenderMode.Static, new { category = category }))
-}
+<table class="table table-responsive table-hover">
+    <thead>
+        <tr><th>&nbsp;</th><th>Kategori</th><th>Açıklama</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model.Categories)
+        {
+            @if(category.HasChild){
+                <tr class="clickable" data-toggle="collapse" data-target=".row@(category.Id)">
+                    <td>
+                        <span></span>
+                    </td>
+                    <td>@(category.Name)</td>
+                    <td>@(category.Description)</td>
+                </tr>
+                foreach (var child in category.Children)
+                {
+                    @if (child.HasChild)
+                    {
+                        <tr class="clickable row@(category.Id)" data-toggle="collapse" data-target=".row@(child.Id)">
+                            <td><span>-></span></td>
+                            <td>@(child.Name)</td>
+                            <td>@(child.Description)</td>
+                        </tr>
+                        foreach (var grandchild in child.Children)
+                        {
+                            <tr class="row@(child.Id)">
+                                <td><span>--></span></td>
+                                <td>@(grandchild.Name)</td>
+                                <td>@(grandchild.Description)</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr class="clickable row@(category.Id)">
+                            <td>-></td>
+                            <td>@(child.Name)</td>
+                            <td>@(child.Description)</td>
+                        </tr>
+                    }
+                }
+            }
+            else{
+                <tr>
+                    <td></td>
+                    <td>@(category.Name)</td>
+                    <td>@(category.Description)</td>
+                </tr>
+            }
+            
+        }
+    </tbody>
+</table>

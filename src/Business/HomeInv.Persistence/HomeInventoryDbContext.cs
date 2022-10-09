@@ -12,6 +12,7 @@ namespace HomeInv.Persistence
         }
 
         public virtual DbSet<Area> Areas { get; set; }
+        public virtual DbSet<AreaUser> AreaUsers { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Home> Homes { get; set; }
         public virtual DbSet<HomeUser> HomeUsers { get; set; }
@@ -80,6 +81,26 @@ namespace HomeInv.Persistence
             builder.Entity<ItemStock>()
                 .Property(itemStock => itemStock.Size)
                 .HasPrecision(18, 2);
+
+            builder.Entity<AreaUser>()
+                .HasOne(user => user.Area)
+                .WithMany(area => area.AreaUsers)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<HomeUser>()
+                .HasOne(user => user.User)
+                .WithMany()
+                .IsRequired()
+                .HasForeignKey(user => user.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<AreaUser>()
+                .HasOne(user => user.User)
+                .WithMany()
+                .IsRequired()
+                .HasForeignKey(user => user.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             //builder.Entity<Transaction>()
             //    .Property(b => b.Amount)

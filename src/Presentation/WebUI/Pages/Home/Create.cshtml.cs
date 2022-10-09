@@ -24,9 +24,12 @@ namespace WebUI.Pages.Home
 
         [BindProperty]
         public HomeEntity Home { get; set; }
+        [BindProperty]
+        public bool IsFirstHome { get; set; }
 
         public IActionResult OnGet()
         {
+            IsFirstHome = (SelectedHomeId == 0);
             return Page();
         }
 

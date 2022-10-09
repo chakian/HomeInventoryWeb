@@ -72,6 +72,18 @@ namespace HomeInv.Common.ServiceContracts
                     return Text;
                 }
             }
+
+            public override string ToString()
+            {
+                if(Messages.Count == 0)
+                {
+                    return "İşlem başarıyla tamamlandı.";
+                }
+                else
+                {
+                    return string.Concat(Messages);
+                }
+            }
         }
         #endregion OperationResult
     }

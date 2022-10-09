@@ -50,9 +50,18 @@ namespace WebUI.Pages.Category
                 HomeId = SelectedHomeId,
                 RequestUserId = UserId
             };
-            var category = categoryService.CreateCategory(createCategoryRequest);
-            
-            return RedirectToPage("List");
+            var categoryResponse = categoryService.CreateCategory(createCategoryRequest);
+
+            if (categoryResponse.IsSuccessful)
+            {
+                TempData.Add("Success", categoryResponse.Result.ToString());
+                return RedirectToPage("List");
+            }
+            else
+            {
+                TempData.Add("Error", categoryResponse.Result.ToString());
+                return RedirectToPage("/Category/Create");
+            }
         }
     }
 }
