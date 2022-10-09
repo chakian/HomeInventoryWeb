@@ -5,6 +5,7 @@ namespace HomeInv.Persistence.Dbo
 {
     public class Area : BaseAuditableDbo
     {
+        [Required]
         public int HomeId { get; set; }
         [Required]
         public string Name { get; set; }
