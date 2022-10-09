@@ -1,3 +1,9 @@
+## Ortam Durumu
+
+Production [![Build status](https://ci.appveyor.com/api/projects/status/em2hb1vcyy73v55n/branch/master?svg=true)](https://ci.appveyor.com/project/chakian/homeinventoryweb/branch/master)
+
+Staging [![Build status](https://ci.appveyor.com/api/projects/status/em2hb1vcyy73v55n/branch/staging?svg=true)](https://ci.appveyor.com/project/chakian/homeinventoryweb/branch/staging)
+
 # Genel Bilgi
 Evimize devamlı bir şeyler alıyoruz. Bazen bir dolap alıyoruz ve sonra ne zaman aldığımızı görmek istiyoruz. Bazen ise en son ne zaman çamaşır deterjanı aldık da hemen yine bitti diye düşünüyoruz. Bu projeye başlama motivasyonum, evdeki eşyaların ve tüketim malzemelerinin takibini kolaylaştırmak; ve devamında da deterjan ortalama 1 ay gidiyorsa ve 1 aydır yenisini almadıysam bildirim ile bana hatırlatacak bir sistem hazırlamak.
 
