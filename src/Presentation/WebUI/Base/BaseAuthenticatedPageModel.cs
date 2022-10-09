@@ -27,10 +27,10 @@ namespace WebUI.Base
                 var homeService = new HomeService(dbContext);
                 GetHomesOfUserRequest request = new GetHomesOfUserRequest { RequestUserId = UserId };
                 var homesResponse = homeService.GetHomesOfUser(request);
-                string homePath = "/Home/Create";
-                if (homesResponse.Homes.Count == 0 && context.ActionDescriptor.ViewEnginePath != homePath)
+                string homeCreationPath = "/Home/Create";
+                if (homesResponse.Homes.Count == 0 && context.ActionDescriptor.ViewEnginePath != homeCreationPath)
                 {
-                    context.Result = RedirectToPage(homePath);
+                    context.Result = RedirectToPage(homeCreationPath);
                 }
                 else
                 {
