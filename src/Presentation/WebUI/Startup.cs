@@ -72,9 +72,6 @@ namespace WebUI
                 app.UseHsts();
             }
 
-            DataCleanup dataCleanup = new DataCleanup();
-            dataCleanup.DeleteAllData(dbContext);
-
             dbContext.Database.Migrate();
 
             app.UseHttpsRedirection();
