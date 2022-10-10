@@ -2,6 +2,7 @@
 using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Area;
+using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using System;
@@ -20,12 +21,29 @@ namespace HomeInv.Business
 
         public override AreaEntity ConvertDboToEntity(Area dbo)
         {
-            throw new NotImplementedException();
+            return new AreaEntity()
+            {
+                Id = dbo.Id,
+                HomeId = dbo.HomeId,
+                Name = dbo.Name,
+                Description = dbo.Description
+            };
         }
 
         public CreateAreaResponse CreateArea(CreateAreaRequest request)
         {
-            throw new NotImplementedException();
+            CreateAreaResponse response = new CreateAreaResponse();
+            Area area = CreateNewAuditableObject(request);
+            area.HomeId = request.AreaEntity.HomeId;
+            area.Name = request.AreaEntity.Name;
+            area.Description = request.AreaEntity.Description;
+
+            context.Areas.Add(area);
+            //context.Entry(area).State = EntityState.Added;
+            context.SaveChanges();
+
+            response.AreaEntity = ConvertDboToEntity(area);
+            return response;
         }
 
         public GetAreasOfHomeResponse GetAreasOfHome(GetAreasOfHomeRequest request)
