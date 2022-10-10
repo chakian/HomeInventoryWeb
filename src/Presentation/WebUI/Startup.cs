@@ -53,6 +53,8 @@ namespace WebUI
             services.AddScoped<IItemService, ItemService>();
             services.AddScoped<ISizeUnitService, SizeUnitService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAreaService, AreaService>();
+            services.AddScoped<IAreaUserService, AreaUserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -69,6 +71,8 @@ namespace WebUI
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            dbContext.Database.EnsureDeleted();
 
             dbContext.Database.Migrate();
 
