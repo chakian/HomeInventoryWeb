@@ -19,7 +19,7 @@ namespace HomeInv.Language {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -97,6 +97,24 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Yeni ev oluşturuldu..
+        /// </summary>
+        public static string Success_Home_Create {
+            get {
+                return ResourceManager.GetString("Success_Home_Create", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ev başarıyla güncellendi..
+        /// </summary>
+        public static string Success_Home_Edit {
+            get {
+                return ResourceManager.GetString("Success_Home_Edit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bu kullanıcının mevcut bir evi bulunuyor!.
         /// </summary>
         public static string UserAlreadyHasAHome {
@@ -111,6 +129,15 @@ namespace HomeInv.Language {
         public static string UserIsAlreadyInThatHome {
             get {
                 return ResourceManager.GetString("UserIsAlreadyInThatHome", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uygulamayı kullanmaya başlamadan önce ilk evinizi oluşturmanız gerekiyor..
+        /// </summary>
+        public static string Warning_HomeNeededToUseTheApp {
+            get {
+                return ResourceManager.GetString("Warning_HomeNeededToUseTheApp", resourceCulture);
             }
         }
     }

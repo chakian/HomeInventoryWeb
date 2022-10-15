@@ -1,6 +1,7 @@
 ﻿using HomeInv.Business;
 using HomeInv.Common.Constants;
 using HomeInv.Common.ServiceContracts.Home;
+using HomeInv.Language;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -24,31 +25,51 @@ namespace WebUI.Base
         {
             if (User != null && User.Identity.IsAuthenticated)
             {
-                var homeService = new HomeService(dbContext);
-                GetHomesOfUserRequest request = new GetHomesOfUserRequest { RequestUserId = UserId };
-                var homesResponse = homeService.GetHomesOfUser(request);
+                string currentPath = context.ActionDescriptor.ViewEnginePath;
                 string homeCreationPath = "/Home/Create";
-                if (homesResponse.Homes.Count == 0 && context.ActionDescriptor.ViewEnginePath != homeCreationPath)
-                {
-                    context.Result = RedirectToPage(homeCreationPath);
-                }
-                else
-                {
-                    if (!context.HttpContext.Session.Keys.Contains(SessionKeys.ACTIVE_HOME_ID))
-                    {
-                        //TODO: Find currently active home and write to session
+                string[] allowedPathsWithoutChecks = new string[] { homeCreationPath };
 
-                        SelectedHomeId = homesResponse.Homes.FirstOrDefault()?.Id ?? 0;
-
-                        if (SelectedHomeId != 0) context.HttpContext.Session.SetInt32(SessionKeys.ACTIVE_HOME_ID, SelectedHomeId);
-                    }
-                    else
+                if (!allowedPathsWithoutChecks.Contains(currentPath))
+                {
+                    if((context.HttpContext.Session.GetInt32(SessionKeys.ACTIVE_HOME_ID) ?? 0) == 0)
                     {
-                        SelectedHomeId = HttpContext.Session.GetInt32(SessionKeys.ACTIVE_HOME_ID) ?? 0;
+                        // find active home id, redirect if it doesn't exist
+                        var isHomeFound = SetActiveHomeId(context);
+                        if (!isHomeFound)
+                        {
+                            SetInfoMessage(Resources.Warning_HomeNeededToUseTheApp);
+                            context.Result = RedirectToPage(homeCreationPath);
+                        }
                     }
                 }
             }
+            else
+            {
+                SetErrorMessage("Kapattık kardeşim. Giriş yapıp tekrar bir deneyin.");
+                context.Result = RedirectToPage("/");
+            }
+
+            // Set site-wide used variables
+            SelectedHomeId = context.HttpContext.Session.GetInt32(SessionKeys.ACTIVE_HOME_ID) ?? 0;
+
             base.OnPageHandlerExecuting(context);
+        }
+
+        private bool SetActiveHomeId(PageHandlerExecutingContext context)
+        {
+            var homeService = new HomeService(dbContext);
+            GetHomesOfUserRequest request = new GetHomesOfUserRequest { RequestUserId = UserId };
+            var homesResponse = homeService.GetHomesOfUser(request);
+
+            if(homesResponse != null && homesResponse.Homes != null && homesResponse.Homes.Count != 0)
+            {
+                var homeId = homesResponse.Homes.FirstOrDefault().Id;
+                context.HttpContext.Session.SetInt32(SessionKeys.ACTIVE_HOME_ID, homeId);
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

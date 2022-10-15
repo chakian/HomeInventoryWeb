@@ -36,6 +36,23 @@ namespace WebUI.Base
             }
         }
 
+        protected void SetErrorMessage(string message)
+        {
+            TempData.Add("Error", message);
+        }
+        protected void SetSuccessMessage(string message)
+        {
+            TempData.Add("Success", message);
+        }
+        protected void SetInfoMessage(string message)
+        {
+            TempData.Add("Info", message);
+        }
+        protected void SetWarningMessage(string message)
+        {
+            TempData.Add("Warning", message);
+        }
+
         public IActionResult OnPost()
         {
             try
@@ -55,6 +72,9 @@ namespace WebUI.Base
             {
                 dbContext.Database.RollbackTransaction();
 
+                var error = TempData.Peek("Error");
+                if (error == null || string.IsNullOrEmpty(error.ToString())) SetErrorMessage("İşleminiz başarıyla gerçekleşemedi. Developer herhangi bir hata da belirtmemiş. Elimizde sadece bu var.");
+
                 return Page();
             }
         }
@@ -66,9 +86,6 @@ namespace WebUI.Base
 
         public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
         {
-            //if(User != null && User.Identity.IsAuthenticated)
-            //{
-            //}
             base.OnPageHandlerExecuting(context);
         }
     }

@@ -54,12 +54,12 @@ namespace WebUI.Pages.Category
 
             if (categoryResponse.IsSuccessful)
             {
-                TempData.Add("Success", categoryResponse.Result.ToString());
+                SetSuccessMessage(categoryResponse.Result.ToString());
                 return RedirectToPage("List");
             }
             else
             {
-                TempData.Add("Error", categoryResponse.Result.ToString());
+                SetErrorMessage(categoryResponse.Result.ToString());
                 return RedirectToPage("/Category/Create");
             }
         }

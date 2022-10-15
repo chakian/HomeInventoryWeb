@@ -4,6 +4,7 @@ using HomeInv.Common.ServiceContracts.Area;
 using HomeInv.Common.ServiceContracts.AreaUser;
 using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.Common.ServiceContracts.HomeUser;
+using HomeInv.Language;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -78,8 +79,10 @@ namespace WebUI.Pages.Home
             };
             areaUserService.InsertAreaUser(insertAreaUserRequest);
             /// TEMPORARY SOLUTION UNTIL AREAS ARE REALLY IMPLEMENTED
+            
+            SetSuccessMessage(Resources.Success_Home_Create);
 
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Home/List");
         }
     }
 }
