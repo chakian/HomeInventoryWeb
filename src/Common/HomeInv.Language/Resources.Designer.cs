@@ -133,15 +133,6 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Bu kullanıcının mevcut bir evi bulunuyor!.
-        /// </summary>
-        public static string UserAlreadyHasAHome {
-            get {
-                return ResourceManager.GetString("UserAlreadyHasAHome", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Bu kullanıcı zaten bu evde bulunuyor!.
         /// </summary>
         public static string UserIsAlreadyInThatHome {

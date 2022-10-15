@@ -141,9 +141,6 @@
   <data name="Success_Home_Edit" xml:space="preserve">
     <value>Ev başarıyla güncellendi.</value>
   </data>
-  <data name="UserAlreadyHasAHome" xml:space="preserve">
-    <value>Bu kullanıcının mevcut bir evi bulunuyor!</value>
-  </data>
   <data name="UserIsAlreadyInThatHome" xml:space="preserve">
     <value>Bu kullanıcı zaten bu evde bulunuyor!</value>
   </data>
