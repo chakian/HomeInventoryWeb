@@ -97,6 +97,15 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Kategori oluşturuldu..
+        /// </summary>
+        public static string Success_Category_Create {
+            get {
+                return ResourceManager.GetString("Success_Category_Create", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to İşlem başarıyla gerçekleşti..
         /// </summary>
         public static string Success_Generic {
