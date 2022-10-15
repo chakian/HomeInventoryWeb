@@ -97,6 +97,15 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to İşlem başarıyla gerçekleşti..
+        /// </summary>
+        public static string Success_Generic {
+            get {
+                return ResourceManager.GetString("Success_Generic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Yeni ev oluşturuldu..
         /// </summary>
         public static string Success_Home_Create {
