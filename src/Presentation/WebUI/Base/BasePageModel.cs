@@ -1,9 +1,13 @@
-﻿using HomeInv.Persistence;
+﻿using HomeInv.Common.ServiceContracts;
+using HomeInv.Common.ServiceContracts.Home;
+using HomeInv.Language;
+using HomeInv.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Security.Claims;
 
 namespace WebUI.Base
@@ -36,6 +40,23 @@ namespace WebUI.Base
             }
         }
 
+        protected void SetErrorMessage(string message)
+        {
+            TempData.Add("Error", message);
+        }
+        protected void SetSuccessMessage(string message)
+        {
+            TempData.Add("Success", message);
+        }
+        protected void SetInfoMessage(string message)
+        {
+            TempData.Add("Info", message);
+        }
+        protected void SetWarningMessage(string message)
+        {
+            TempData.Add("Warning", message);
+        }
+
         public IActionResult OnPost()
         {
             try
@@ -47,7 +68,17 @@ namespace WebUI.Base
 
                 dbContext.Database.BeginTransaction();
                 var result = OnModelPost();
-                dbContext.Database.CommitTransaction();
+                if (_serviceCallResponse.IsSuccessful)
+                {
+                    SetSuccessMessage(_serviceCallSuccessMessage);
+                    dbContext.Database.CommitTransaction();
+                }
+                else
+                {
+                    result = Page();
+                    SetErrorMessage(_serviceCallResponse.Result.ToString());
+                    dbContext.Database.RollbackTransaction();
+                }
 
                 return result;
             }
@@ -55,8 +86,24 @@ namespace WebUI.Base
             {
                 dbContext.Database.RollbackTransaction();
 
+                var error = TempData.Peek("Error");
+                if (error == null || string.IsNullOrEmpty(error.ToString())) SetErrorMessage("İşleminiz başarıyla gerçekleşemedi. Developer herhangi bir hata da belirtmemiş. Elimizde sadece bu var.");
+
                 return Page();
             }
+        }
+
+        private BaseResponse _serviceCallResponse { get; set; }
+        private string _serviceCallSuccessMessage { get; set; }
+        protected TResponse CallService<TRequest, TResponse>(Func<TRequest, TResponse> serviceMethod, TRequest serviceRequest, string successMessage = null)
+            where TResponse : BaseResponse
+        {
+            if (string.IsNullOrEmpty(successMessage)) successMessage = Resources.Success_Generic;
+            _serviceCallSuccessMessage = successMessage;
+
+            _serviceCallResponse = serviceMethod.Invoke(serviceRequest);
+
+            return (TResponse)_serviceCallResponse;
         }
 
         protected virtual IActionResult OnModelPost()
@@ -66,9 +113,6 @@ namespace WebUI.Base
 
         public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
         {
-            //if(User != null && User.Identity.IsAuthenticated)
-            //{
-            //}
             base.OnPageHandlerExecuting(context);
         }
     }

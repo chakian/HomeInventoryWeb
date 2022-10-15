@@ -1,9 +1,9 @@
 using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Home;
+using HomeInv.Language;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using WebUI.Base;
 
@@ -13,7 +13,7 @@ namespace WebUI.Pages.Home
     {
         readonly IHomeService homeService;
 
-        public EditModel(ILogger<EditModel> logger, 
+        public EditModel(ILogger<EditModel> logger,
             HomeInventoryDbContext dbContext,
             IHomeService homeService) : base(logger, dbContext)
         {
@@ -41,9 +41,10 @@ namespace WebUI.Pages.Home
                 HomeEntity = Home,
                 RequestUserId = UserId
             };
-            homeService.UpdateHome(updateHomeRequest);
-            
-            return RedirectToPage("/Home/List");
+            var response = CallService(homeService.UpdateHome, updateHomeRequest, Resources.Success_Home_Edit);
+
+            if (response.IsSuccessful) return RedirectToPage("/Home/List");
+            return Page();
         }
     }
 }
