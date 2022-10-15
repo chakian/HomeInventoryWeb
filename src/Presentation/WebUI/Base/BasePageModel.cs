@@ -93,19 +93,17 @@ namespace WebUI.Base
             }
         }
 
-        //protected RESP CallService<T, TR, REQ, RESP>(T service, Func<T, TR> func, REQ request, RESP response)
-        //{
-        //}
         private BaseResponse _serviceCallResponse { get; set; }
         private string _serviceCallSuccessMessage { get; set; }
-        protected CreateHomeResponse CallService(Func<CreateHomeRequest, CreateHomeResponse> createHome, CreateHomeRequest createHomeRequest, string successMessage = null)
+        protected TResponse CallService<TRequest, TResponse>(Func<TRequest, TResponse> serviceMethod, TRequest serviceRequest, string successMessage = null)
+            where TResponse : BaseResponse
         {
             if (string.IsNullOrEmpty(successMessage)) successMessage = Resources.Success_Generic;
             _serviceCallSuccessMessage = successMessage;
 
-            _serviceCallResponse = createHome.Invoke(createHomeRequest);
+            _serviceCallResponse = serviceMethod.Invoke(serviceRequest);
 
-            return (CreateHomeResponse)_serviceCallResponse;
+            return (TResponse)_serviceCallResponse;
         }
 
         protected virtual IActionResult OnModelPost()
