@@ -1,9 +1,13 @@
-﻿using HomeInv.Persistence;
+﻿using HomeInv.Common.ServiceContracts;
+using HomeInv.Common.ServiceContracts.Home;
+using HomeInv.Language;
+using HomeInv.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Security.Claims;
 
 namespace WebUI.Base
@@ -64,7 +68,17 @@ namespace WebUI.Base
 
                 dbContext.Database.BeginTransaction();
                 var result = OnModelPost();
-                dbContext.Database.CommitTransaction();
+                if (_serviceCallResponse.IsSuccessful)
+                {
+                    SetSuccessMessage(_serviceCallSuccessMessage);
+                    dbContext.Database.CommitTransaction();
+                }
+                else
+                {
+                    result = Page();
+                    SetErrorMessage(_serviceCallResponse.Result.ToString());
+                    dbContext.Database.RollbackTransaction();
+                }
 
                 return result;
             }
@@ -77,6 +91,21 @@ namespace WebUI.Base
 
                 return Page();
             }
+        }
+
+        //protected RESP CallService<T, TR, REQ, RESP>(T service, Func<T, TR> func, REQ request, RESP response)
+        //{
+        //}
+        private BaseResponse _serviceCallResponse { get; set; }
+        private string _serviceCallSuccessMessage { get; set; }
+        protected CreateHomeResponse CallService(Func<CreateHomeRequest, CreateHomeResponse> createHome, CreateHomeRequest createHomeRequest, string successMessage = null)
+        {
+            if (string.IsNullOrEmpty(successMessage)) successMessage = Resources.Success_Generic;
+            _serviceCallSuccessMessage = successMessage;
+
+            _serviceCallResponse = createHome.Invoke(createHomeRequest);
+
+            return (CreateHomeResponse)_serviceCallResponse;
         }
 
         protected virtual IActionResult OnModelPost()
