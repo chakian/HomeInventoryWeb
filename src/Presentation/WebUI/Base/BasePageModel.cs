@@ -48,6 +48,10 @@ namespace WebUI.Base
         {
             TempData.Add("Info", message);
         }
+        protected void SetWarningMessage(string message)
+        {
+            TempData.Add("Warning", message);
+        }
 
         public IActionResult OnPost()
         {

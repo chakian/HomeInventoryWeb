@@ -42,6 +42,24 @@
                 </div>
             </div>
         }
+        @if (TempData["Info"] != null)
+        {
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Bilgi</div>
+                <div class="card-body">
+                    <p class="card-text">@TempData["Info"]</p>
+                </div>
+            </div>
+        }
+        @if (TempData["Warning"] != null)
+        {
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Uyarı</div>
+                <div class="card-body">
+                    <p class="card-text">@TempData["Warning"]</p>
+                </div>
+            </div>
+        }
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

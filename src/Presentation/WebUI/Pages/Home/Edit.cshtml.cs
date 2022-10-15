@@ -1,6 +1,7 @@
 using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Home;
+using HomeInv.Language;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -42,7 +43,8 @@ namespace WebUI.Pages.Home
                 RequestUserId = UserId
             };
             homeService.UpdateHome(updateHomeRequest);
-            
+
+            SetSuccessMessage(Resources.Success_Home_Edit);
             return RedirectToPage("/Home/List");
         }
     }

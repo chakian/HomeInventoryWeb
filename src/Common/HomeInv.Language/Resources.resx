@@ -129,10 +129,19 @@
   <data name="ItemNameExists" xml:space="preserve">
     <value>Bu evde, bu isimde bir nesne zaten var!</value>
   </data>
+  <data name="Success_Home_Create" xml:space="preserve">
+    <value>Yeni ev oluşturuldu.</value>
+  </data>
+  <data name="Success_Home_Edit" xml:space="preserve">
+    <value>Ev başarıyla güncellendi.</value>
+  </data>
   <data name="UserAlreadyHasAHome" xml:space="preserve">
     <value>Bu kullanıcının mevcut bir evi bulunuyor!</value>
   </data>
   <data name="UserIsAlreadyInThatHome" xml:space="preserve">
     <value>Bu kullanıcı zaten bu evde bulunuyor!</value>
+  </data>
+  <data name="Warning_HomeNeededToUseTheApp" xml:space="preserve">
+    <value>Uygulamayı kullanmaya başlamadan önce ilk evinizi oluşturmanız gerekiyor.</value>
   </data>
 </root>

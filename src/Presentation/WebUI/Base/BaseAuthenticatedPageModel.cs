@@ -1,6 +1,7 @@
 ﻿using HomeInv.Business;
 using HomeInv.Common.Constants;
 using HomeInv.Common.ServiceContracts.Home;
+using HomeInv.Language;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -27,16 +28,18 @@ namespace WebUI.Base
                 string currentPath = context.ActionDescriptor.ViewEnginePath;
                 string homeCreationPath = "/Home/Create";
                 string[] allowedPathsWithoutChecks = new string[] { homeCreationPath };
-                bool isRedirectionSet = false;
 
-                if (!allowedPathsWithoutChecks.Contains(currentPath) && !context.HttpContext.Session.Keys.Contains(SessionKeys.ACTIVE_HOME_ID) && !isRedirectionSet)
+                if (!allowedPathsWithoutChecks.Contains(currentPath))
                 {
-                    // find active home id, redirect if it doesn't exist
-                    var isHomeFound = SetActiveHomeId(context);
-                    if (!isHomeFound)
+                    if((context.HttpContext.Session.GetInt32(SessionKeys.ACTIVE_HOME_ID) ?? 0) == 0)
                     {
-                        context.Result = RedirectToPage(homeCreationPath);
-                        isRedirectionSet = true;
+                        // find active home id, redirect if it doesn't exist
+                        var isHomeFound = SetActiveHomeId(context);
+                        if (!isHomeFound)
+                        {
+                            SetInfoMessage(Resources.Warning_HomeNeededToUseTheApp);
+                            context.Result = RedirectToPage(homeCreationPath);
+                        }
                     }
                 }
             }
@@ -45,6 +48,9 @@ namespace WebUI.Base
                 SetErrorMessage("Kapattık kardeşim. Giriş yapıp tekrar bir deneyin.");
                 context.Result = RedirectToPage("/");
             }
+
+            // Set site-wide used variables
+            SelectedHomeId = context.HttpContext.Session.GetInt32(SessionKeys.ACTIVE_HOME_ID) ?? 0;
 
             base.OnPageHandlerExecuting(context);
         }
@@ -57,8 +63,8 @@ namespace WebUI.Base
 
             if(homesResponse != null && homesResponse.Homes != null && homesResponse.Homes.Count != 0)
             {
-                SelectedHomeId = homesResponse.Homes.FirstOrDefault().Id;
-                context.HttpContext.Session.SetInt32(SessionKeys.ACTIVE_HOME_ID, SelectedHomeId);
+                var homeId = homesResponse.Homes.FirstOrDefault().Id;
+                context.HttpContext.Session.SetInt32(SessionKeys.ACTIVE_HOME_ID, homeId);
 
                 return true;
             }
