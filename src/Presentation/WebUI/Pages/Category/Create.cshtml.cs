@@ -1,6 +1,7 @@
 using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Category;
+using HomeInv.Language;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -50,16 +51,14 @@ namespace WebUI.Pages.Category
                 HomeId = SelectedHomeId,
                 RequestUserId = UserId
             };
-            var categoryResponse = categoryService.CreateCategory(createCategoryRequest);
+            var categoryResponse = CallService(categoryService.CreateCategory, createCategoryRequest, Resources.Success_Category_Create);
 
             if (categoryResponse.IsSuccessful)
             {
-                SetSuccessMessage(categoryResponse.Result.ToString());
                 return RedirectToPage("List");
             }
             else
             {
-                SetErrorMessage(categoryResponse.Result.ToString());
                 return RedirectToPage("/Category/Create");
             }
         }

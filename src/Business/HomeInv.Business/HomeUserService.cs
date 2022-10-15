@@ -55,11 +55,6 @@ namespace HomeInv.Business
                 response.AddError(Resources.UserIsAlreadyInThatHome);
                 return response;
             }
-            else if (context.HomeUsers.Any(q => q.UserId == request.UserId))
-            {
-                response.AddError(Resources.UserAlreadyHasAHome);
-                return response;
-            }
 
             HomeUser homeUser = CreateNewAuditableObject(request);
             homeUser.HomeId = request.HomeId;

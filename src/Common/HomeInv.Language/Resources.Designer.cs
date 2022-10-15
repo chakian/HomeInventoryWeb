@@ -97,6 +97,24 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Kategori oluşturuldu..
+        /// </summary>
+        public static string Success_Category_Create {
+            get {
+                return ResourceManager.GetString("Success_Category_Create", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to İşlem başarıyla gerçekleşti..
+        /// </summary>
+        public static string Success_Generic {
+            get {
+                return ResourceManager.GetString("Success_Generic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Yeni ev oluşturuldu..
         /// </summary>
         public static string Success_Home_Create {
@@ -111,15 +129,6 @@ namespace HomeInv.Language {
         public static string Success_Home_Edit {
             get {
                 return ResourceManager.GetString("Success_Home_Edit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Bu kullanıcının mevcut bir evi bulunuyor!.
-        /// </summary>
-        public static string UserAlreadyHasAHome {
-            get {
-                return ResourceManager.GetString("UserAlreadyHasAHome", resourceCulture);
             }
         }
         

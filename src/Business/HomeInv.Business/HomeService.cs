@@ -2,9 +2,11 @@
 using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Home;
+using HomeInv.Common.ServiceContracts.HomeUser;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -43,8 +45,21 @@ namespace HomeInv.Business
             home.Description = request.HomeEntity.Description;
 
             context.Homes.Add(home);
-            //context.Entry(home).State = EntityState.Added;
             context.SaveChanges();
+
+            var insertHomeUserRequest = new InsertHomeUserRequest()
+            {
+                HomeId = home.Id,
+                UserId = request.RequestUserId,
+                Role = "owner",
+                RequestUserId = request.RequestUserId,
+            };
+            var _service = new HomeUserService(context);
+            var insertHomeUserResponse = _service.InsertHomeUser(insertHomeUserRequest);
+            if(insertHomeUserResponse != null && !insertHomeUserResponse.IsSuccessful)
+            {
+                response.Result.Messages.AddRange(insertHomeUserResponse.Result.Messages);
+            }
 
             response.HomeEntity = ConvertDboToEntity(home);
             return response;
