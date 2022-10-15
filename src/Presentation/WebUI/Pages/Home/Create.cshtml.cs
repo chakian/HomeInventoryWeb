@@ -46,32 +46,8 @@ namespace WebUI.Pages.Home
                 HomeEntity = Home,
                 RequestUserId = UserId
             };
-            //var createHomeResponse = homeService.CreateHome(createHomeRequest);
             var r = CallService(homeService.CreateHome, createHomeRequest);
             
-            /// TEMPORARY SOLUTION UNTIL AREAS ARE REALLY IMPLEMENTED
-            //var createAreaRequest = new CreateAreaRequest()
-            //{
-            //    AreaEntity = new AreaEntity()
-            //    {
-            //        HomeId = createHomeResponse.HomeEntity.Id,
-            //        Name = "Genel"
-            //    },
-            //    RequestUserId = UserId
-            //};
-            //var area = areaService.CreateArea(createAreaRequest);
-            //var insertAreaUserRequest = new InsertAreaUserRequest()
-            //{
-            //    AreaId = area.AreaEntity.Id,
-            //    UserId = UserId,
-            //    Role = "owner",
-            //    RequestUserId = UserId
-            //};
-            //areaUserService.InsertAreaUser(insertAreaUserRequest);
-            /// TEMPORARY SOLUTION UNTIL AREAS ARE REALLY IMPLEMENTED
-
-            //SetScreenMessage(Resources.Success_Home_Create, createHomeResponse);
-
             return RedirectToPage("/Home/List");
         }
     }
