@@ -31,8 +31,11 @@ namespace WebUI.Base
 
                 if (!allowedPathsWithoutChecks.Contains(currentPath))
                 {
-                    if((context.HttpContext.Session.GetInt32(SessionKeys.ACTIVE_HOME_ID) ?? 0) == 0)
+                    if((context.HttpContext.Session.GetInt32(SessionKeys.ACTIVE_HOME_ID) ?? 0) == 0 || context.HttpContext.Session.GetString("UserID") != UserId)
                     {
+                        //abandon session
+                        context.HttpContext.Session.Clear();
+
                         // find active home id, redirect if it doesn't exist
                         var isHomeFound = SetActiveHomeId(context);
                         if (!isHomeFound)
@@ -64,6 +67,7 @@ namespace WebUI.Base
             if(homesResponse != null && homesResponse.Homes != null && homesResponse.Homes.Count != 0)
             {
                 var homeId = homesResponse.Homes.FirstOrDefault().Id;
+                context.HttpContext.Session.SetString("UserID", UserId);
                 context.HttpContext.Session.SetInt32(SessionKeys.ACTIVE_HOME_ID, homeId);
 
                 return true;
