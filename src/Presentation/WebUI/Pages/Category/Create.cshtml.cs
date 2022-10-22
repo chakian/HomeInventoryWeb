@@ -28,7 +28,7 @@ namespace WebUI.Pages.Category
         {
             var categoryList = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest()
             {
-                HomeId = SelectedHomeId
+                HomeId = UserSettings.DefaultHomeId
             }).Categories;
             AllCategories = new List<SelectListItem>();
             AllCategories.Add(new SelectListItem("Üst Kategori", ""));
@@ -48,7 +48,7 @@ namespace WebUI.Pages.Category
             var createCategoryRequest = new CreateCategoryRequest()
             {
                 CategoryEntity = Category,
-                HomeId = SelectedHomeId,
+                HomeId = UserSettings.DefaultHomeId,
                 RequestUserId = UserId
             };
             var categoryResponse = CallService(categoryService.CreateCategory, createCategoryRequest, Resources.Success_Category_Create);

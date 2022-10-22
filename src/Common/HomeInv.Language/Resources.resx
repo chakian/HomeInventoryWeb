@@ -123,6 +123,9 @@
   <data name="Category_SameNameExists" xml:space="preserve">
     <value>Aynı isimde başka bir kategori mevcut</value>
   </data>
+  <data name="Error_LoggedOut" xml:space="preserve">
+    <value>Oturum uçmus, giriş yapıp tekrar bir deneyin. Giriş sağ üstte bir yerlerde.</value>
+  </data>
   <data name="HomeSelectionIsMandatory" xml:space="preserve">
     <value>Ev seçimi zorunludur.</value>
   </data>
@@ -145,6 +148,6 @@
     <value>Bu kullanıcı zaten bu evde bulunuyor!</value>
   </data>
   <data name="Warning_HomeNeededToUseTheApp" xml:space="preserve">
-    <value>Uygulamayı kullanmaya başlamadan önce ilk evinizi oluşturmanız gerekiyor.</value>
+    <value>Uygulamayı kullanmaya başlamadan önce ilk evinizi oluşturmanız veya bir eve davet edilmeniz gerekiyor.</value>
   </data>
 </root>

@@ -79,6 +79,15 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Oturum uçmus, giriş yapıp tekrar bir deneyin. Giriş sağ üstte bir yerlerde..
+        /// </summary>
+        public static string Error_LoggedOut {
+            get {
+                return ResourceManager.GetString("Error_LoggedOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ev seçimi zorunludur..
         /// </summary>
         public static string HomeSelectionIsMandatory {
@@ -142,7 +151,7 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Uygulamayı kullanmaya başlamadan önce ilk evinizi oluşturmanız gerekiyor..
+        ///   Looks up a localized string similar to Uygulamayı kullanmaya başlamadan önce ilk evinizi oluşturmanız veya bir eve davet edilmeniz gerekiyor..
         /// </summary>
         public static string Warning_HomeNeededToUseTheApp {
             get {
