@@ -88,6 +88,15 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Aynı isimde başka bir eviniz var, lütfen farklı bir isim giriniz..
+        /// </summary>
+        public static string Home_Error_SameNameExists {
+            get {
+                return ResourceManager.GetString("Home_Error_SameNameExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ev seçimi zorunludur..
         /// </summary>
         public static string HomeSelectionIsMandatory {

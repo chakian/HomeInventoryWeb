@@ -8,4 +8,8 @@
     <Folder Include="ServiceContracts\ItemStock\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\HomeInv.Language\HomeInv.Language.csproj" />
+  </ItemGroup>
+
 </Project>
