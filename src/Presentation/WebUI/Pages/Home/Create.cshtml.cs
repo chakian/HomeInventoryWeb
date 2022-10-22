@@ -26,7 +26,6 @@ namespace WebUI.Pages.Home
 
         public IActionResult OnGet()
         {
-            IsFirstHome = (SelectedHomeId == 0);
             return Page();
         }
 

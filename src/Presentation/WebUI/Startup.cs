@@ -55,6 +55,7 @@ namespace WebUI
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAreaService, AreaService>();
             services.AddScoped<IAreaUserService, AreaUserService>();
+            services.AddScoped<IUserSettingService, UserSettingService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

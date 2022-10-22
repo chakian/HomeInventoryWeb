@@ -1,13 +1,14 @@
-﻿using HomeInv.Business;
-using HomeInv.Common.Constants;
-using HomeInv.Common.ServiceContracts.Home;
+﻿using HomeInv.Common.Entities;
 using HomeInv.Language;
 using HomeInv.Persistence;
+using HomeInv.Persistence.Dbo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
+using System.Text.Json;
 
 namespace WebUI.Base
 {
@@ -15,7 +16,8 @@ namespace WebUI.Base
     public class BaseAuthenticatedPageModel<T> : BasePageModel<T>
     {
         private readonly HomeInventoryDbContext dbContext;
-        protected int SelectedHomeId { get; private set; }
+        protected UserSettingEntity UserSettings { get; private set; }
+
         public BaseAuthenticatedPageModel(ILogger<T> logger, HomeInventoryDbContext dbContext) : base(logger, dbContext)
         {
             this.dbContext = dbContext;
@@ -25,55 +27,88 @@ namespace WebUI.Base
         {
             if (User != null && User.Identity.IsAuthenticated)
             {
-                string currentPath = context.ActionDescriptor.ViewEnginePath;
-                string homeCreationPath = "/Home/Create";
-                string[] allowedPathsWithoutChecks = new string[] { homeCreationPath };
-
-                if (!allowedPathsWithoutChecks.Contains(currentPath))
+                var settings = ReadUserSettingsFromSession(context);
+                if(settings != null)
                 {
-                    if((context.HttpContext.Session.GetInt32(SessionKeys.ACTIVE_HOME_ID) ?? 0) == 0 || context.HttpContext.Session.GetString("UserID") != UserId)
-                    {
-                        //abandon session
-                        context.HttpContext.Session.Clear();
-
-                        // find active home id, redirect if it doesn't exist
-                        var isHomeFound = SetActiveHomeId(context);
-                        if (!isHomeFound)
+                    UserSettings = settings;
+                }
+                else
+                {
+                    var settingDbo = dbContext.UserSettings.SingleOrDefault(setting => setting.UserId == UserId);
+                    if (settingDbo != null) {
+                        UserSettings = new UserSettingEntity()
                         {
-                            SetInfoMessage(Resources.Warning_HomeNeededToUseTheApp);
-                            context.Result = RedirectToPage(homeCreationPath);
+                            UserId = UserId,
+                            DefaultHomeId = settingDbo.DefaultHomeId
+                        };
+                        WriteUserSettingsToSession(context, UserSettings);
+                    }
+                    else
+                    {
+                        // If the user does not have a settings record that means they haven't created a Home by themselves.
+                        // check if they are part of a home
+                        var userHomes = dbContext.HomeUsers.Where(hu => hu.UserId == UserId).ToList();
+                        if (userHomes != null && userHomes.Any())
+                        {
+                            var _settingDbo = new UserSetting()
+                            {
+                                UserId = UserId,
+                                DefaultHomeId = userHomes.First().HomeId,
+                                IsActive = true,
+                                InsertUserId = UserId,
+                                InsertTime = DateTime.UtcNow
+                            };
+                            dbContext.UserSettings.Add(_settingDbo);
+                            dbContext.SaveChanges();
+
+                            UserSettings = new UserSettingEntity()
+                            {
+                                UserId = UserId,
+                                DefaultHomeId = userHomes.First().HomeId
+                            };
+                            WriteUserSettingsToSession(context, UserSettings);
+                        }
+                        else
+                        {
+                            WarnAndRedirectToHomeCreation(context);
                         }
                     }
                 }
             }
             else
             {
-                SetErrorMessage("Kapattık kardeşim. Giriş yapıp tekrar bir deneyin.");
+                SetErrorMessage(Resources.Error_LoggedOut);
                 context.Result = RedirectToPage("/");
             }
-
-            // Set site-wide used variables
-            SelectedHomeId = context.HttpContext.Session.GetInt32(SessionKeys.ACTIVE_HOME_ID) ?? 0;
 
             base.OnPageHandlerExecuting(context);
         }
 
-        private bool SetActiveHomeId(PageHandlerExecutingContext context)
+        private void WarnAndRedirectToHomeCreation(PageHandlerExecutingContext context)
         {
-            var homeService = new HomeService(dbContext);
-            GetHomesOfUserRequest request = new GetHomesOfUserRequest { RequestUserId = UserId };
-            var homesResponse = homeService.GetHomesOfUser(request);
+            string currentPath = context.ActionDescriptor.ViewEnginePath;
+            string homeCreationPath = "/Home/Create";
 
-            if(homesResponse != null && homesResponse.Homes != null && homesResponse.Homes.Count != 0)
+            SetInfoMessage(Resources.Warning_HomeNeededToUseTheApp);
+            if (currentPath != homeCreationPath) context.Result = RedirectToPage(homeCreationPath);
+        }
+
+        private UserSettingEntity ReadUserSettingsFromSession(PageHandlerExecutingContext context)
+        {
+            var settingsJson = context.HttpContext.Session.Get("UserSettings");
+            if(settingsJson != null)
             {
-                var homeId = homesResponse.Homes.FirstOrDefault().Id;
-                context.HttpContext.Session.SetString("UserID", UserId);
-                context.HttpContext.Session.SetInt32(SessionKeys.ACTIVE_HOME_ID, homeId);
-
-                return true;
+                var settings = JsonSerializer.Deserialize<UserSettingEntity>(settingsJson);
+                if(settings != null && settings.UserId == UserId) return settings;
+                else context.HttpContext.Session.Clear();
             }
-
-            return false;
+            else context.HttpContext.Session.Clear();
+            return null;
+        }
+        private void WriteUserSettingsToSession(PageHandlerExecutingContext context, UserSettingEntity userSettings)
+        {
+            var settingsJson = JsonSerializer.SerializeToUtf8Bytes(userSettings);
+            context.HttpContext.Session.Set("UserSettings", settingsJson);
         }
     }
 }

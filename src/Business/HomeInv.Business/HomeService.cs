@@ -3,6 +3,7 @@ using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.Common.ServiceContracts.HomeUser;
+using HomeInv.Common.ServiceContracts.UserSetting;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using Microsoft.EntityFrameworkCore;
@@ -54,11 +55,34 @@ namespace HomeInv.Business
                 Role = "owner",
                 RequestUserId = request.RequestUserId,
             };
-            var _service = new HomeUserService(context);
-            var insertHomeUserResponse = _service.InsertHomeUser(insertHomeUserRequest);
+            var _userService = new HomeUserService(context);
+            var insertHomeUserResponse = _userService.InsertHomeUser(insertHomeUserRequest);
             if(insertHomeUserResponse != null && !insertHomeUserResponse.IsSuccessful)
             {
                 response.Result.Messages.AddRange(insertHomeUserResponse.Result.Messages);
+            }
+
+            var _settingService = new UserSettingService(context);
+            var getUserSettingsRequest = new GetUserSettingsRequest()
+            {
+                UserId = request.RequestUserId,
+                RequestUserId = request.RequestUserId
+            };
+            var getUserSettingsResponse = _settingService.GetUserSettings(getUserSettingsRequest);
+            if (getUserSettingsResponse.UserSetting.DefaultHomeId <= 0)
+            {
+                var insertOrUpdateForDefaultHomeRequest = new InsertOrUpdateForDefaultHomeRequest()
+                {
+                    UserId = request.RequestUserId,
+                    DefaultHomeId = home.Id,
+                    RequestUserId = request.RequestUserId
+                };
+
+                var insertOrUpdateForDefaultHomeResponse = _settingService.InsertOrUpdateForDefaultHome(insertOrUpdateForDefaultHomeRequest);
+                if (insertOrUpdateForDefaultHomeResponse != null && !insertOrUpdateForDefaultHomeResponse.IsSuccessful)
+                {
+                    response.Result.Messages.AddRange(insertOrUpdateForDefaultHomeResponse.Result.Messages);
+                }
             }
 
             response.HomeEntity = ConvertDboToEntity(home);

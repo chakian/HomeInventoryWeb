@@ -19,6 +19,7 @@ namespace HomeInv.Persistence
         public virtual DbSet<Item> Items { get; set; }
         public virtual DbSet<ItemStock> ItemStocks { get; set; }
         public virtual DbSet<SizeUnit> SizeUnits { get; set; }
+        public virtual DbSet<UserSetting> UserSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -102,17 +103,21 @@ namespace HomeInv.Persistence
                 .HasForeignKey(user => user.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<UserSetting>()
+                .HasOne(setting => setting.DefaultHome)
+                .WithMany()
+                .IsRequired()
+                .HasForeignKey(setting => setting.DefaultHomeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<UserSetting>()
+                .HasOne(setting => setting.User)
+                .WithOne()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
             //builder.Entity<Transaction>()
             //    .Property(b => b.Amount)
-            //    .HasColumnType("money");
-
-            //builder.Entity<Transaction>()
-            //    .HasOne(t => t.Budget)
-            //    .WithMany(b => b.Transactions)
-            //    .OnDelete(DeleteBehavior.NoAction);
-
-            //builder.Entity<Account>()
-            //    .Property(b => b.Balance)
             //    .HasColumnType("money");
         }
     }
