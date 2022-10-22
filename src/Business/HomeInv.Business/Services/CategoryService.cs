@@ -1,15 +1,13 @@
-﻿using HomeInv.Business.Base;
-using HomeInv.Common.Entities;
+﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Category;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HomeInv.Business
+namespace HomeInv.Business.Services
 {
     public class CategoryService : ServiceBase<Category, CategoryEntity>, ICategoryService<Category>
     {
@@ -26,7 +24,7 @@ namespace HomeInv.Business
         {
             var response = new CreateCategoryResponse();
 
-            if(request.HomeId == 0)
+            if (request.HomeId == 0)
             {
                 response.AddError(Language.Resources.Category_HomeIsMandatory);
             }
@@ -34,16 +32,16 @@ namespace HomeInv.Business
             {
                 //Prevent creating categories under the same parent with the same name
                 var existingCategory = context.Categories.Where(category => category.HomeId == request.HomeId && category.Name == request.CategoryEntity.Name && category.ParentCategoryId == request.CategoryEntity.ParentCategoryId);
-                if(existingCategory != null && existingCategory.Count() > 0)
+                if (existingCategory != null && existingCategory.Count() > 0)
                 {
                     response.AddError(Language.Resources.Category_SameNameExists);
                 }
 
                 //Prevent creating level 3 children
-                if(request.CategoryEntity.ParentCategoryId != null && request.CategoryEntity.ParentCategoryId > 0)
+                if (request.CategoryEntity.ParentCategoryId != null && request.CategoryEntity.ParentCategoryId > 0)
                 {
                     var parent = context.Categories.Find(request.CategoryEntity.ParentCategoryId);
-                    if(parent != null && (parent.ParentCategoryId ?? 0) > 0)
+                    if (parent != null && (parent.ParentCategoryId ?? 0) > 0)
                     {
                         var grandparent = context.Categories.Find(parent.ParentCategoryId);
                         if (grandparent != null && (grandparent.ParentCategoryId ?? 0) > 0)
@@ -116,7 +114,7 @@ namespace HomeInv.Business
         private List<CategoryEntity> GetChildrenOfCategory(List<Category> dbCategoryList, int parentCategoryId)
         {
             var childCategoryList = new List<CategoryEntity>();
-            
+
             foreach (var dbCategory in dbCategoryList.Where(cat => cat.ParentCategoryId == parentCategoryId).ToList())
             {
                 var childCategory = new CategoryEntity()
@@ -127,7 +125,7 @@ namespace HomeInv.Business
                     HasParent = true,
                     ParentCategoryId = dbCategory.ParentCategoryId
                 };
-                
+
                 childCategory.Children = GetChildrenOfCategory(dbCategoryList, childCategory.Id);
                 childCategory.HasChild = childCategory.Children != null && childCategory.Children.Count > 0;
                 childCategoryList.Add(childCategory);

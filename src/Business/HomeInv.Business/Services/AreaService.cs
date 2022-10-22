@@ -1,17 +1,11 @@
-﻿using HomeInv.Business.Base;
-using HomeInv.Common.Entities;
+﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Area;
-using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HomeInv.Business
+namespace HomeInv.Business.Services
 {
     public class AreaService : AuditableServiceBase<Area, AreaEntity>, IAreaService<Area>
     {

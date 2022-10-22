@@ -8,7 +8,7 @@
 //using System.Threading.Tasks;
 //using Xunit;
 
-//namespace HomeInv.Business.Tests.Home
+//namespace HomeInv.Business.Services.Tests.Home
 //{
 //    public class AreaTests : TestBase, IDisposable
 //    {

@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeInv.Common", "Common\Ho
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebUI", "Presentation\WebUI\WebUI.csproj", "{B6DEDF5B-FA78-4C72-A810-A0D464E68040}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeInv.Business.Tests", "Tests\HomeInv.Business.Tests\HomeInv.Business.Tests.csproj", "{CA39B682-6DE3-4E2A-8ABE-F252189804E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeInv.Business.Services.Tests", "Tests\HomeInv.Business.Tests\HomeInv.Business.Services.Tests.csproj", "{CA39B682-6DE3-4E2A-8ABE-F252189804E2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeInv.Language", "Common\HomeInv.Language\HomeInv.Language.csproj", "{087F332A-FE62-4742-BE07-21C9ECA01381}"
 EndProject

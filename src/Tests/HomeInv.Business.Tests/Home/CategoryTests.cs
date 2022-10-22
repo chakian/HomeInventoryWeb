@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using Xunit;
 
-namespace HomeInv.Business.Tests
+namespace HomeInv.Business.Services.Tests
 {
     public class CategoryTests : TestBase, IDisposable
     {

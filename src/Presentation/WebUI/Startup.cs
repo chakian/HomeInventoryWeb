@@ -1,4 +1,4 @@
-using HomeInv.Business;
+using HomeInv.Business.Services;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Builder;

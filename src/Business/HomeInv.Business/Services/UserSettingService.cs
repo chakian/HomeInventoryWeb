@@ -1,5 +1,4 @@
-﻿using HomeInv.Business.Base;
-using HomeInv.Common.Entities;
+﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.UserSetting;
 using HomeInv.Persistence;
@@ -8,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
-namespace HomeInv.Business
+namespace HomeInv.Business.Services
 {
     public class UserSettingService : AuditableServiceBase<UserSetting, UserSettingEntity>, IUserSettingService<UserSetting>
     {
@@ -78,7 +77,7 @@ namespace HomeInv.Business
             var response = new UpdateUserSettingsResponse();
 
             var settingDbo = context.UserSettings.SingleOrDefault(setting => setting.UserId == request.UserSettingEntity.UserId);
-            if(settingDbo != null)
+            if (settingDbo != null)
             {
                 settingDbo.DefaultHomeId = request.UserSettingEntity.DefaultHomeId;
             }

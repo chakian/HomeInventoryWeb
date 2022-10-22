@@ -1,5 +1,4 @@
-﻿using HomeInv.Business.Base;
-using HomeInv.Common.Entities;
+﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Item;
 using HomeInv.Language;
@@ -9,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HomeInv.Business
+namespace HomeInv.Business.Services
 {
     public class ItemService : AuditableServiceBase<Item, ItemEntity>, IItemService<Item>
     {
