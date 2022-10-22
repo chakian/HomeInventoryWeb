@@ -24,7 +24,7 @@ namespace WebUI.Pages.Category
         {
             var request = new GetCategoriesOfHomeRequest()
             {
-                HomeId = SelectedHomeId,
+                HomeId = UserSettings.DefaultHomeId,
                 RequestUserId = UserId
             };
             var categoriesResponse = categoryService.GetCategoriesOfHome_Hierarchial(request);

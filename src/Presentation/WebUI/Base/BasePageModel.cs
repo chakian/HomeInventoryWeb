@@ -42,19 +42,38 @@ namespace WebUI.Base
 
         protected void SetErrorMessage(string message)
         {
-            TempData.Add("Error", message);
+            var key = "Error";
+            AddOrUpdateTempData(key, message);
         }
         protected void SetSuccessMessage(string message)
         {
-            TempData.Add("Success", message);
+            var key = "Success";
+            AddOrUpdateTempData(key, message);
         }
         protected void SetInfoMessage(string message)
         {
-            TempData.Add("Info", message);
+            var key = "Info";
+            AddOrUpdateTempData(key, message);
         }
         protected void SetWarningMessage(string message)
         {
-            TempData.Add("Warning", message);
+            var key = "Warning";
+            AddOrUpdateTempData(key, message);
+        }
+        private void AddOrUpdateTempData(string key, string message)
+        {
+            var _tempData = TempData.Peek(key);
+            string currentText = (_tempData != null) ? _tempData.ToString() : "";
+            if (string.IsNullOrEmpty(currentText.ToString()))
+            {
+                TempData.Add(key, message);
+            }
+            else if(!currentText.Contains(message))
+            {
+                TempData.Remove(key);
+                currentText += " " + message;
+                TempData.Add(key, currentText);
+            }
         }
 
         public IActionResult OnPost()

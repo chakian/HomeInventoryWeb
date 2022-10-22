@@ -24,7 +24,7 @@ namespace WebUI.Pages.Item
         {
             var request = new GetAllItemsInHomeRequest()
             {
-                HomeId = SelectedHomeId,
+                HomeId = UserSettings.DefaultHomeId,
                 RequestUserId = UserId
             };
             var itemsResponse = itemService.GetAllItemsInHome(request);

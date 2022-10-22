@@ -18,6 +18,7 @@ namespace HomeInv.Persistence
             Configure<HomeUser>(modelBuilder);
             Configure<Item>(modelBuilder);
             Configure<ItemStock>(modelBuilder);
+            Configure<UserSetting>(modelBuilder);
         }
 
         private static void Configure<T>(ModelBuilder modelBuilder, bool isUserBindingRequired = false)

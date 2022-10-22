@@ -34,7 +34,7 @@ namespace WebUI.Pages.Item
         {
             var categoryList = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest()
             {
-                HomeId = SelectedHomeId
+                HomeId = UserSettings.DefaultHomeId
             }).Categories;
             AllCategories = new List<SelectListItem>();
             AllCategories.Add(new SelectListItem("Üst Kategori", ""));
@@ -49,7 +49,7 @@ namespace WebUI.Pages.Item
 
             var sizeUnitList = sizeUnitService.GetAllSizes(new GetAllSizesRequest()
             {
-                HomeId = SelectedHomeId,
+                HomeId = UserSettings.DefaultHomeId,
                 RequestUserId = UserId
             }).SizeUnits;
             AllSizeUnits = new List<SelectListItem>();
