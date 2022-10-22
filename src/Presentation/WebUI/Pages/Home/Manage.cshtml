@@ -42,23 +42,25 @@
         @if (Model.UserResult != null && Model.UserResult.Any())
         {
             <form method="post">
+                <input asp-for="Home.Id" type="hidden" />
+                <input asp-for="Home.Name" type="hidden" />
+                
                 <table class="table">
                     <tr>
                         <td>#</td>
                         <td>Kullanıcı Adı</td>
-                        <td>Kullanıcı Rolü</td>
                     </tr>
-                    @{int index = 0;}
-                    @foreach (var homeUser in Model.UserResult)
+                    @for (int index = 0; index < Model.UserResult.Count; index++)
                     {
+                        <input asp-for="UserResult[index].Id" type="hidden" />
                         <tr>
-                            @*<td><input asp-for="" type="checkbox"/></td>*@
-                            <td>@homeUser.Username</td>
-                            <td>@homeUser.Id</td>
+                            <td><input asp-for="UserResult[index].IsSelected" type="checkbox"/></td>
+                            <td>@Model.UserResult[index].Name</td>
                         </tr>
-                }
-            </table>
-        </form>
+                    }
+                </table>
+                <input type="submit" value="Seçilenleri Ekle" class="btn btn-secondary" />
+            </form>
         }
     </div>
 </div>
