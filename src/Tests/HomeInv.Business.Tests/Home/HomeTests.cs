@@ -1,11 +1,12 @@
 ﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Home;
+using HomeInv.Language;
 using System;
 using System.Linq;
 using Xunit;
 
-namespace HomeInv.Business.Tests
+namespace HomeInv.Business.Services.Tests
 {
     public class HomeTests : TestBase, IDisposable
     {
@@ -59,6 +60,18 @@ namespace HomeInv.Business.Tests
                 Role = "owner",
                 IsActive = true
             });
+            homeId = context.Homes.Add(new Persistence.Dbo.Home()
+            {
+                Name = "test home 2",
+                IsActive = true
+            }).Entity.Id;
+            context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
+            {
+                HomeId = homeId,
+                UserId = userIds[0],
+                Role = "owner",
+                IsActive = true
+            });
             context.SaveChanges();
             
             // act
@@ -89,6 +102,78 @@ namespace HomeInv.Business.Tests
 
             // assert
             Assert.Empty(actual.Homes);
+        }
+
+        [Fact]
+        public void Home_Create_Fail_SameNameExists()
+        {
+            // arrange
+            var context = GetContext();
+            IHomeService homeService = new HomeService(context);
+            string homeName = "test home";
+            var homeId = context.Homes.Add(new Persistence.Dbo.Home()
+            {
+                Name = homeName,
+                IsActive = true
+            }).Entity.Id;
+            context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
+            {
+                HomeId = homeId,
+                UserId = userIds[0],
+                Role = "owner",
+                IsActive = true
+            });
+            context.SaveChanges();
+
+            HomeEntity homeEntity = new HomeEntity()
+            {
+                Name = homeName,
+            };
+
+            // act
+            var request = new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[0] };
+            var actual = homeService.CreateHome(request);
+
+            var expected = Resources.Home_Error_SameNameExists;
+
+            // assert
+            Assert.Equal(expected, actual.Result.ToString());
+        }
+
+        [Fact]
+        public void Home_Create_Ok_DifferentUsersCanUserSameHomeName()
+        {
+            // arrange
+            var context = GetContext();
+            IHomeService homeService = new HomeService(context);
+            string homeName = "test home";
+            var homeId = context.Homes.Add(new Persistence.Dbo.Home()
+            {
+                Name = homeName,
+                IsActive = true
+            }).Entity.Id;
+            context.HomeUsers.Add(new Persistence.Dbo.HomeUser()
+            {
+                HomeId = homeId,
+                UserId = userIds[0],
+                Role = "owner",
+                IsActive = true
+            });
+            context.SaveChanges();
+
+            HomeEntity homeEntity = new HomeEntity()
+            {
+                Name = homeName,
+            };
+
+            // act
+            var request = new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[1] };
+            var actual = homeService.CreateHome(request);
+
+            var expected = Resources.Success_Generic;
+
+            // assert
+            Assert.Equal(expected, actual.Result.ToString());
         }
     }
 }

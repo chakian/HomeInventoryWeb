@@ -6,7 +6,7 @@ using HomeInv.Persistence.Dbo;
 using System;
 using System.Linq;
 
-namespace HomeInv.Business.Base
+namespace HomeInv.Business.Services
 {
     public abstract class AuditableServiceBase<D, E> : ServiceBase<D, E>, IAuditableServiceBase<D, E>
         where D : BaseAuditableDbo, new()

@@ -1,12 +1,11 @@
-﻿using HomeInv.Business.Base;
-using HomeInv.Common.Entities;
+﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.SizeUnit;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using System;
 
-namespace HomeInv.Business
+namespace HomeInv.Business.Services
 {
     public class SizeUnitService : ServiceBase<SizeUnit, SizeUnitEntity>, ISizeUnitService<SizeUnit>
     {

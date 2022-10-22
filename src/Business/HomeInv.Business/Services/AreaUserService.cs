@@ -1,5 +1,4 @@
-﻿using HomeInv.Business.Base;
-using HomeInv.Common.Entities;
+﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.AreaUser;
 using HomeInv.Common.ServiceContracts.HomeUser;
@@ -12,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomeInv.Business
+namespace HomeInv.Business.Services
 {
     public class AreaUserService : AuditableServiceBase<AreaUser, AreaUserEntity>, IAreaUserService<AreaUser>
     {

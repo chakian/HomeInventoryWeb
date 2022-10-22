@@ -1,17 +1,16 @@
-﻿using HomeInv.Business.Base;
-using HomeInv.Common.Entities;
+﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.Common.ServiceContracts.HomeUser;
 using HomeInv.Common.ServiceContracts.UserSetting;
+using HomeInv.Language;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HomeInv.Business
+namespace HomeInv.Business.Services
 {
     public class HomeService : AuditableServiceBase<Home, HomeEntity>, IHomeService<Home>
     {
@@ -41,6 +40,14 @@ namespace HomeInv.Business
         public CreateHomeResponse CreateHome(CreateHomeRequest request)
         {
             CreateHomeResponse response = new CreateHomeResponse();
+
+            var homesOfUser = GetHomesOfUserInternal(request.RequestUserId);
+            if(homesOfUser != null && homesOfUser.Any(home => home.Name.Trim() == request.HomeEntity.Name.Trim()))
+            {
+                response.AddError(Resources.Home_Error_SameNameExists);
+                return response;
+            }
+
             Home home = CreateNewAuditableObject(request);
             home.Name = request.HomeEntity.Name;
             home.Description = request.HomeEntity.Description;
@@ -57,7 +64,7 @@ namespace HomeInv.Business
             };
             var _userService = new HomeUserService(context);
             var insertHomeUserResponse = _userService.InsertHomeUser(insertHomeUserRequest);
-            if(insertHomeUserResponse != null && !insertHomeUserResponse.IsSuccessful)
+            if (insertHomeUserResponse != null && !insertHomeUserResponse.IsSuccessful)
             {
                 response.Result.Messages.AddRange(insertHomeUserResponse.Result.Messages);
             }

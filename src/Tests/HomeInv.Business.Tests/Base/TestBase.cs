@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 
-namespace HomeInv.Business.Tests
+namespace HomeInv.Business.Services.Tests
 {
     public abstract class TestBase
     {

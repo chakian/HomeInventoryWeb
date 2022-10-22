@@ -6,7 +6,7 @@
 //using System.Linq;
 //using Xunit;
 
-//namespace HomeInv.Business.Tests
+//namespace HomeInv.Business.Services.Tests
 //{
 //    public class ItemTests : TestBase, IDisposable
 //    {

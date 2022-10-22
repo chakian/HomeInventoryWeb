@@ -1,5 +1,4 @@
-﻿using HomeInv.Business.Base;
-using HomeInv.Common.Entities;
+﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.HomeUser;
 using HomeInv.Language;
@@ -9,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HomeInv.Business
+namespace HomeInv.Business.Services
 {
     public class HomeUserService : AuditableServiceBase<HomeUser, HomeUserEntity>, IHomeUserService<HomeUser>
     {
@@ -34,7 +33,7 @@ namespace HomeInv.Business
             var response = new GetUsersOfHomeResponse();
 
             var homeUsers = context.HomeUsers
-                .Where(homeUser => homeUser.UserId == request.RequestUserId)
+                .Where(homeUser => homeUser.HomeId == request.HomeId)
                 .Include(user => user.User).ToList();
             var homeUserEntities = new List<HomeUserEntity>();
             foreach (var homeUser in homeUsers)

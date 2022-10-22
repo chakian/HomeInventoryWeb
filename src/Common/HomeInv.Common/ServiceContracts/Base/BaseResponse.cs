@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using HomeInv.Language;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HomeInv.Common.ServiceContracts
@@ -77,7 +78,7 @@ namespace HomeInv.Common.ServiceContracts
             {
                 if(Messages.Count == 0)
                 {
-                    return "İşlem başarıyla tamamlandı.";
+                    return Resources.Success_Generic;
                 }
                 else
                 {
