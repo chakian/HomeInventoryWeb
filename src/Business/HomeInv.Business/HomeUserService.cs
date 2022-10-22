@@ -34,7 +34,7 @@ namespace HomeInv.Business
             var response = new GetUsersOfHomeResponse();
 
             var homeUsers = context.HomeUsers
-                .Where(homeUser => homeUser.UserId == request.RequestUserId)
+                .Where(homeUser => homeUser.HomeId == request.HomeId)
                 .Include(user => user.User).ToList();
             var homeUserEntities = new List<HomeUserEntity>();
             foreach (var homeUser in homeUsers)

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
 using WebUI.Base;
 
 namespace WebUI.Pages.Home
@@ -39,7 +40,14 @@ namespace WebUI.Pages.Home
         public string SearchQuery { get; set; }
 
         [BindProperty]
-        public List<UserEntity> UserResult { get; set; }
+        public List<SelectableUserResult> UserResult { get; set; }
+
+        public class SelectableUserResult
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+            public bool IsSelected { get; set; }
+        }
 
         public void OnGet(int homeId, string searchQuery)
         {
@@ -62,7 +70,12 @@ namespace WebUI.Pages.Home
             {
                 var searchUserRequest = new SearchUserRequest { SearchQuery = searchQuery, RequestUserId = UserId };
                 var searchUserResponse = userService.SearchUser(searchUserRequest);
-                UserResult = searchUserResponse.SearchResults;
+                UserResult = searchUserResponse.SearchResults.Select(res => new SelectableUserResult()
+                {
+                    Id = res.UserId,
+                    Name = res.Username,
+                    IsSelected = false
+                }).ToList();
 
                 SearchQuery = searchQuery;
             }
@@ -72,14 +85,27 @@ namespace WebUI.Pages.Home
 
         protected override IActionResult OnModelPost()
         {
-            
+            if(UserResult != null && UserResult.Any(result => result.IsSelected))
+            {
+                foreach (var user in UserResult.Where(result => result.IsSelected))
+                {
+                    var insertRequest = new InsertHomeUserRequest()
+                    {
+                        UserId = user.Id,
+                        HomeId = Home.Id,
+                        RequestUserId = UserId,
+                        Role = "owner"
+                    };
+                    CallService(homeUserService.InsertHomeUser, insertRequest);
+                }
+            }
 
             var routeValues = new
             {
                 homeId = Home.Id,
                 searchQuery = SearchQuery,
             };
-            return RedirectToPage("/Manage", routeValues);
+            return RedirectToPage("/Home/Manage", routeValues);
         }
 
         public class SelectableUser
