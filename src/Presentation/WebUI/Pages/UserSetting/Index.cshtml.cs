@@ -65,6 +65,8 @@ namespace WebUI.Pages.UserSetting
             };
             var response = CallService(userSettingService.UpdateUserSettings, updateUserSettingsRequest);
 
+            if (response.IsSuccessful) HttpContext.Session.Clear();
+
             InitiatePageModel();
 
             return Page();
