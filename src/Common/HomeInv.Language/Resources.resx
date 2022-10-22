@@ -129,6 +129,9 @@
   <data name="HomeSelectionIsMandatory" xml:space="preserve">
     <value>Ev seçimi zorunludur.</value>
   </data>
+  <data name="Home_Error_SameNameExists" xml:space="preserve">
+    <value>Aynı isimde başka bir eviniz var, lütfen farklı bir isim giriniz.</value>
+  </data>
   <data name="ItemNameExists" xml:space="preserve">
     <value>Bu evde, bu isimde bir nesne zaten var!</value>
   </data>
