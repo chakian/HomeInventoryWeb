@@ -5,9 +5,9 @@
 }
 
 <h1>Kategoriler</h1>
-<h4><a asp-page="Create">Yeni Kategori</a></h4>
+<a class="btn btn-primary" asp-page="Create">Yeni Kategori</a>
 
-<table class="table table-responsive table-hover">
+<table class="table table-responsive table-hover table-dark">
     <thead>
         <tr><th>&nbsp;</th><th>Kategori</th><th>Açıklama</th></tr>
     </thead>
@@ -34,7 +34,7 @@
                         foreach (var grandchild in child.Children)
                         {
                             <tr class="row@(child.Id)">
-                                <td><span>--></span></td>
+                                <td><span>->-></span></td>
                                 <td>@(grandchild.Name)</td>
                                 <td>@(grandchild.Description)</td>
                             </tr>

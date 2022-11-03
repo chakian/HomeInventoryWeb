@@ -7,17 +7,10 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
-<body>
-    <header class="py-3 mb-3 border-bottom bg-dark text-white">
-        <div class="container-fluid">
-            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                    <img src="~/assets/s-logo-blue-white.png" height="32" style="margin-right:8px;" />
-                </a>
-
-                <partial name="_NavigationPartial" />
-                <partial name="_LoginPartial" />
-            </div>
+<body class="bg-dark text-white">
+    <header class="py-3 mb-3 border-bottom">
+        <div class="container-fluid d-grid gap-3 align-items-center" style="grid-template-columns: 1fr 5fr;">
+            <partial name="_TopNavPartial" />
         </div>
     </header>
     

@@ -132,6 +132,11 @@ namespace WebUI.Base
 
         public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
         {
+            if (User != null && User.Identity.IsAuthenticated && (context.ActionDescriptor.ViewEnginePath == "/" || context.ActionDescriptor.ViewEnginePath == "/Index"))
+            {
+                string defaultLandingPage = "/Item/List";
+                context.Result = RedirectToPage(defaultLandingPage);
+            }
             base.OnPageHandlerExecuting(context);
         }
     }
