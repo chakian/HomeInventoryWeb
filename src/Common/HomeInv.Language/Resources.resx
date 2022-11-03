@@ -120,6 +120,9 @@
   <data name="Category_HomeIsMandatory" xml:space="preserve">
     <value>Ev seçimi olmadan kategori kaydedilemez!</value>
   </data>
+  <data name="Category_MaxThreeLevelsAllowed" xml:space="preserve">
+    <value>Üçüncü seviyede kategori eklenemez.</value>
+  </data>
   <data name="Category_SameNameExists" xml:space="preserve">
     <value>Aynı isimde başka bir kategori mevcut</value>
   </data>
