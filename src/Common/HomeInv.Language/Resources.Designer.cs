@@ -70,6 +70,15 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Üçüncü seviyede kategori eklenemez..
+        /// </summary>
+        public static string Category_MaxThreeLevelsAllowed {
+            get {
+                return ResourceManager.GetString("Category_MaxThreeLevelsAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Aynı isimde başka bir kategori mevcut.
         /// </summary>
         public static string Category_SameNameExists {
