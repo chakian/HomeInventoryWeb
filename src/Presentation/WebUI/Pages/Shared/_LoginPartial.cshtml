@@ -1,25 +1,28 @@
 ﻿@inject SignInManager<HomeInv.Persistence.Dbo.User> SignInManager
 @inject UserManager<HomeInv.Persistence.Dbo.User> UserManager
 
-<ul class="navbar-nav">
-    @if (SignInManager.IsSignedIn(User))
-    {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-page="/UserSetting/Index" title="Manage">Hello @User.Identity.Name.Substring(0, User.Identity.Name.IndexOf('@'))!</a>
-        </li>
-        <li class="nav-item">
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post" >
-                <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-            </form>
-        </li>
-    }
-    else
-    {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-        </li>
-    }
-</ul>
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="flex-shrink-0 dropdown">
+        <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="rounded-circle border text-white" style="padding-left:5px; padding-right:5px;">C</span>
+        </a>
+        <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2" style="">
+            <li><a class="dropdown-item" asp-area="" asp-page="/UserSetting/Index">Seçenekler</a></li>
+            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Hesap Ayarları</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                    <button type="submit" class="dropdown-item">Çıkış</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+}
+else
+{
+    <div class="text-end">
+        <a class="btn btn-outline-light me-2" asp-area="Identity" asp-page="/Account/Login">Giriş</a>
+        <a class="btn btn-warning" asp-area="Identity" asp-page="/Account/Register">Yeni Kayıt</a>
+    </div>
+}
