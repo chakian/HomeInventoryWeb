@@ -22,6 +22,7 @@ namespace HomeInv.Persistence
         public virtual DbSet<ItemStock> ItemStocks { get; set; }
         public virtual DbSet<SizeUnit> SizeUnits { get; set; }
         public virtual DbSet<UserSetting> UserSettings { get; set; }
+        public virtual DbSet<ItemUnitPrice> ItemUnitPrices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -69,14 +70,12 @@ namespace HomeInv.Persistence
                 .HasOne(itemStockAction => itemStockAction.ItemStock)
                 .WithMany(itemStock => itemStock.ItemStockActions)
                 .IsRequired()
-                //.HasForeignKey(itemStockAction => itemStockAction.ItemStockId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<ItemStockAction>()
                 .HasOne(itemStockAction => itemStockAction.ItemStockActionType)
                 .WithMany()
                 .IsRequired()
-                //.HasForeignKey(itemStockAction => itemStockAction.ItemStockActionTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<ItemStockAction>()
@@ -86,6 +85,18 @@ namespace HomeInv.Persistence
             builder.Entity<ItemStockAction>()
                 .Property(b => b.Currency)
                 .HasColumnType("nvarchar(10)");
+
+            builder.Entity<ItemUnitPrice>()
+                .HasOne(itemUnitPrice => itemUnitPrice.ItemStockAction)
+                .WithMany();
+
+            builder.Entity<ItemUnitPrice>()
+                .HasOne(itemUnitPrice => itemUnitPrice.ItemDefinition)
+                .WithMany();
+
+            builder.Entity<ItemUnitPrice>()
+                .Property(b => b.UnitPrice)
+                .HasColumnType("money");
 
             builder.Entity<AreaUser>()
                 .HasOne(user => user.Area)
