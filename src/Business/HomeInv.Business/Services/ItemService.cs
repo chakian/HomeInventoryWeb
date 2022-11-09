@@ -57,15 +57,14 @@ namespace HomeInv.Business.Services
         {
             var response = new GetAllItemsInHomeResponse();
 
-            throw new NotImplementedException();
-            //var dbItemList = context.Items.Where(item => item.IsActive && item.HomeId == request.HomeId).ToList();
-            //List<ItemEntity> itemList = new List<ItemEntity>();
-            //foreach (var item in dbItemList)
-            //{
-            //    itemList.Add(ConvertDboToEntity(item));
-            //}
+            var dbItemList = context.ItemDefinitions.Where(item => item.IsActive && item.Category.HomeId == request.HomeId).ToList();
+            List<ItemEntity> itemList = new List<ItemEntity>();
+            foreach (var item in dbItemList)
+            {
+                itemList.Add(ConvertDboToEntity(item));
+            }
 
-            //response.Items = itemList;
+            response.Items = itemList;
 
             return response;
         }
