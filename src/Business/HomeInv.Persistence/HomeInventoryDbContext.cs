@@ -18,7 +18,7 @@ namespace HomeInv.Persistence
         public virtual DbSet<HomeUser> HomeUsers { get; set; }
         public virtual DbSet<ItemDefinition> ItemDefinitions { get; set; }
         public virtual DbSet<ItemStockActionType> ItemStockActionTypes { get; set; }
-        //public virtual DbSet<ItemStock> ItemStocks { get; set; }
+        public virtual DbSet<ItemStock> ItemStocks { get; set; }
         public virtual DbSet<SizeUnit> SizeUnits { get; set; }
         public virtual DbSet<UserSetting> UserSettings { get; set; }
 
@@ -38,29 +38,27 @@ namespace HomeInv.Persistence
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //TODO: Uncomment these
-            //builder.Entity<ItemStock>()
-            //    .HasOne(itemStock => itemStock.SizeUnit)
-            //    .WithMany()
-            //    .IsRequired()
-            //    .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ItemStock>()
+                .HasOne(itemStock => itemStock.SizeUnit)
+                .WithMany()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //builder.Entity<ItemStock>()
-            //    .Property(itemStock => itemStock.Size)
-            //    .HasPrecision(18, 2);
+            builder.Entity<ItemStock>()
+                .Property(itemStock => itemStock.Size)
+                .HasPrecision(18, 2);
 
-            //builder.Entity<ItemStock>()
-            //    .HasOne(itemStock => itemStock.ItemDefinition)
-            //    .WithMany()
-            //    .IsRequired()
-            //    .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ItemStock>()
+                .HasOne(itemStock => itemStock.ItemDefinition)
+                .WithMany()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //builder.Entity<ItemStock>()
-            //    .HasOne(item => itemStock.Area)
-            //    .WithMany(area => area.ItemStocks)
-            //    .IsRequired()
-            //    .OnDelete(DeleteBehavior.Restrict);
-            //TODO: End of uncommenting
+            builder.Entity<ItemStock>()
+                .HasOne(itemStock => itemStock.Area)
+                .WithMany(area => area.ItemStocks)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<AreaUser>()
                 .HasOne(user => user.Area)
