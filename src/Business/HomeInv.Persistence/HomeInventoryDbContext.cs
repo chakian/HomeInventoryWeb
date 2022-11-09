@@ -18,6 +18,7 @@ namespace HomeInv.Persistence
         public virtual DbSet<HomeUser> HomeUsers { get; set; }
         public virtual DbSet<ItemDefinition> ItemDefinitions { get; set; }
         public virtual DbSet<ItemStockActionType> ItemStockActionTypes { get; set; }
+        public virtual DbSet<ItemStockAction> ItemStockActions { get; set; }
         public virtual DbSet<ItemStock> ItemStocks { get; set; }
         public virtual DbSet<SizeUnit> SizeUnits { get; set; }
         public virtual DbSet<UserSetting> UserSettings { get; set; }
@@ -64,6 +65,28 @@ namespace HomeInv.Persistence
                 .Property(itemStock => itemStock.RemainingAmount)
                 .HasPrecision(18, 2);
 
+            builder.Entity<ItemStockAction>()
+                .HasOne(itemStockAction => itemStockAction.ItemStock)
+                .WithMany(itemStock => itemStock.ItemStockActions)
+                .IsRequired()
+                //.HasForeignKey(itemStockAction => itemStockAction.ItemStockId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ItemStockAction>()
+                .HasOne(itemStockAction => itemStockAction.ItemStockActionType)
+                .WithMany()
+                .IsRequired()
+                //.HasForeignKey(itemStockAction => itemStockAction.ItemStockActionTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ItemStockAction>()
+                .Property(b => b.Price)
+                .HasColumnType("money");
+
+            builder.Entity<ItemStockAction>()
+                .Property(b => b.Currency)
+                .HasColumnType("nvarchar(10)");
+
             builder.Entity<AreaUser>()
                 .HasOne(user => user.Area)
                 .WithMany(area => area.AreaUsers)
@@ -96,10 +119,6 @@ namespace HomeInv.Persistence
                 .WithOne()
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<Transaction>()
-            //    .Property(b => b.Amount)
-            //    .HasColumnType("money");
         }
     }
 }
