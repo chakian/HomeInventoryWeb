@@ -16,7 +16,8 @@ namespace HomeInv.Persistence
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Home> Homes { get; set; }
         public virtual DbSet<HomeUser> HomeUsers { get; set; }
-        //public virtual DbSet<Item> Items { get; set; }
+        public virtual DbSet<ItemDefinition> ItemDefinitions { get; set; }
+        public virtual DbSet<ItemStockActionType> ItemStockActionTypes { get; set; }
         //public virtual DbSet<ItemStock> ItemStocks { get; set; }
         public virtual DbSet<SizeUnit> SizeUnits { get; set; }
         public virtual DbSet<UserSetting> UserSettings { get; set; }
