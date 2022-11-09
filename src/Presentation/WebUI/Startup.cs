@@ -50,7 +50,6 @@ namespace WebUI
             services.AddScoped<IHomeService, HomeService>();
             services.AddScoped<IHomeUserService, HomeUserService>();
             services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<IItemService, ItemService>();
             services.AddScoped<ISizeUnitService, SizeUnitService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAreaService, AreaService>();

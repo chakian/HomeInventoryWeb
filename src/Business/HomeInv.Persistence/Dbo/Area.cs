@@ -13,7 +13,7 @@ namespace HomeInv.Persistence.Dbo
 
         public virtual Home Home { get; set; }
 
-        public virtual IEnumerable<ItemStock> ItemStocks { get; set; }
+        //public virtual IEnumerable<ItemStock> ItemStocks { get; set; }
         public virtual IEnumerable<AreaUser> AreaUsers { get; set; }
     }
 }

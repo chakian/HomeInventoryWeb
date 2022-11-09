@@ -8,7 +8,7 @@ using Xunit;
 
 namespace HomeInv.Business.Services.Tests
 {
-    public class CategoryTests : TestBase, IDisposable
+    public class CategoryTests : HomeRelatedTestBase, IDisposable
     {
         public void Dispose()
         {
@@ -25,27 +25,21 @@ namespace HomeInv.Business.Services.Tests
             var context = GetContext();
             string categoryName = "Test category", description = "Test";
 
-            var home = new Home()
-            {
-                Name = "new home"
-            };
-            context.Homes.Add(home);
-            context.SaveChanges();
+            int homeId = CreateDefaultHome(context);
 
+            // act
             ICategoryService categoryService = new CategoryService(context);
             var request = new CreateCategoryRequest()
             {
-                CategoryEntity=new CategoryEntity()
+                CategoryEntity = new CategoryEntity()
                 {
                     Name = categoryName,
                     Description = description,
                     ParentCategoryId = null
                 },
-                HomeId = home.Id,
+                HomeId = homeId,
                 RequestUserId = userIds[0]
             };
-
-            // act
             var actual = categoryService.CreateCategory(request);
             var expected = context.Categories.First();
 
@@ -61,22 +55,19 @@ namespace HomeInv.Business.Services.Tests
             var context = GetContext();
             string categoryName = "Test category", description = "Test";
 
-            var home = new Home()
-            {
-                Name = "new home"
-            };
-            context.Homes.Add(home);
+            int homeId = CreateDefaultHome(context);
 
             var existingCategory = new Category()
             {
                 Name = categoryName,
                 Description = description,
-                HomeId = home.Id,
+                HomeId = homeId,
                 ParentCategoryId = null
             };
             context.Categories.Add(existingCategory);
             context.SaveChanges();
 
+            // act
             ICategoryService categoryService = new CategoryService(context);
             var request = new CreateCategoryRequest()
             {
@@ -86,17 +77,97 @@ namespace HomeInv.Business.Services.Tests
                     Description = description,
                     ParentCategoryId = null
                 },
-                HomeId = home.Id,
+                HomeId = homeId,
                 RequestUserId = userIds[0]
             };
-
-            // act
             var actual = categoryService.CreateCategory(request);
 
             // assert
             Assert.False(actual.IsSuccessful);
             Assert.Equal(Language.Resources.Category_SameNameExists, actual.Result.Messages[0].Text);
-            //TODO: Assert error message as well
+        }
+
+        [Fact]
+        public void Category_Create_Fail_HomeRequired()
+        {
+            // arrange
+            var context = GetContext();
+            string categoryName = "Test category", description = "Test";
+
+            // act
+            ICategoryService categoryService = new CategoryService(context);
+            var request = new CreateCategoryRequest()
+            {
+                CategoryEntity = new CategoryEntity()
+                {
+                    Name = categoryName,
+                    Description = description,
+                    ParentCategoryId = null
+                },
+                RequestUserId = userIds[0]
+            };
+            var actual = categoryService.CreateCategory(request);
+
+            // assert
+            Assert.False(actual.IsSuccessful);
+            Assert.Equal(Language.Resources.Category_HomeIsMandatory, actual.Result.Messages[0].Text);
+        }
+
+        [Fact]
+        public void Category_Create_Fail_MaxThreeLevelsAllowed()
+        {
+            // arrange
+            var context = GetContext();
+            string categoryTopLevel = "Test category", categorySecondLevel = "Second Level", categoryThirdLevel = "Third Level";
+            int homeId = CreateDefaultHome(context);
+
+            var existingCategory = new Category()
+            {
+                Name = categoryTopLevel,
+                HomeId = homeId,
+                ParentCategoryId = null
+            };
+            context.Categories.Add(existingCategory);
+            context.SaveChanges();
+            int topLevelId = existingCategory.Id;
+            
+            existingCategory = new Category()
+            {
+                Name = categorySecondLevel,
+                HomeId = homeId,
+                ParentCategoryId = topLevelId
+            };
+            context.Categories.Add(existingCategory);
+            context.SaveChanges();
+            int secondLevelId = existingCategory.Id;
+
+            existingCategory = new Category()
+            {
+                Name = categoryThirdLevel,
+                HomeId = homeId,
+                ParentCategoryId = secondLevelId
+            };
+            context.Categories.Add(existingCategory);
+            context.SaveChanges();
+            int thirdLevelId = existingCategory.Id;
+
+            // act
+            ICategoryService categoryService = new CategoryService(context);
+            var request = new CreateCategoryRequest()
+            {
+                CategoryEntity = new CategoryEntity()
+                {
+                    Name = "new category",
+                    ParentCategoryId = thirdLevelId
+                },
+                HomeId = homeId,
+                RequestUserId = userIds[0]
+            };
+            var actual = categoryService.CreateCategory(request);
+
+            // assert
+            Assert.False(actual.IsSuccessful);
+            Assert.Equal(Language.Resources.Category_MaxThreeLevelsAllowed, actual.Result.Messages[0].Text);
         }
 
         [Fact]
@@ -104,11 +175,7 @@ namespace HomeInv.Business.Services.Tests
         {
             // arrange
             var context = GetContext();
-            var home = new Home()
-            {
-                Name = "new home"
-            };
-            context.Homes.Add(home);
+            int homeId = CreateDefaultHome(context);
 
             string categoryName = "Test category", description = "Test";
             for (int i = 0; i < 10; i++)
@@ -117,7 +184,7 @@ namespace HomeInv.Business.Services.Tests
                 {
                     Name = categoryName + i.ToString(),
                     Description = description,
-                    HomeId = home.Id,
+                    HomeId = homeId,
                     ParentCategoryId = null,
                     IsActive = true
                 };
@@ -125,14 +192,13 @@ namespace HomeInv.Business.Services.Tests
             }
             context.SaveChanges();
 
+            // act
             ICategoryService categoryService = new CategoryService(context);
             var request = new GetCategoriesOfHomeRequest()
             {
-                HomeId = home.Id,
+                HomeId = homeId,
                 RequestUserId = userIds[0]
             };
-
-            // act
             var actual = categoryService.GetCategoriesOfHome_Ordered(request);
 
             // assert
@@ -145,11 +211,7 @@ namespace HomeInv.Business.Services.Tests
         {
             // arrange
             var context = GetContext();
-            var home = new Home()
-            {
-                Name = "new home"
-            };
-            context.Homes.Add(home);
+            int homeId = CreateDefaultHome(context);
 
             string categoryName = "Test category", description = "Test";
             for (int i = 0; i < 10; i++)
@@ -158,7 +220,7 @@ namespace HomeInv.Business.Services.Tests
                 {
                     Name = categoryName + i.ToString(),
                     Description = description,
-                    HomeId = home.Id,
+                    HomeId = homeId,
                     ParentCategoryId = null,
                     IsActive = i % 2 == 0
                 };
@@ -166,14 +228,13 @@ namespace HomeInv.Business.Services.Tests
             }
             context.SaveChanges();
 
+            // act
             ICategoryService categoryService = new CategoryService(context);
             var request = new GetCategoriesOfHomeRequest()
             {
-                HomeId = home.Id,
+                HomeId = homeId,
                 RequestUserId = userIds[0]
             };
-
-            // act
             var actual = categoryService.GetCategoriesOfHome_Ordered(request);
 
             // assert
