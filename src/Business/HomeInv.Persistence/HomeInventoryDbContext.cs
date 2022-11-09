@@ -60,6 +60,10 @@ namespace HomeInv.Persistence
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<ItemStock>()
+                .Property(itemStock => itemStock.RemainingAmount)
+                .HasPrecision(18, 2);
+
             builder.Entity<AreaUser>()
                 .HasOne(user => user.Area)
                 .WithMany(area => area.AreaUsers)
