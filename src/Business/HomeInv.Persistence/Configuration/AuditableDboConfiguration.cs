@@ -16,7 +16,7 @@ namespace HomeInv.Persistence
             Configure<AreaUser>(modelBuilder);
             Configure<Home>(modelBuilder);
             Configure<HomeUser>(modelBuilder);
-            //Configure<Item>(modelBuilder);
+            Configure<ItemDefinition>(modelBuilder);
             //Configure<ItemStock>(modelBuilder);
             Configure<UserSetting>(modelBuilder);
         }

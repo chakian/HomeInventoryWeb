@@ -27,47 +27,17 @@ namespace HomeInv.Persistence
 
             AuditableDboConfiguration.Configure(builder);
 
-            //builder.Entity<Category>()
-            //    .HasOne(category => category.ParentCategory)
-            //    .WithMany(parent => parent.ChildCategories)
-            //    .IsRequired(false);
-
-            //builder.Entity<Item>()
-            //    .HasOne(item => item.Category)
-            //    .WithMany(category => category.Items)
-            //    .IsRequired();
-
-            //builder.Entity<ItemStock>()
-            //    .HasOne(item => item.Area)
-            //    .WithMany(area => area.ItemStocks)
-            //    .IsRequired();
-
-            //builder.Entity<ItemStock>()
-            //    .HasOne(item => item.Container)
-            //    .WithMany(container => container.ContainingItems)
-            //    .IsRequired(false);
-
             builder.Entity<SizeUnit>()
                 .Property(sizeUnit => sizeUnit.ConversionMultiplierToBase)
                 .HasPrecision(28, 14);
 
+            builder.Entity<ItemDefinition>()
+                .HasOne(item => item.Category)
+                .WithMany(category => category.ItemDefinitions)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
             //TODO: Uncomment these
-            //builder.Entity<Item>()
-            //    .Property(item => item.Size)
-            //    .HasPrecision(18, 2);
-
-            //builder.Entity<Item>()
-            //    .HasOne(item => item.SizeUnit)
-            //    .WithMany()
-            //    .IsRequired()
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<Item>()
-            //    .HasOne(item => item.Home)
-            //    .WithMany()
-            //    .IsRequired()
-            //    .OnDelete(DeleteBehavior.Restrict);
-
             //builder.Entity<ItemStock>()
             //    .HasOne(itemStock => itemStock.SizeUnit)
             //    .WithMany()
@@ -75,14 +45,20 @@ namespace HomeInv.Persistence
             //    .OnDelete(DeleteBehavior.Restrict);
 
             //builder.Entity<ItemStock>()
-            //    .HasOne(itemStock => itemStock.Item)
+            //    .Property(itemStock => itemStock.Size)
+            //    .HasPrecision(18, 2);
+
+            //builder.Entity<ItemStock>()
+            //    .HasOne(itemStock => itemStock.ItemDefinition)
             //    .WithMany()
             //    .IsRequired()
             //    .OnDelete(DeleteBehavior.Restrict);
 
             //builder.Entity<ItemStock>()
-            //    .Property(itemStock => itemStock.Size)
-            //    .HasPrecision(18, 2);
+            //    .HasOne(item => itemStock.Area)
+            //    .WithMany(area => area.ItemStocks)
+            //    .IsRequired()
+            //    .OnDelete(DeleteBehavior.Restrict);
             //TODO: End of uncommenting
 
             builder.Entity<AreaUser>()
