@@ -2,7 +2,7 @@
 
 namespace HomeInv.Common.Entities
 {
-    public class ItemEntity : EntityBase
+    public class ItemDefinitionEntity : EntityBase
     {
         [Required]
         public string Name { get; set; }

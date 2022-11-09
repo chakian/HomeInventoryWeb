@@ -24,7 +24,7 @@ namespace WebUI.Pages.Item
             this.sizeUnitService = sizeUnitService;
         }
 
-        [BindProperty] public ItemEntity Item { get; set; }
+        [BindProperty] public ItemDefinitionEntity Item { get; set; }
 
         [BindProperty] public List<SelectListItem> AllCategories { get; set; }
 
