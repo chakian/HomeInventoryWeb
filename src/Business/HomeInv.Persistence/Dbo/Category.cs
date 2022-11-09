@@ -14,7 +14,7 @@ namespace HomeInv.Persistence.Dbo
         public virtual Category ParentCategory { get; set; }
         public virtual IEnumerable<Category> ChildCategories { get; set; }
 
-        //public virtual IEnumerable<Item> Items { get; set; }
+        public virtual IEnumerable<ItemDefinition> ItemDefinitions { get; set; }
 
         [Required]
         public int HomeId { get; set; }

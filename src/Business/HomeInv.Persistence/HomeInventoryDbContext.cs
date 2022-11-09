@@ -16,8 +16,9 @@ namespace HomeInv.Persistence
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Home> Homes { get; set; }
         public virtual DbSet<HomeUser> HomeUsers { get; set; }
-        //public virtual DbSet<Item> Items { get; set; }
-        //public virtual DbSet<ItemStock> ItemStocks { get; set; }
+        public virtual DbSet<ItemDefinition> ItemDefinitions { get; set; }
+        public virtual DbSet<ItemStockActionType> ItemStockActionTypes { get; set; }
+        public virtual DbSet<ItemStock> ItemStocks { get; set; }
         public virtual DbSet<SizeUnit> SizeUnits { get; set; }
         public virtual DbSet<UserSetting> UserSettings { get; set; }
 
@@ -27,63 +28,41 @@ namespace HomeInv.Persistence
 
             AuditableDboConfiguration.Configure(builder);
 
-            //builder.Entity<Category>()
-            //    .HasOne(category => category.ParentCategory)
-            //    .WithMany(parent => parent.ChildCategories)
-            //    .IsRequired(false);
-
-            //builder.Entity<Item>()
-            //    .HasOne(item => item.Category)
-            //    .WithMany(category => category.Items)
-            //    .IsRequired();
-
-            //builder.Entity<ItemStock>()
-            //    .HasOne(item => item.Area)
-            //    .WithMany(area => area.ItemStocks)
-            //    .IsRequired();
-
-            //builder.Entity<ItemStock>()
-            //    .HasOne(item => item.Container)
-            //    .WithMany(container => container.ContainingItems)
-            //    .IsRequired(false);
-
             builder.Entity<SizeUnit>()
                 .Property(sizeUnit => sizeUnit.ConversionMultiplierToBase)
                 .HasPrecision(28, 14);
 
-            //TODO: Uncomment these
-            //builder.Entity<Item>()
-            //    .Property(item => item.Size)
-            //    .HasPrecision(18, 2);
+            builder.Entity<ItemDefinition>()
+                .HasOne(item => item.Category)
+                .WithMany(category => category.ItemDefinitions)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //builder.Entity<Item>()
-            //    .HasOne(item => item.SizeUnit)
-            //    .WithMany()
-            //    .IsRequired()
-            //    .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ItemStock>()
+                .HasOne(itemStock => itemStock.SizeUnit)
+                .WithMany()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //builder.Entity<Item>()
-            //    .HasOne(item => item.Home)
-            //    .WithMany()
-            //    .IsRequired()
-            //    .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ItemStock>()
+                .Property(itemStock => itemStock.Size)
+                .HasPrecision(18, 2);
 
-            //builder.Entity<ItemStock>()
-            //    .HasOne(itemStock => itemStock.SizeUnit)
-            //    .WithMany()
-            //    .IsRequired()
-            //    .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ItemStock>()
+                .HasOne(itemStock => itemStock.ItemDefinition)
+                .WithMany()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //builder.Entity<ItemStock>()
-            //    .HasOne(itemStock => itemStock.Item)
-            //    .WithMany()
-            //    .IsRequired()
-            //    .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ItemStock>()
+                .HasOne(itemStock => itemStock.Area)
+                .WithMany(area => area.ItemStocks)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //builder.Entity<ItemStock>()
-            //    .Property(itemStock => itemStock.Size)
-            //    .HasPrecision(18, 2);
-            //TODO: End of uncommenting
+            builder.Entity<ItemStock>()
+                .Property(itemStock => itemStock.RemainingAmount)
+                .HasPrecision(18, 2);
 
             builder.Entity<AreaUser>()
                 .HasOne(user => user.Area)

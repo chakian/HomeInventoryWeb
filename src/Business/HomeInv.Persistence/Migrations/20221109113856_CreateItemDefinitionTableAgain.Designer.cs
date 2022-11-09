@@ -4,6 +4,7 @@ using HomeInv.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeInv.Persistence.Migrations
 {
     [DbContext(typeof(HomeInventoryDbContext))]
-    partial class HomeInventoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221109113856_CreateItemDefinitionTableAgain")]
+    partial class CreateItemDefinitionTableAgain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -291,93 +293,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("UpdateUserId");
 
-                    b.ToTable("ItemDefinitions");
-                });
-
-            modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemStock", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("AreaId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ExpirationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("InsertTime")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<string>("InsertUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ItemDefinitionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("RemainingAmount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Size")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("SizeUnitId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdateUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AreaId");
-
-                    b.HasIndex("InsertUserId");
-
-                    b.HasIndex("ItemDefinitionId");
-
-                    b.HasIndex("SizeUnitId");
-
-                    b.HasIndex("UpdateUserId");
-
-                    b.ToTable("ItemStocks");
-                });
-
-            modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemStockActionType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ItemStockActionTypes");
+                    b.ToTable("ItemDefinition");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.SizeUnit", b =>
@@ -807,45 +723,6 @@ namespace HomeInv.Persistence.Migrations
                     b.Navigation("UpdateUser");
                 });
 
-            modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemStock", b =>
-                {
-                    b.HasOne("HomeInv.Persistence.Dbo.Area", "Area")
-                        .WithMany("ItemStocks")
-                        .HasForeignKey("AreaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("HomeInv.Persistence.Dbo.User", "InsertUser")
-                        .WithMany()
-                        .HasForeignKey("InsertUserId");
-
-                    b.HasOne("HomeInv.Persistence.Dbo.ItemDefinition", "ItemDefinition")
-                        .WithMany()
-                        .HasForeignKey("ItemDefinitionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("HomeInv.Persistence.Dbo.SizeUnit", "SizeUnit")
-                        .WithMany()
-                        .HasForeignKey("SizeUnitId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("HomeInv.Persistence.Dbo.User", "UpdateUser")
-                        .WithMany()
-                        .HasForeignKey("UpdateUserId");
-
-                    b.Navigation("Area");
-
-                    b.Navigation("InsertUser");
-
-                    b.Navigation("ItemDefinition");
-
-                    b.Navigation("SizeUnit");
-
-                    b.Navigation("UpdateUser");
-                });
-
             modelBuilder.Entity("HomeInv.Persistence.Dbo.UserSetting", b =>
                 {
                     b.HasOne("HomeInv.Persistence.Dbo.Home", "DefaultHome")
@@ -931,8 +808,6 @@ namespace HomeInv.Persistence.Migrations
             modelBuilder.Entity("HomeInv.Persistence.Dbo.Area", b =>
                 {
                     b.Navigation("AreaUsers");
-
-                    b.Navigation("ItemStocks");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.Category", b =>
