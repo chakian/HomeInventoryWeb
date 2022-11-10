@@ -18,9 +18,11 @@ namespace HomeInv.Persistence
         public virtual DbSet<HomeUser> HomeUsers { get; set; }
         public virtual DbSet<ItemDefinition> ItemDefinitions { get; set; }
         public virtual DbSet<ItemStockActionType> ItemStockActionTypes { get; set; }
+        public virtual DbSet<ItemStockAction> ItemStockActions { get; set; }
         public virtual DbSet<ItemStock> ItemStocks { get; set; }
         public virtual DbSet<SizeUnit> SizeUnits { get; set; }
         public virtual DbSet<UserSetting> UserSettings { get; set; }
+        public virtual DbSet<ItemUnitPrice> ItemUnitPrices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -45,10 +47,6 @@ namespace HomeInv.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<ItemStock>()
-                .Property(itemStock => itemStock.Size)
-                .HasPrecision(18, 2);
-
-            builder.Entity<ItemStock>()
                 .HasOne(itemStock => itemStock.ItemDefinition)
                 .WithMany()
                 .IsRequired()
@@ -63,6 +61,42 @@ namespace HomeInv.Persistence
             builder.Entity<ItemStock>()
                 .Property(itemStock => itemStock.RemainingAmount)
                 .HasPrecision(18, 2);
+
+            builder.Entity<ItemStockAction>()
+                .HasOne(itemStockAction => itemStockAction.ItemStock)
+                .WithMany(itemStock => itemStock.ItemStockActions)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ItemStockAction>()
+                .HasOne(itemStockAction => itemStockAction.ItemStockActionType)
+                .WithMany()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ItemStockAction>()
+                .Property(itemStockAction => itemStockAction.Size)
+                .HasPrecision(18, 2);
+
+            builder.Entity<ItemStockAction>()
+                .Property(itemStockAction => itemStockAction.Price)
+                .HasColumnType("money");
+
+            builder.Entity<ItemStockAction>()
+                .Property(itemStockAction => itemStockAction.Currency)
+                .HasColumnType("nvarchar(10)");
+
+            builder.Entity<ItemUnitPrice>()
+                .HasOne(itemUnitPrice => itemUnitPrice.ItemStockAction)
+                .WithMany();
+
+            builder.Entity<ItemUnitPrice>()
+                .HasOne(itemUnitPrice => itemUnitPrice.ItemDefinition)
+                .WithMany();
+
+            builder.Entity<ItemUnitPrice>()
+                .Property(b => b.UnitPrice)
+                .HasColumnType("money");
 
             builder.Entity<AreaUser>()
                 .HasOne(user => user.Area)
@@ -96,10 +130,6 @@ namespace HomeInv.Persistence
                 .WithOne()
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
-
-            //builder.Entity<Transaction>()
-            //    .Property(b => b.Amount)
-            //    .HasColumnType("money");
         }
     }
 }

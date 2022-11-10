@@ -1,5 +1,5 @@
 ﻿@page
-@model WebUI.Pages.Item.CreateModel
+@model WebUI.Pages.ItemDefinition.CreateModel
 @{
     ViewData["Title"] = "Yeni İtem";
 }
@@ -27,24 +27,14 @@
                 <span asp-validation-for="Item.Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Item.SizeUnitId" class="control-label"></label>
-                <select asp-for="Item.SizeUnitId" asp-items="Model.AllSizeUnits" class="form-control"></select>
-                <span asp-validation-for="Item.SizeUnitId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Item.Size" class="control-label"></label>
-                <input asp-for="Item.Size" class="form-control" />
-                <span asp-validation-for="Item.Size" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Kaydet" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-page="List">Back to List</a>
+    <a asp-page="List">Listeye Dön</a>
 </div>
 
 @section Scripts {

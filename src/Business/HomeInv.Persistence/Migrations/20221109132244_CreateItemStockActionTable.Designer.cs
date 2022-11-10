@@ -4,6 +4,7 @@ using HomeInv.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeInv.Persistence.Migrations
 {
     [DbContext(typeof(HomeInventoryDbContext))]
-    partial class HomeInventoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221109132244_CreateItemStockActionTable")]
+    partial class CreateItemStockActionTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -322,7 +324,14 @@ namespace HomeInv.Persistence.Migrations
                     b.Property<int>("ItemDefinitionId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("RemainingAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Size")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
@@ -385,10 +394,6 @@ namespace HomeInv.Persistence.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("money");
 
-                    b.Property<decimal>("Size")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime?>("UpdateTime")
                         .HasColumnType("datetime2");
 
@@ -429,41 +434,6 @@ namespace HomeInv.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ItemStockActionTypes");
-                });
-
-            modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemUnitPrice", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("ItemDefinitionId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ItemStockActionId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("PriceDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("money");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ItemDefinitionId");
-
-                    b.HasIndex("ItemStockActionId");
-
-                    b.ToTable("ItemUnitPrices");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.SizeUnit", b =>
@@ -961,21 +931,6 @@ namespace HomeInv.Persistence.Migrations
                     b.Navigation("ItemStockActionType");
 
                     b.Navigation("UpdateUser");
-                });
-
-            modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemUnitPrice", b =>
-                {
-                    b.HasOne("HomeInv.Persistence.Dbo.ItemDefinition", "ItemDefinition")
-                        .WithMany()
-                        .HasForeignKey("ItemDefinitionId");
-
-                    b.HasOne("HomeInv.Persistence.Dbo.ItemStockAction", "ItemStockAction")
-                        .WithMany()
-                        .HasForeignKey("ItemStockActionId");
-
-                    b.Navigation("ItemDefinition");
-
-                    b.Navigation("ItemStockAction");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.UserSetting", b =>

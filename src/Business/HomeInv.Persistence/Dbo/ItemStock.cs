@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace HomeInv.Persistence.Dbo
@@ -13,21 +15,17 @@ namespace HomeInv.Persistence.Dbo
         public int AreaId { get; set; }
         public virtual Area Area { get; set; }
 
-        //[Required]
-        //public DateTime PurchaseDate { get; set; }
-
         #region Size Properties
         public int SizeUnitId { get; set; }
         public virtual SizeUnit SizeUnit { get; set; }
-        public decimal Size { get; set; }
         #endregion
-
-        public int Quantity { get; set; }
-
+        
         #region Consumable
         public DateTime? ExpirationDate { get; set; }
         #endregion
 
         public decimal RemainingAmount { get; set; }
+
+        public virtual IEnumerable<ItemStockAction> ItemStockActions { get; set; }
     }
 }

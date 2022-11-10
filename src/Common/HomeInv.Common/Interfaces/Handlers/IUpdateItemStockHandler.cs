@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomeInv.Common.ServiceContracts.Item
+namespace HomeInv.Common.Interfaces.Handlers
 {
-    public class GetItemResponse : BaseResponse
+    public interface IUpdateItemStockHandler : IHandlerBase
     {
     }
 }

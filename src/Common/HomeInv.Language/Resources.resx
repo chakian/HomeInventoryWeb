@@ -138,6 +138,21 @@
   <data name="ItemNameExists" xml:space="preserve">
     <value>Bu evde, bu isimde bir nesne zaten var!</value>
   </data>
+  <data name="ItemStock_Error_AreaIdEmpty" xml:space="preserve">
+    <value>Stoğun odası seçilmeden stoğun nerede olduğunu bilemeyiz ki ama...</value>
+  </data>
+  <data name="ItemStock_Error_ItemDefinitionIdEmpty" xml:space="preserve">
+    <value>İtem Tanımı seçimi yapılmadan stok güncellenemez ki ama...</value>
+  </data>
+  <data name="ItemStock_Error_ItemStockIdEmptyOnUpdateAction" xml:space="preserve">
+    <value>Bu aksiyon sadece stokta bulunan bir üründe güncelleme yapılırken seçilebilir!</value>
+  </data>
+  <data name="ItemStock_Error_SizeEmpty" xml:space="preserve">
+    <value>Kaç kilo, kaç tane, kaç ney bu ürün :(</value>
+  </data>
+  <data name="ItemStock_Error_SizeUnitIdEmpty" xml:space="preserve">
+    <value>Stoktaki ürünün boyunu posunu da bilmeyelim mi?...</value>
+  </data>
   <data name="Success_Category_Create" xml:space="preserve">
     <value>Kategori oluşturuldu.</value>
   </data>

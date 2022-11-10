@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomeInv.Common.ServiceContracts.Item
+namespace HomeInv.Common.ServiceContracts.ItemDefinition
 {
-    public class GetItemRequest : BaseHomeRelatedRequest
+    public class GetItemDefinitionRequest : BaseHomeRelatedRequest
     {
     }
 }
