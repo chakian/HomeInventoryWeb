@@ -11,10 +11,10 @@ namespace WebUI.Pages.ItemDefinition
 {
     public class ListModel : BaseAuthenticatedPageModel<ListModel>
     {
-        readonly IItemDefinitionService itemDefinitionService;
+        readonly IItemDefinitionService _itemDefinitionService;
         public ListModel(ILogger<ListModel> logger, HomeInventoryDbContext dbContext, IItemDefinitionService itemDefinitionService) : base(logger, dbContext)
         {
-            this.itemDefinitionService = itemDefinitionService;
+            _itemDefinitionService = itemDefinitionService;
         }
 
         [BindProperty]
@@ -27,7 +27,7 @@ namespace WebUI.Pages.ItemDefinition
                 HomeId = UserSettings.DefaultHomeId,
                 RequestUserId = UserId
             };
-            var itemsResponse = itemDefinitionService.GetAllItemDefinitionsInHome(request, true);
+            var itemsResponse = _itemDefinitionService.GetAllItemDefinitionsInHome(request, true);
 
             if (!itemsResponse.IsSuccessful)
             {
