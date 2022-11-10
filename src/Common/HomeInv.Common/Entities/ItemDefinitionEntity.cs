@@ -9,14 +9,11 @@ namespace HomeInv.Common.Entities
 
         public string Description { get; set; }
 
+        [Required]
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
-
-        public int SizeUnitId { get; set; }
-        public int SizeUnitText { get; set; }
-        public decimal Size { get; set; }
+        public string CategoryFullName { get; set; }
 
         public bool IsExpirable { get; set; }
-        public bool IsContainer { get; set; }
     }
 }

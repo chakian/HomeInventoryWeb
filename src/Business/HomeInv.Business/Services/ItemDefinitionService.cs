@@ -4,6 +4,7 @@ using HomeInv.Common.ServiceContracts.ItemDefinition;
 using HomeInv.Language;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +19,30 @@ namespace HomeInv.Business.Services
 
         public override ItemDefinitionEntity ConvertDboToEntity(ItemDefinition dbo)
         {
+            var queryableCategories = context.Categories.AsQueryable();
             ItemDefinitionEntity entity = ConvertBaseDboToEntityBase(dbo);
             entity.Name = dbo.Name;
             entity.Description = dbo.Description;
+            if(dbo.Category != null)
+            {
+                entity.CategoryId= dbo.Category.Id;
+                entity.CategoryName= dbo.Category.Name;
+
+                if (dbo.Category.ParentCategoryId!= null)
+                {
+                    var parentsNames = "";
+
+                    var parent = queryableCategories.Single(c => c.Id == dbo.Category.ParentCategoryId);
+                    parentsNames = parent.Name;
+                    if(parent.ParentCategoryId != null)
+                    {
+                        var grandparent = queryableCategories.Single(c => c.Id == parent.ParentCategoryId);
+                        parentsNames = grandparent.Name + " - " + parentsNames;
+                    }
+
+                    entity.CategoryFullName = parentsNames;
+                }
+            }
             return entity;
         }
 
@@ -28,11 +50,15 @@ namespace HomeInv.Business.Services
         {
             CreateItemDefinitionResponse response = new CreateItemDefinitionResponse();
 
+            if (request.ItemEntity.CategoryId <= 0)
+            {
+                response.AddError("Kategori seçimi olmadan item tanımı yapılamaz!");
+            }
             if (string.IsNullOrEmpty(request.ItemEntity.Name))
             {
                 response.AddError("İsim boş olamaz!");
             }
-            if (context.ItemDefinitions.Any(q => q.Name == request.ItemEntity.Name))
+            if (context.ItemDefinitions.Any(q => q.Category.HomeId == request.HomeId && q.Name == request.ItemEntity.Name))
             {
                 response.AddError(Resources.ItemNameExists);
             }
@@ -42,11 +68,11 @@ namespace HomeInv.Business.Services
                 ItemDefinition item = CreateNewAuditableObject(request);
                 item.Name = request.ItemEntity.Name;
                 item.Description = request.ItemEntity.Description;
+                item.CategoryId = request.ItemEntity.CategoryId;
+                item.IsExpirable = request.ItemEntity.IsExpirable;
 
                 context.ItemDefinitions.Add(item);
                 context.SaveChanges();
-
-                response.ItemEntity = ConvertDboToEntity(item);
             }
 
             return response;
@@ -56,7 +82,9 @@ namespace HomeInv.Business.Services
         {
             var response = new GetAllItemDefinitionsInHomeResponse();
 
-            var dbItemList = context.ItemDefinitions.Where(item => item.IsActive && item.Category.HomeId == request.HomeId).ToList();
+            var dbItemList = context.ItemDefinitions.Include(itemDef => itemDef.Category)
+                .Where(item => (includeInactive ? true : item.IsActive) && item.Category.HomeId == request.HomeId)
+                .ToList();
             List<ItemDefinitionEntity> itemList = new List<ItemDefinitionEntity>();
             foreach (var item in dbItemList)
             {

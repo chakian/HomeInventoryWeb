@@ -1,0 +1,24 @@
+﻿@page
+@model WebUI.Pages.ItemDefinition.ListModel
+@{
+    ViewData["Title"] = "İtem Tanımları";
+}
+
+<h1>İtem Tanımları</h1>
+<a class="btn btn-primary" asp-page="Create">Yeni İtem</a>
+
+<table class="table table-responsive table-hover table-dark">
+    <thead>
+        <tr><th>Tanım Adı</th><th>Kategori</th><th>SonKulTar Oluyor Mu?</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var itemDefinition in Model.ItemDefinitions)
+        {
+            <tr>
+                <td>@(itemDefinition.Name)</td>
+                <td>@(itemDefinition.CategoryName + (string.IsNullOrEmpty(itemDefinition.CategoryFullName) ? "" : " (" + itemDefinition.CategoryFullName + ")"))</td>
+                <td>@(itemDefinition.IsExpirable ? "Evet" : "Hayır")</td>
+            </tr>
+        }
+    </tbody>
+</table>
