@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomeInv.Business.Handlers
+namespace HomeInv.Common.Interfaces.Handlers
 {
-    public class HomeHandler : HandlerBase
+    public interface IUpdateItemStockHandler : IHandlerBase
     {
     }
 }

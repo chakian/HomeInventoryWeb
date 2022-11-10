@@ -9,6 +9,8 @@ namespace HomeInv.Persistence.Dbo
         public int ItemStockId { get; set; }
         public virtual ItemStock ItemStock { get; set; }
 
+        public decimal Size { get; set; }
+
         [Required]
         public int ItemStockActionTypeId { get; set; }
         public virtual ItemStockActionType ItemStockActionType { get; set; }

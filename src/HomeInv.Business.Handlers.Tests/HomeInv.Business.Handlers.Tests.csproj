@@ -1,7 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -22,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Business\HomeInv.Business\HomeInv.Business.csproj" />
-    <ProjectReference Include="..\..\Business\HomeInv.Persistence\HomeInv.Persistence.csproj" />
+    <ProjectReference Include="..\Business\HomeInv.Business\HomeInv.Business.csproj" />
+    <ProjectReference Include="..\Business\HomeInv.Persistence\HomeInv.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

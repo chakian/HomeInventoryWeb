@@ -47,10 +47,6 @@ namespace HomeInv.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<ItemStock>()
-                .Property(itemStock => itemStock.Size)
-                .HasPrecision(18, 2);
-
-            builder.Entity<ItemStock>()
                 .HasOne(itemStock => itemStock.ItemDefinition)
                 .WithMany()
                 .IsRequired()
@@ -79,11 +75,15 @@ namespace HomeInv.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<ItemStockAction>()
-                .Property(b => b.Price)
+                .Property(itemStockAction => itemStockAction.Size)
+                .HasPrecision(18, 2);
+
+            builder.Entity<ItemStockAction>()
+                .Property(itemStockAction => itemStockAction.Price)
                 .HasColumnType("money");
 
             builder.Entity<ItemStockAction>()
-                .Property(b => b.Currency)
+                .Property(itemStockAction => itemStockAction.Currency)
                 .HasColumnType("nvarchar(10)");
 
             builder.Entity<ItemUnitPrice>()

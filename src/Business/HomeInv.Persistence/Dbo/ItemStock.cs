@@ -18,11 +18,8 @@ namespace HomeInv.Persistence.Dbo
         #region Size Properties
         public int SizeUnitId { get; set; }
         public virtual SizeUnit SizeUnit { get; set; }
-        public decimal Size { get; set; }
         #endregion
-
-        public int Quantity { get; set; }
-
+        
         #region Consumable
         public DateTime? ExpirationDate { get; set; }
         #endregion

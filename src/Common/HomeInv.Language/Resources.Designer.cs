@@ -124,6 +124,51 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Stoğun odası seçilmeden stoğun nerede olduğunu bilemeyiz ki ama....
+        /// </summary>
+        public static string ItemStock_Error_AreaIdEmpty {
+            get {
+                return ResourceManager.GetString("ItemStock_Error_AreaIdEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to İtem Tanımı seçimi yapılmadan stok güncellenemez ki ama....
+        /// </summary>
+        public static string ItemStock_Error_ItemDefinitionIdEmpty {
+            get {
+                return ResourceManager.GetString("ItemStock_Error_ItemDefinitionIdEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bu aksiyon sadece stokta bulunan bir üründe güncelleme yapılırken seçilebilir!.
+        /// </summary>
+        public static string ItemStock_Error_ItemStockIdEmptyOnUpdateAction {
+            get {
+                return ResourceManager.GetString("ItemStock_Error_ItemStockIdEmptyOnUpdateAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Kaç kilo, kaç tane, kaç ney bu ürün :(.
+        /// </summary>
+        public static string ItemStock_Error_SizeEmpty {
+            get {
+                return ResourceManager.GetString("ItemStock_Error_SizeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stoktaki ürünün boyunu posunu da bilmeyelim mi?....
+        /// </summary>
+        public static string ItemStock_Error_SizeUnitIdEmpty {
+            get {
+                return ResourceManager.GetString("ItemStock_Error_SizeUnitIdEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Kategori oluşturuldu..
         /// </summary>
         public static string Success_Category_Create {
