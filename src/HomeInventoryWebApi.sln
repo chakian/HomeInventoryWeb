@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeInv.Business.Services.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeInv.Language", "Common\HomeInv.Language\HomeInv.Language.csproj", "{087F332A-FE62-4742-BE07-21C9ECA01381}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeInv.Business.Handlers.Tests", "HomeInv.Business.Handlers.Tests\HomeInv.Business.Handlers.Tests.csproj", "{8E01B61E-21FF-4B15-8DDD-A4997A1573F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeInv.Business.Handlers.Tests", "HomeInv.Business.Handlers.Tests\HomeInv.Business.Handlers.Tests.csproj", "{8E01B61E-21FF-4B15-8DDD-A4997A1573F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

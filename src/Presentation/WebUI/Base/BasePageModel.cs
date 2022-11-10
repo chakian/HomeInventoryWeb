@@ -16,7 +16,7 @@ namespace WebUI.Base
     {
         private readonly HomeInventoryDbContext dbContext;
         protected readonly ILogger<T> logger;
-        private const string DEFAULT_LANDING_PAGE_FOR_LOGGEDIN = "/ItemDefinition/List";
+        private const string DEFAULT_LANDING_PAGE_FOR_LOGGEDIN = "/Stock/Overview";
 
         public BasePageModel(ILogger<T> logger, HomeInventoryDbContext dbContext)
         {
