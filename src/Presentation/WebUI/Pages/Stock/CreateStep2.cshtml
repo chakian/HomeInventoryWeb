@@ -1,0 +1,73 @@
+﻿@page
+@model WebUI.Pages.Stock.CreateStep2Model
+@{
+    ViewData["Title"] = "Stok Girişi";
+}
+
+<h1>Yeni Stok Girişi - Detay Adımı</h1>
+
+<div class="row">
+    <div class="col">
+        @if (!string.IsNullOrEmpty(Model.StockEntry.ImageName))
+        {
+            <img src="~/uploads/@(Model.HomeId)/@(Model.StockEntry.ImageName)" />
+        }
+
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input asp-for=ItemDefinitionId type="hidden" />
+            <input asp-for=StockEntry.SizeUnitId type="hidden" />
+
+            <div class="form-group">
+                <label asp-for="StockEntry.StockActionTypeId" class="control-label"></label>
+                <select asp-for="StockEntry.StockActionTypeId" asp-items="Model.StockActionTypes" class="form-select"></select>
+                <span asp-validation-for="StockEntry.StockActionTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StockEntry.AreaId" class="control-label"></label>
+                <select asp-for="StockEntry.AreaId" asp-items="Model.AllAreas" class="form-select"></select>
+                <span asp-validation-for="StockEntry.AreaId" class="text-danger"></span>
+            </div>
+            <hr />
+            <div class="form-group">
+                <label asp-for="StockEntry.EntryAmount" class="control-label"></label>
+                <input asp-for="StockEntry.EntryAmount" type="number" class="form-control" /><span>Boyut Birimi: @Model.StockEntry.SizeUnitName</span>
+                <span asp-validation-for="StockEntry.EntryAmount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StockEntry.TotalPrice" class="control-label"></label>
+                <input asp-for="StockEntry.TotalPrice" type="number" class="form-control" />
+                <span asp-validation-for="StockEntry.TotalPrice" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StockEntry.ExpirationDate" class="control-label"></label>
+                <input asp-for="StockEntry.ExpirationDate" type="date" class="form-control" />
+                <span asp-validation-for="StockEntry.ExpirationDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StockEntry.ActionDate" class="control-label"></label>
+                <input asp-for="StockEntry.ActionDate" type="date" class="form-control" />
+                <span asp-validation-for="StockEntry.ActionDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StockEntry.ActionTarget" class="control-label"></label>
+                <input asp-for="StockEntry.ActionTarget" type="text" class="form-control" />
+                <span asp-validation-for="StockEntry.ActionTarget" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Kaydet" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="List">Listeye Dön</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace HomeInv.Persistence.Dbo
 {
@@ -16,10 +17,18 @@ namespace HomeInv.Persistence.Dbo
         public virtual Category Category { get; set; }
         #endregion
 
+        #region Size Properties
+        public int SizeUnitId { get; set; }
+        public virtual SizeUnit SizeUnit { get; set; }
+        #endregion
+
         #region Consumable
         public bool IsExpirable { get; set; }
         #endregion
 
+        public string ImageName { get; set; }
+
+        public virtual IEnumerable<ItemStock> ItemStocks { get; set; }
         //TODO: Add "Brand" and "Model"
     }
 }

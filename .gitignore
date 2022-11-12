@@ -332,3 +332,6 @@ ASALocalRun/
 
 #Code coverage by reportgenerator
 coveragereport/
+
+#User Files
+uploads/

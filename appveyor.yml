@@ -1,6 +1,6 @@
 image: Visual Studio 2022
 configuration: Release
-platform: Any CPU
+#platform: Any CPU
 
 before_build:
 - cmd: nuget restore src/HomeInventoryWebApi.sln

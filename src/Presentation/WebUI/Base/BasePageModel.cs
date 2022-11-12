@@ -16,6 +16,7 @@ namespace WebUI.Base
     {
         private readonly HomeInventoryDbContext dbContext;
         protected readonly ILogger<T> logger;
+        private const string DEFAULT_LANDING_PAGE_FOR_LOGGEDIN = "/Stock/Overview";
 
         public BasePageModel(ILogger<T> logger, HomeInventoryDbContext dbContext)
         {
@@ -76,7 +77,7 @@ namespace WebUI.Base
             }
         }
 
-        public IActionResult OnPost()
+        public virtual IActionResult OnPost()
         {
             try
             {
@@ -134,8 +135,7 @@ namespace WebUI.Base
         {
             if (User != null && User.Identity.IsAuthenticated && (context.ActionDescriptor.ViewEnginePath == "/" || context.ActionDescriptor.ViewEnginePath == "/Index"))
             {
-                string defaultLandingPage = "/Item/List";
-                context.Result = RedirectToPage(defaultLandingPage);
+                context.Result = RedirectToPage(DEFAULT_LANDING_PAGE_FOR_LOGGEDIN);
             }
             base.OnPageHandlerExecuting(context);
         }

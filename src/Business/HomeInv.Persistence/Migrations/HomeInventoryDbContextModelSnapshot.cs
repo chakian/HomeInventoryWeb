@@ -259,6 +259,9 @@ namespace HomeInv.Persistence.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("InsertTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -277,6 +280,9 @@ namespace HomeInv.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SizeUnitId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdateTime")
                         .HasColumnType("datetime2");
 
@@ -288,6 +294,8 @@ namespace HomeInv.Persistence.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("InsertUserId");
+
+                    b.HasIndex("SizeUnitId");
 
                     b.HasIndex("UpdateUserId");
 
@@ -322,19 +330,9 @@ namespace HomeInv.Persistence.Migrations
                     b.Property<int>("ItemDefinitionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("RemainingAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Size")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("SizeUnitId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateTime")
                         .HasColumnType("datetime2");
@@ -350,11 +348,67 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("ItemDefinitionId");
 
-                    b.HasIndex("SizeUnitId");
-
                     b.HasIndex("UpdateUserId");
 
                     b.ToTable("ItemStocks");
+                });
+
+            modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemStockAction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("ActionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ActionTarget")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Currency")
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("InsertTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InsertUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ItemStockActionTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ItemStockId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("money");
+
+                    b.Property<decimal>("Size")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdateUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InsertUserId");
+
+                    b.HasIndex("ItemStockActionTypeId");
+
+                    b.HasIndex("ItemStockId");
+
+                    b.HasIndex("UpdateUserId");
+
+                    b.ToTable("ItemStockActions");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemStockActionType", b =>
@@ -378,6 +432,41 @@ namespace HomeInv.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ItemStockActionTypes");
+                });
+
+            modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemUnitPrice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Currency")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ItemDefinitionId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ItemStockActionId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PriceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("money");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemDefinitionId");
+
+                    b.HasIndex("ItemStockActionId");
+
+                    b.ToTable("ItemUnitPrices");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.SizeUnit", b =>
@@ -796,6 +885,12 @@ namespace HomeInv.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("InsertUserId");
 
+                    b.HasOne("HomeInv.Persistence.Dbo.SizeUnit", "SizeUnit")
+                        .WithMany()
+                        .HasForeignKey("SizeUnitId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("HomeInv.Persistence.Dbo.User", "UpdateUser")
                         .WithMany()
                         .HasForeignKey("UpdateUserId");
@@ -803,6 +898,8 @@ namespace HomeInv.Persistence.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("InsertUser");
+
+                    b.Navigation("SizeUnit");
 
                     b.Navigation("UpdateUser");
                 });
@@ -820,14 +917,8 @@ namespace HomeInv.Persistence.Migrations
                         .HasForeignKey("InsertUserId");
 
                     b.HasOne("HomeInv.Persistence.Dbo.ItemDefinition", "ItemDefinition")
-                        .WithMany()
+                        .WithMany("ItemStocks")
                         .HasForeignKey("ItemDefinitionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("HomeInv.Persistence.Dbo.SizeUnit", "SizeUnit")
-                        .WithMany()
-                        .HasForeignKey("SizeUnitId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -841,9 +932,53 @@ namespace HomeInv.Persistence.Migrations
 
                     b.Navigation("ItemDefinition");
 
-                    b.Navigation("SizeUnit");
+                    b.Navigation("UpdateUser");
+                });
+
+            modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemStockAction", b =>
+                {
+                    b.HasOne("HomeInv.Persistence.Dbo.User", "InsertUser")
+                        .WithMany()
+                        .HasForeignKey("InsertUserId");
+
+                    b.HasOne("HomeInv.Persistence.Dbo.ItemStockActionType", "ItemStockActionType")
+                        .WithMany()
+                        .HasForeignKey("ItemStockActionTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HomeInv.Persistence.Dbo.ItemStock", "ItemStock")
+                        .WithMany("ItemStockActions")
+                        .HasForeignKey("ItemStockId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HomeInv.Persistence.Dbo.User", "UpdateUser")
+                        .WithMany()
+                        .HasForeignKey("UpdateUserId");
+
+                    b.Navigation("InsertUser");
+
+                    b.Navigation("ItemStock");
+
+                    b.Navigation("ItemStockActionType");
 
                     b.Navigation("UpdateUser");
+                });
+
+            modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemUnitPrice", b =>
+                {
+                    b.HasOne("HomeInv.Persistence.Dbo.ItemDefinition", "ItemDefinition")
+                        .WithMany()
+                        .HasForeignKey("ItemDefinitionId");
+
+                    b.HasOne("HomeInv.Persistence.Dbo.ItemStockAction", "ItemStockAction")
+                        .WithMany()
+                        .HasForeignKey("ItemStockActionId");
+
+                    b.Navigation("ItemDefinition");
+
+                    b.Navigation("ItemStockAction");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.UserSetting", b =>
@@ -947,6 +1082,16 @@ namespace HomeInv.Persistence.Migrations
                     b.Navigation("Categories");
 
                     b.Navigation("HomeUsers");
+                });
+
+            modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemDefinition", b =>
+                {
+                    b.Navigation("ItemStocks");
+                });
+
+            modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemStock", b =>
+                {
+                    b.Navigation("ItemStockActions");
                 });
 #pragma warning restore 612, 618
         }
