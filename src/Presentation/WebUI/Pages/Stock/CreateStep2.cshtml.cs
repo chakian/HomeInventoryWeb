@@ -2,6 +2,7 @@ using HomeInv.Common.Constants;
 using HomeInv.Common.Interfaces.Handlers;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Area;
+using HomeInv.Common.ServiceContracts.ItemDefinition;
 using HomeInv.Common.ServiceContracts.ItemStock;
 using HomeInv.Common.ServiceContracts.SizeUnit;
 using HomeInv.Language;
@@ -21,16 +22,19 @@ namespace WebUI.Pages.Stock
         readonly IAreaService _areaService;
         readonly ISizeUnitService _sizeUnitService;
         readonly IUpdateItemStockHandler _updateItemStockHandler;
+        readonly IItemDefinitionService _itemDefinitionService;
 
         public CreateStep2Model(ILogger<CreateStep2Model> logger,
             HomeInventoryDbContext dbContext,
             IAreaService areaService,
             ISizeUnitService sizeUnitService,
-            IUpdateItemStockHandler updateItemStockHandler) : base(logger, dbContext)
+            IUpdateItemStockHandler updateItemStockHandler,
+            IItemDefinitionService itemDefinitionService) : base(logger, dbContext)
         {
             _areaService = areaService;
             _sizeUnitService = sizeUnitService;
             _updateItemStockHandler = updateItemStockHandler;
+            _itemDefinitionService = itemDefinitionService;
         }
 
         [BindProperty]
@@ -56,11 +60,20 @@ namespace WebUI.Pages.Stock
             if (int.TryParse(Request.Query["ItemDefinitionId"].ToString(), out int _itemDefinitionId))
             {
                 ItemDefinitionId = _itemDefinitionId;
-                //TODO: Get ItemDefinition info here
+
+                var itemDefinition = _itemDefinitionService.GetItemDefinition(new GetItemDefinitionRequest()
+                {
+                    ItemDefinitionId = ItemDefinitionId,
+                    HomeId = UserSettings.DefaultHomeId,
+                    RequestUserId = UserId
+                });
+
                 StockEntry = new ItemStockEntry()
                 {
                     ActionDate = DateTime.Now,
                     ExpirationDate = DateTime.Now,
+                    SizeUnitId = itemDefinition.ItemDefinition.SizeUnitId,
+                    SizeUnitName = itemDefinition.ItemDefinition.SizeUnitName,
                 };
                 HomeId = UserSettings.DefaultHomeId;
 
@@ -87,16 +100,16 @@ namespace WebUI.Pages.Stock
                     });
                 }
 
-                AllSizeUnits = new List<SelectListItem>() { new SelectListItem() { Text = "-- Boyut --", Value = "0" } };
-                var sizes = _sizeUnitService.GetAllSizes(new GetAllSizesRequest() { RequestUserId = UserId });
-                foreach (var size in sizes.SizeUnits)
-                {
-                    AllSizeUnits.Add(new SelectListItem()
-                    {
-                        Text = size.Name,
-                        Value = size.Id.ToString()
-                    });
-                }
+                //AllSizeUnits = new List<SelectListItem>() { new SelectListItem() { Text = "-- Boyut --", Value = "0" } };
+                //var sizes = _sizeUnitService.GetAllSizes(new GetAllSizesRequest() { RequestUserId = UserId });
+                //foreach (var size in sizes.SizeUnits)
+                //{
+                //    AllSizeUnits.Add(new SelectListItem()
+                //    {
+                //        Text = size.Name,
+                //        Value = size.Id.ToString()
+                //    });
+                //}
             }
             else
             {
@@ -142,6 +155,7 @@ namespace WebUI.Pages.Stock
         [Display(Name = nameof(Resources.ItemStockEntry_SizeUnitId), ResourceType = typeof(Resources))]
         [Required]
         public int SizeUnitId { get; set; }
+        public string SizeUnitName { get; set; }
 
         [Display(Name = nameof(Resources.ItemStockEntry_EntryAmount), ResourceType = typeof(Resources))]
         [Required]

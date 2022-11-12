@@ -17,6 +17,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <input asp-for=ItemDefinitionId type="hidden" />
+            <input asp-for=StockEntry.SizeUnitId type="hidden" />
 
             <div class="form-group">
                 <label asp-for="StockEntry.StockActionTypeId" class="control-label"></label>
@@ -28,15 +29,15 @@
                 <select asp-for="StockEntry.AreaId" asp-items="Model.AllAreas" class="form-select"></select>
                 <span asp-validation-for="StockEntry.AreaId" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            @*<div class="form-group">
                 <label asp-for="StockEntry.SizeUnitId" class="control-label"></label>
                 <select asp-for="StockEntry.SizeUnitId" asp-items="Model.AllSizeUnits" class="form-select"></select>
                 <span asp-validation-for="StockEntry.SizeUnitId" class="text-danger"></span>
-            </div>
+            </div>*@
             <hr />
             <div class="form-group">
                 <label asp-for="StockEntry.EntryAmount" class="control-label"></label>
-                <input asp-for="StockEntry.EntryAmount" type="number" class="form-control" />
+                <input asp-for="StockEntry.EntryAmount" type="number" class="form-control" /><span>Boyut Birimi: @Model.StockEntry.SizeUnitName</span>
                 <span asp-validation-for="StockEntry.EntryAmount" class="text-danger"></span>
             </div>
             <div class="form-group">

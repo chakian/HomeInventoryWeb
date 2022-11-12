@@ -86,7 +86,9 @@ namespace HomeInv.Business.Services
         {
             var response = new GetAllItemDefinitionsInHomeResponse();
 
-            var dbItemList = context.ItemDefinitions.Include(itemDef => itemDef.Category)
+            var dbItemList = context.ItemDefinitions
+                .Include(itemDef => itemDef.Category)
+                .Include(itemDef => itemDef.SizeUnit)
                 .Where(item => (includeInactive || item.IsActive) && item.Category.HomeId == request.HomeId)
                 .ToList();
             var itemList = new List<ItemDefinitionEntity>();
@@ -136,7 +138,22 @@ namespace HomeInv.Business.Services
 
         public GetItemDefinitionResponse GetItemDefinition(GetItemDefinitionRequest request)
         {
-            throw new NotImplementedException();
+            var response = new GetItemDefinitionResponse() { };
+
+            var item = context.ItemDefinitions
+                .Include(item => item.Category)
+                .Include(item => item.SizeUnit)
+                .SingleOrDefault(i => i.Id == request.ItemDefinitionId);
+            if(item == null)
+            {
+                response.AddError("Urun tanimi bulunamadi");
+            }
+            else
+            {
+                response.ItemDefinition = ConvertDboToEntity(item);
+            }
+
+            return response;
         }
     }
 }

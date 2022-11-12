@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HomeInv.Common.ServiceContracts.ItemDefinition
+﻿namespace HomeInv.Common.ServiceContracts.ItemDefinition
 {
     public class GetItemDefinitionRequest : BaseHomeRelatedRequest
     {
+        public int ItemDefinitionId { get; set; }
     }
 }

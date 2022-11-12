@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HomeInv.Common.Entities;
 
 namespace HomeInv.Common.ServiceContracts.ItemDefinition
 {
     public class GetItemDefinitionResponse : BaseResponse
     {
+        public ItemDefinitionEntity ItemDefinition { get; set; }
     }
 }
