@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomeInv.Common.ServiceContracts.Area
+namespace HomeInv.Common.ServiceContracts.ItemStock
 {
-    public class GetAreasOfHomeRequest : BaseHomeRelatedRequest
+    public class GetItemStocksRequest : BaseHomeRelatedRequest
     {
     }
 }

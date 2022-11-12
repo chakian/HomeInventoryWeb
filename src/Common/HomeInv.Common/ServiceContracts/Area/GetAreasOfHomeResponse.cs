@@ -1,12 +1,10 @@
-﻿using System;
+﻿using HomeInv.Common.Entities;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeInv.Common.ServiceContracts.Area
 {
     public class GetAreasOfHomeResponse : BaseResponse
     {
+        public List<AreaEntity> Areas { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using HomeInv.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeInv.Persistence.Migrations
 {
     [DbContext(typeof(HomeInventoryDbContext))]
-    partial class HomeInventoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221112132303_AddImageName")]
+    partial class AddImageName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,9 +282,6 @@ namespace HomeInv.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SizeUnitId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdateTime")
                         .HasColumnType("datetime2");
 
@@ -294,8 +293,6 @@ namespace HomeInv.Persistence.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("InsertUserId");
-
-                    b.HasIndex("SizeUnitId");
 
                     b.HasIndex("UpdateUserId");
 
@@ -334,6 +331,9 @@ namespace HomeInv.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("SizeUnitId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdateTime")
                         .HasColumnType("datetime2");
 
@@ -347,6 +347,8 @@ namespace HomeInv.Persistence.Migrations
                     b.HasIndex("InsertUserId");
 
                     b.HasIndex("ItemDefinitionId");
+
+                    b.HasIndex("SizeUnitId");
 
                     b.HasIndex("UpdateUserId");
 
@@ -885,12 +887,6 @@ namespace HomeInv.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("InsertUserId");
 
-                    b.HasOne("HomeInv.Persistence.Dbo.SizeUnit", "SizeUnit")
-                        .WithMany()
-                        .HasForeignKey("SizeUnitId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("HomeInv.Persistence.Dbo.User", "UpdateUser")
                         .WithMany()
                         .HasForeignKey("UpdateUserId");
@@ -898,8 +894,6 @@ namespace HomeInv.Persistence.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("InsertUser");
-
-                    b.Navigation("SizeUnit");
 
                     b.Navigation("UpdateUser");
                 });
@@ -922,6 +916,12 @@ namespace HomeInv.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("HomeInv.Persistence.Dbo.SizeUnit", "SizeUnit")
+                        .WithMany()
+                        .HasForeignKey("SizeUnitId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("HomeInv.Persistence.Dbo.User", "UpdateUser")
                         .WithMany()
                         .HasForeignKey("UpdateUserId");
@@ -931,6 +931,8 @@ namespace HomeInv.Persistence.Migrations
                     b.Navigation("InsertUser");
 
                     b.Navigation("ItemDefinition");
+
+                    b.Navigation("SizeUnit");
 
                     b.Navigation("UpdateUser");
                 });

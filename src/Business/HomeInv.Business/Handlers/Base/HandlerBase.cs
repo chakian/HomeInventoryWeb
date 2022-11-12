@@ -12,7 +12,7 @@ namespace HomeInv.Business.Handlers
         {
         }
 
-        public R Execute(T request)
+        private R ExecuteWithInternalTransaction(T request)
         {
             var response = new R();
 
@@ -38,6 +38,23 @@ namespace HomeInv.Business.Handlers
             }
 
             return response;
+        }
+
+        public R Execute(T request)
+        {
+            if(_context.Database.CurrentTransaction == null)
+            {
+                return ExecuteWithInternalTransaction(request);
+            }
+            else
+            {
+                var response = new R();
+                if ((response = ValidateRequest(request, response)).IsSuccessful)
+                {
+                    response = ExecuteInternal(request, response);
+                }
+                return response;
+            }
         }
 
         protected abstract R ValidateRequest(T request, R response);

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HomeInv.Common.ServiceContracts.ItemStock;
 
 namespace HomeInv.Common.Interfaces.Handlers
 {
-    public interface IUpdateItemStockHandler : IHandlerBase
+    public interface IUpdateItemStockHandler : IHandlerBase<UpdateItemStockRequest, UpdateItemStockResponse>
     {
     }
 }

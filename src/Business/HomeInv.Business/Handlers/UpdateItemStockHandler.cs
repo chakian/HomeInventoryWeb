@@ -60,7 +60,6 @@ namespace HomeInv.Business.Handlers
                     {
                         ItemDefinitionId = request.ItemDefinitionId,
                         AreaId = request.AreaId,
-                        SizeUnitId = request.SizeUnitId,
                         ExpirationDate = request.ExpirationDate,
                         RemainingAmount = request.Size,
                         IsActive = true,
@@ -68,7 +67,8 @@ namespace HomeInv.Business.Handlers
                         InsertTime = DateTime.UtcNow
                     };
 
-                    _context.Entry(currentStock).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                    _context.ItemStocks.Add(currentStock);
+                    _context.SaveChanges();
                 }
                 else
                 {
@@ -108,7 +108,8 @@ namespace HomeInv.Business.Handlers
                 InsertUserId = request.RequestUserId,
                 InsertTime = DateTime.UtcNow
             };
-            _context.Entry(action).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+            _context.ItemStockActions.Add(action);
+            _context.SaveChanges();
 
             //Insert unit price if this is a purchase action
             if (IsPurchaseAction(request.ItemStockActionTypeId))
@@ -121,7 +122,7 @@ namespace HomeInv.Business.Handlers
                     PriceDate = request.ActionDate,
                     IsActive=true
                 };
-                _context.Entry(unitPrice).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                _context.ItemUnitPrices.Add(unitPrice);
             }
 
             _context.SaveChanges();

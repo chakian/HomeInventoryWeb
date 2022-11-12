@@ -5,7 +5,9 @@
 }
 
 <h1>Stok Durumu <img src="~/assets/nazarbonc.png" height="32" /> <i>Maşallah Diyelim</i> <img src="~/assets/nazarbonc.png" height="32" /></h1>
-<a class="btn btn-primary" asp-page="Create">Yeni Stok Girişi</a>
+<a class="btn btn-primary" asp-page="CreateStep1">Yeni Stok Girişi</a>
+
+<!-- Filtreleme -->
 
 <table class="table table-responsive table-hover table-dark">
     <thead>
@@ -27,7 +29,7 @@
                 <td>@(itemDefinition.CategoryName + (string.IsNullOrEmpty(itemDefinition.CategoryParentNames) ? "" : " (" + itemDefinition.CategoryParentNames + ")"))</td>
                 <td>@(itemDefinition.AreaName)</td>
                 <td>@(itemDefinition.CurrentStockAmount + " " + itemDefinition.SizeUnitName)</td>
-                <td>@(itemDefinition.ExpirationDate)</td>
+                <td>@(itemDefinition.ExpirationDate == DateTime.MinValue ? "-" : itemDefinition.ExpirationDate)</td>
             </tr>
         }
     </tbody>

@@ -3,7 +3,8 @@ using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Area;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
-using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HomeInv.Business.Services
 {
@@ -42,7 +43,16 @@ namespace HomeInv.Business.Services
 
         public GetAreasOfHomeResponse GetAreasOfHome(GetAreasOfHomeRequest request)
         {
-            throw new NotImplementedException();
+            var response = new GetAreasOfHomeResponse();
+            response.Areas = new List<AreaEntity>();
+
+            var areas = context.Areas.Where(area => area.HomeId == request.HomeId);
+            foreach (var area in areas)
+            {
+                response.Areas.Add(ConvertDboToEntity(area));
+            }
+
+            return response;
         }
     }
 }

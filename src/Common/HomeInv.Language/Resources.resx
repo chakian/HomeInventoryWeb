@@ -138,6 +138,33 @@
   <data name="ItemNameExists" xml:space="preserve">
     <value>Bu evde, bu isimde bir nesne zaten var!</value>
   </data>
+  <data name="ItemStockEntry_ActionDate" xml:space="preserve">
+    <value>Hareketin Yapıldığı Tarih</value>
+  </data>
+  <data name="ItemStockEntry_ActionTarget" xml:space="preserve">
+    <value>Market, Kişi falan...</value>
+  </data>
+  <data name="ItemStockEntry_AreaId" xml:space="preserve">
+    <value>Oda</value>
+  </data>
+  <data name="ItemStockEntry_EntryAmount" xml:space="preserve">
+    <value>Stoğa Giren Miktar</value>
+  </data>
+  <data name="ItemStockEntry_ExpirationDate" xml:space="preserve">
+    <value>Son Kullanma Tarihi</value>
+  </data>
+  <data name="ItemStockEntry_ItemDefinitionId" xml:space="preserve">
+    <value>Ürün</value>
+  </data>
+  <data name="ItemStockEntry_SizeUnitId" xml:space="preserve">
+    <value>Boyut Birimi</value>
+  </data>
+  <data name="ItemStockEntry_StockActionTypeId" xml:space="preserve">
+    <value>Stok Giriş Tipi</value>
+  </data>
+  <data name="ItemStockEntry_TotalPrice" xml:space="preserve">
+    <value>Toplam Tutar</value>
+  </data>
   <data name="ItemStock_Error_AreaIdEmpty" xml:space="preserve">
     <value>Stoğun odası seçilmeden stoğun nerede olduğunu bilemeyiz ki ama...</value>
   </data>

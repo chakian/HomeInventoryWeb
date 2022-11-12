@@ -3,11 +3,15 @@ using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Category;
 using HomeInv.Common.ServiceContracts.ItemDefinition;
 using HomeInv.Common.ServiceContracts.SizeUnit;
+using HomeInv.Language;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Security.AccessControl;
+using System.Xml.Linq;
 using WebUI.Base;
 
 namespace WebUI.Pages.ItemDefinition
@@ -16,18 +20,23 @@ namespace WebUI.Pages.ItemDefinition
     {
         readonly IItemDefinitionService _itemDefinitionService;
         readonly ICategoryService _categoryService;
+        readonly ISizeUnitService _sizeUnitService;
+
         public CreateModel(ILogger<CreateModel> logger,
             HomeInventoryDbContext dbContext,
             IItemDefinitionService itemDefinitionService,
-            ICategoryService categoryService) : base(logger, dbContext)
+            ICategoryService categoryService,
+            ISizeUnitService sizeUnitService) : base(logger, dbContext)
         {
             _itemDefinitionService = itemDefinitionService;
             _categoryService = categoryService;
+            _sizeUnitService = sizeUnitService;
         }
 
         [BindProperty] public ItemDefinitionEntity Item { get; set; }
 
         [BindProperty] public List<SelectListItem> AllCategories { get; set; }
+        [BindProperty] public List<SelectListItem> AllSizeUnits { get; set; }
 
         public IActionResult OnGet()
         {
@@ -48,6 +57,17 @@ namespace WebUI.Pages.ItemDefinition
                     Value = category.Id.ToString()
                 });
             });
+
+            AllSizeUnits = new List<SelectListItem>() { new SelectListItem() { Text = "-- Boyut --", Value = "0" } };
+            var sizes = _sizeUnitService.GetAllSizes(new GetAllSizesRequest() { RequestUserId = UserId });
+            foreach (var size in sizes.SizeUnits)
+            {
+                AllSizeUnits.Add(new SelectListItem()
+                {
+                    Text = size.Name,
+                    Value = size.Id.ToString()
+                });
+            }
 
             return Page();
         }
