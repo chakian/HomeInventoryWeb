@@ -24,7 +24,8 @@ namespace HomeInv.Business.Services
             entity.Description = dbo.Description;
             entity.ImageName = dbo.ImageName;
             entity.SizeUnitId = dbo.SizeUnitId;
-            entity.SizeUnitName = dbo.SizeUnit.Name;
+            entity.SizeUnitName = string.IsNullOrEmpty(dbo.SizeUnit.Description) ? dbo.SizeUnit.Name : dbo.SizeUnit.Description;
+            entity.IsExpirable = dbo.IsExpirable;
             if (dbo.Category != null)
             {
                 entity.CategoryId = dbo.Category.Id;
@@ -56,6 +57,10 @@ namespace HomeInv.Business.Services
             {
                 response.AddError("Kategori seçimi olmadan item tanımı yapılamaz!");
             }
+            if (request.ItemEntity.SizeUnitId <= 0)
+            {
+                response.AddError("Boyut seçimi olmadan item tanımı yapılamaz!");
+            }
             if (string.IsNullOrEmpty(request.ItemEntity.Name))
             {
                 response.AddError("İsim boş olamaz!");
@@ -77,6 +82,13 @@ namespace HomeInv.Business.Services
 
                 context.ItemDefinitions.Add(item);
                 context.SaveChanges();
+
+                if (!string.IsNullOrEmpty(request.ImageFileExtension))
+                {
+                    item.ImageName = string.Concat("item_", item.Id.ToString(), request.ImageFileExtension);
+                    context.SaveChanges();
+                    response.ImageFileName = item.ImageName;
+                }
             }
 
             return response;
@@ -151,6 +163,40 @@ namespace HomeInv.Business.Services
             else
             {
                 response.ItemDefinition = ConvertDboToEntity(item);
+            }
+
+            return response;
+        }
+
+        public UpdateItemDefinitionResponse UpdateItemDefinition(UpdateItemDefinitionRequest request)
+        {
+            var response = new UpdateItemDefinitionResponse();
+
+            if (request.CategoryId <= 0)
+            {
+                response.AddError("Kategori seçimi olmadan item tanımı yapılamaz!");
+            }
+            if (string.IsNullOrEmpty(request.Name))
+            {
+                response.AddError("İsim boş olamaz!");
+            }
+            if (context.ItemDefinitions.Any(q => q.Id != request.ItemDefinitionId
+                && q.Category.HomeId == request.HomeId
+                && q.Name == request.Name))
+            {
+                response.AddError(Resources.ItemNameExists);
+            }
+
+            if (response.IsSuccessful)
+            {
+                var item = context.ItemDefinitions.Find(request.ItemDefinitionId);
+                item.Name = request.Name;
+                item.Description = request.Description;
+                if (!string.IsNullOrEmpty(request.ImageFileName)) item.ImageName = request.ImageFileName;
+                item.CategoryId = request.CategoryId;
+                item.IsExpirable = request.IsExpirable;
+
+                context.SaveChanges();
             }
 
             return response;

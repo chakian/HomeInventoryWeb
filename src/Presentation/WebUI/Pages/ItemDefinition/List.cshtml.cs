@@ -17,11 +17,13 @@ namespace WebUI.Pages.ItemDefinition
             _itemDefinitionService = itemDefinitionService;
         }
 
-        [BindProperty]
-        public List<ItemDefinitionEntity> ItemDefinitions { get; set; }
+        [BindProperty] public List<ItemDefinitionEntity> ItemDefinitions { get; set; }
+        [BindProperty] public int HomeId { get; set; }
 
         public void OnGet()
         {
+            HomeId = UserSettings.DefaultHomeId;
+
             var request = new GetAllItemDefinitionsInHomeRequest()
             {
                 HomeId = UserSettings.DefaultHomeId,

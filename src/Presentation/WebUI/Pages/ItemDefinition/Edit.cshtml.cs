@@ -2,7 +2,6 @@ using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Category;
 using HomeInv.Common.ServiceContracts.ItemDefinition;
-using HomeInv.Common.ServiceContracts.SizeUnit;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -15,34 +14,47 @@ using WebUI.Base;
 
 namespace WebUI.Pages.ItemDefinition
 {
-    public class CreateModel : BaseAuthenticatedPageModel<CreateModel>
+    public class EditModel : BaseAuthenticatedPageModel<EditModel>
     {
         readonly IWebHostEnvironment _webHostEnvironment;
         readonly IItemDefinitionService _itemDefinitionService;
         readonly ICategoryService _categoryService;
-        readonly ISizeUnitService _sizeUnitService;
 
-        public CreateModel(ILogger<CreateModel> logger,
+        public EditModel(ILogger<EditModel> logger,
             HomeInventoryDbContext dbContext,
             IWebHostEnvironment webHostEnvironment,
             IItemDefinitionService itemDefinitionService,
-            ICategoryService categoryService,
-            ISizeUnitService sizeUnitService) : base(logger, dbContext)
+            ICategoryService categoryService) : base(logger, dbContext)
         {
             _itemDefinitionService = itemDefinitionService;
             _categoryService = categoryService;
-            _sizeUnitService = sizeUnitService;
             _webHostEnvironment = webHostEnvironment;
         }
 
         [BindProperty] public ItemDefinitionEntity Item { get; set; }
-
         [BindProperty] public List<SelectListItem> AllCategories { get; set; }
-        [BindProperty] public List<SelectListItem> AllSizeUnits { get; set; }
         [BindProperty] public IFormFile FormFile { get; set; }
+        [BindProperty] public int HomeId { get; set; }
 
         public IActionResult OnGet()
         {
+            if (!int.TryParse(Request.Query["ItemDefinitionId"].ToString(), out int _itemDefinitionId))
+            {
+                SetErrorMessage("Oyle bir urun bulamadik. Butona dikkatli tiklayiniz.");
+                return RedirectToPage("List");
+            }
+
+            HomeId = UserSettings.DefaultHomeId;
+
+            var itemDefinition = _itemDefinitionService.GetItemDefinition(new GetItemDefinitionRequest()
+            {
+                ItemDefinitionId = _itemDefinitionId,
+                HomeId = UserSettings.DefaultHomeId,
+                RequestUserId = UserId
+            });
+
+            Item = itemDefinition.ItemDefinition;
+
             var categoryList = _categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest()
             {
                 HomeId = UserSettings.DefaultHomeId
@@ -57,51 +69,53 @@ namespace WebUI.Pages.ItemDefinition
                 AllCategories.Add(new SelectListItem()
                 {
                     Text = category.Name,
-                    Value = category.Id.ToString()
+                    Value = category.Id.ToString(),
+                    Selected = (category.Id == Item.CategoryId)
                 });
             });
-
-            AllSizeUnits = new List<SelectListItem>() { new SelectListItem() { Text = "-- Boyut --", Value = "0" } };
-            var sizes = _sizeUnitService.GetAllSizes(new GetAllSizesRequest() { RequestUserId = UserId });
-            foreach (var size in sizes.SizeUnits)
-            {
-                AllSizeUnits.Add(new SelectListItem()
-                {
-                    Text = size.Name,
-                    Value = size.Id.ToString()
-                });
-            }
 
             return Page();
         }
 
         protected override IActionResult OnModelPost()
         {
-            string imageFileExtension = "";
-            if (FormFile != null && !string.IsNullOrEmpty(FormFile.FileName))// && FormFile.FileName.IndexOf(".") > 0)
+            string imageFileExtension = "", newFileName = "";
+            if (FormFile != null && !string.IsNullOrEmpty(FormFile.FileName))
             {
                 imageFileExtension = FormFile.FileName.Substring(FormFile.FileName.LastIndexOf("."));
+                newFileName = string.Concat("item_", Item.Id, imageFileExtension);
             }
 
-            var createRequest = new CreateItemDefinitionRequest()
+            var updateRequest = new UpdateItemDefinitionRequest()
             {
-                ItemEntity = Item,
-                ImageFileExtension = imageFileExtension,
+                ItemDefinitionId = Item.Id,
+                Name = Item.Name,
+                Description = Item.Description,
+                CategoryId = Item.CategoryId,
+                ImageFileName = newFileName,
+                IsExpirable = Item.IsExpirable,
                 HomeId = UserSettings.DefaultHomeId,
                 RequestUserId = UserId
             };
-            var response = CallService(_itemDefinitionService.CreateItemDefinition, createRequest);
+            var response = CallService(_itemDefinitionService.UpdateItemDefinition, updateRequest);
 
             if (response.IsSuccessful)
             {
-                if (FormFile.Length > 0)
+                if (FormFile?.Length > 0)
                 {
                     string path = Path.Combine(_webHostEnvironment.WebRootPath,
                         "uploads",
                         UserSettings.DefaultHomeId.ToString());
                     Directory.CreateDirectory(path);
 
-                    path = Path.Combine(path, response.ImageFileName);
+                    //delete old image if exists
+                    if (!string.IsNullOrEmpty(Item.ImageName))
+                    {
+                        string oldImagePath = Path.Combine(path, Item.ImageName);
+                        if (System.IO.File.Exists(oldImagePath)) System.IO.File.Delete(oldImagePath);
+                    }
+
+                    path = Path.Combine(path, newFileName);
                     using (var stream = new FileStream(path, FileMode.Create))
                     {
                         FormFile.CopyTo(stream);

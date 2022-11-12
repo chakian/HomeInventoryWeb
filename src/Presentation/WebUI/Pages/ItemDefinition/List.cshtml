@@ -7,17 +7,29 @@
 <h1>İtem Tanımları</h1>
 <a class="btn btn-primary" asp-page="Create">Yeni İtem</a>
 
-<table class="table table-responsive table-hover table-dark">
+<table class="table table-responsive table-hover table-dark" id="itemListTable">
     <thead>
-        <tr><th>Tanım Adı</th><th>Kategori</th><th>Bozulan Bir Şey Mi?</th></tr>
+        <tr>
+            <th>Görsel</th>
+            <th>Tanım Adı</th>
+            <th class="d-none d-lg-block">Açıklama</th>
+            <th>Kategori</th>
+            <th>Ölçü Birimi</th>
+            <th class="d-none d-lg-block">Bozulan Bir Şey Mi?</th>
+            <th>&nbsp;</th>
+        </tr>
     </thead>
     <tbody>
         @foreach (var itemDefinition in Model.ItemDefinitions)
         {
             <tr>
+                <td><img src="~/uploads/@(Model.HomeId)/@(itemDefinition.ImageName)" height="60" /></td>
                 <td>@(itemDefinition.Name)</td>
+                <td class="d-none d-lg-block">@(itemDefinition.Description)</td>
                 <td>@(itemDefinition.CategoryName + (string.IsNullOrEmpty(itemDefinition.CategoryFullName) ? "" : " (" + itemDefinition.CategoryFullName + ")"))</td>
-                <td>@(itemDefinition.IsExpirable ? "Evet" : "Hayır")</td>
+                <td>@(itemDefinition.SizeUnitName)</td>
+                <td class="d-none d-lg-block">@(itemDefinition.IsExpirable ? "Evet" : "Hayır")</td>
+                <td class="text-end"><a class="btn btn-secondary" asp-page="Edit" asp-route-ItemDefinitionId="@itemDefinition.Id">Duzenle</a></td>
             </tr>
         }
     </tbody>
