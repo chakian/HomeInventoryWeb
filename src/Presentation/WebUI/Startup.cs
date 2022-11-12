@@ -1,4 +1,6 @@
+using HomeInv.Business.Handlers;
 using HomeInv.Business.Services;
+using HomeInv.Common.Interfaces.Handlers;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Builder;
@@ -56,6 +58,8 @@ namespace WebUI
             services.AddScoped<IAreaUserService, AreaUserService>();
             services.AddScoped<IUserSettingService, UserSettingService>();
             services.AddScoped<IItemDefinitionService, ItemDefinitionService>();
+
+            services.AddScoped<IUpdateItemStockHandler, UpdateItemStockHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

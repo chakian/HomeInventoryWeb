@@ -169,6 +169,87 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hareketin Yapıldığı Tarih.
+        /// </summary>
+        public static string ItemStockEntry_ActionDate {
+            get {
+                return ResourceManager.GetString("ItemStockEntry_ActionDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market, Kişi falan....
+        /// </summary>
+        public static string ItemStockEntry_ActionTarget {
+            get {
+                return ResourceManager.GetString("ItemStockEntry_ActionTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Oda.
+        /// </summary>
+        public static string ItemStockEntry_AreaId {
+            get {
+                return ResourceManager.GetString("ItemStockEntry_AreaId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stoğa Giren Miktar.
+        /// </summary>
+        public static string ItemStockEntry_EntryAmount {
+            get {
+                return ResourceManager.GetString("ItemStockEntry_EntryAmount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Son Kullanma Tarihi.
+        /// </summary>
+        public static string ItemStockEntry_ExpirationDate {
+            get {
+                return ResourceManager.GetString("ItemStockEntry_ExpirationDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ürün.
+        /// </summary>
+        public static string ItemStockEntry_ItemDefinitionId {
+            get {
+                return ResourceManager.GetString("ItemStockEntry_ItemDefinitionId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Boyut Birimi.
+        /// </summary>
+        public static string ItemStockEntry_SizeUnitId {
+            get {
+                return ResourceManager.GetString("ItemStockEntry_SizeUnitId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stok Giriş Tipi.
+        /// </summary>
+        public static string ItemStockEntry_StockActionTypeId {
+            get {
+                return ResourceManager.GetString("ItemStockEntry_StockActionTypeId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toplam Tutar.
+        /// </summary>
+        public static string ItemStockEntry_TotalPrice {
+            get {
+                return ResourceManager.GetString("ItemStockEntry_TotalPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Kategori oluşturuldu..
         /// </summary>
         public static string Success_Category_Create {
