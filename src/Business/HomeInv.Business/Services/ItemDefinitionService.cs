@@ -5,7 +5,6 @@ using HomeInv.Language;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -74,6 +73,7 @@ namespace HomeInv.Business.Services
                 item.ImageName = request.ItemEntity.ImageName;
                 item.CategoryId = request.ItemEntity.CategoryId;
                 item.IsExpirable = request.ItemEntity.IsExpirable;
+                item.SizeUnitId = request.ItemEntity.SizeUnitId;
 
                 context.ItemDefinitions.Add(item);
                 context.SaveChanges();
@@ -144,7 +144,7 @@ namespace HomeInv.Business.Services
                 .Include(item => item.Category)
                 .Include(item => item.SizeUnit)
                 .SingleOrDefault(i => i.Id == request.ItemDefinitionId);
-            if(item == null)
+            if (item == null)
             {
                 response.AddError("Urun tanimi bulunamadi");
             }

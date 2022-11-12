@@ -29,7 +29,7 @@
                 <td>@(itemDefinition.CategoryName + (string.IsNullOrEmpty(itemDefinition.CategoryParentNames) ? "" : " (" + itemDefinition.CategoryParentNames + ")"))</td>
                 <td>@(itemDefinition.AreaName)</td>
                 <td>@(itemDefinition.CurrentStockAmount + " " + itemDefinition.SizeUnitName)</td>
-                <td>@(itemDefinition.ExpirationDate)</td>
+                <td>@(itemDefinition.ExpirationDate == DateTime.MinValue ? "-" : itemDefinition.ExpirationDate)</td>
             </tr>
         }
     </tbody>

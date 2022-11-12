@@ -63,7 +63,7 @@ namespace WebUI.Pages.Stock
                     CategoryName = definition.CategoryName,
                     CategoryParentNames = definition.CategoryFullName,
                     ImageName = definition.ImageName,
-                    
+
                 };
                 var currentItemStocks = stocks.ItemStocks.Where(s => s.ItemDefinitionId == definition.Id).ToList();
                 if (currentItemStocks.Any())
@@ -71,11 +71,11 @@ namespace WebUI.Pages.Stock
                     foreach (var stock in currentItemStocks)
                     {
                         var stockOverview = overview.Clone();
-                        stockOverview.StockId= stock.Id;
+                        stockOverview.StockId = stock.Id;
                         stockOverview.AreaId = stock.AreaId;
-                        stockOverview.AreaName= stock.AreaName;
+                        stockOverview.AreaName = stock.AreaName;
                         stockOverview.CurrentStockAmount = stock.Quantity;
-                        stockOverview.ExpirationDate= stock.ExpirationDate;
+                        stockOverview.ExpirationDate = definition.IsExpirable ? stock.ExpirationDate : DateTime.MinValue;
                         stockOverview.SizeUnitId = stock.SizeUnitId;
                         stockOverview.SizeUnitName = stock.SizeUnitName;
                         OverviewList.Add(stockOverview);

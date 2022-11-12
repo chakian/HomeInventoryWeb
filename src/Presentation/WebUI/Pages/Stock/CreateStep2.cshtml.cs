@@ -50,9 +50,6 @@ namespace WebUI.Pages.Stock
         public List<SelectListItem> AllAreas { get; set; }
 
         [BindProperty]
-        public List<SelectListItem> AllSizeUnits { get; set; }
-
-        [BindProperty]
         public List<SelectListItem> StockActionTypes { get; set; }
 
         public void OnGet()
@@ -99,17 +96,6 @@ namespace WebUI.Pages.Stock
                         Value = area.Id.ToString()
                     });
                 }
-
-                //AllSizeUnits = new List<SelectListItem>() { new SelectListItem() { Text = "-- Boyut --", Value = "0" } };
-                //var sizes = _sizeUnitService.GetAllSizes(new GetAllSizesRequest() { RequestUserId = UserId });
-                //foreach (var size in sizes.SizeUnits)
-                //{
-                //    AllSizeUnits.Add(new SelectListItem()
-                //    {
-                //        Text = size.Name,
-                //        Value = size.Id.ToString()
-                //    });
-                //}
             }
             else
             {
