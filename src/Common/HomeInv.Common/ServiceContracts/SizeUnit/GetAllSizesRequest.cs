@@ -1,6 +1,6 @@
 ﻿namespace HomeInv.Common.ServiceContracts.SizeUnit
 {
-    public class GetAllSizesRequest : BaseHomeRelatedRequest
+    public class GetAllSizesRequest : BaseRequest
     {
     }
 }
