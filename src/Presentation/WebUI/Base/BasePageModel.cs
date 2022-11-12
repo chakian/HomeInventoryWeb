@@ -77,7 +77,7 @@ namespace WebUI.Base
             }
         }
 
-        public IActionResult OnPost()
+        public virtual IActionResult OnPost()
         {
             try
             {
