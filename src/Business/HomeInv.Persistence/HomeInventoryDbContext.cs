@@ -30,16 +30,19 @@ namespace HomeInv.Persistence
 
             AuditableDboConfiguration.Configure(builder);
 
+            // --- SizeUnit
             builder.Entity<SizeUnit>()
                 .Property(sizeUnit => sizeUnit.ConversionMultiplierToBase)
                 .HasPrecision(28, 14);
 
+            // --- ItemDefinition
             builder.Entity<ItemDefinition>()
                 .HasOne(item => item.Category)
                 .WithMany(category => category.ItemDefinitions)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // --- ItemStock
             builder.Entity<ItemStock>()
                 .HasOne(itemStock => itemStock.SizeUnit)
                 .WithMany()
@@ -48,7 +51,7 @@ namespace HomeInv.Persistence
 
             builder.Entity<ItemStock>()
                 .HasOne(itemStock => itemStock.ItemDefinition)
-                .WithMany()
+                .WithMany(item => item.ItemStocks)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -62,6 +65,7 @@ namespace HomeInv.Persistence
                 .Property(itemStock => itemStock.RemainingAmount)
                 .HasPrecision(18, 2);
 
+            // --- ItemStockAction
             builder.Entity<ItemStockAction>()
                 .HasOne(itemStockAction => itemStockAction.ItemStock)
                 .WithMany(itemStock => itemStock.ItemStockActions)
@@ -86,6 +90,7 @@ namespace HomeInv.Persistence
                 .Property(itemStockAction => itemStockAction.Currency)
                 .HasColumnType("nvarchar(10)");
 
+            // --- ItemUnitPrice
             builder.Entity<ItemUnitPrice>()
                 .HasOne(itemUnitPrice => itemUnitPrice.ItemStockAction)
                 .WithMany();
@@ -98,12 +103,21 @@ namespace HomeInv.Persistence
                 .Property(b => b.UnitPrice)
                 .HasColumnType("money");
 
+            // --- AreaUser
             builder.Entity<AreaUser>()
                 .HasOne(user => user.Area)
                 .WithMany(area => area.AreaUsers)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<AreaUser>()
+                .HasOne(user => user.User)
+                .WithMany()
+                .IsRequired()
+                .HasForeignKey(user => user.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // --- HomeUser
             builder.Entity<HomeUser>()
                 .HasOne(user => user.User)
                 .WithMany()
@@ -111,13 +125,7 @@ namespace HomeInv.Persistence
                 .HasForeignKey(user => user.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<AreaUser>()
-                .HasOne(user => user.User)
-                .WithMany()
-                .IsRequired()
-                .HasForeignKey(user => user.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+            // --- UserSetting
             builder.Entity<UserSetting>()
                 .HasOne(setting => setting.DefaultHome)
                 .WithMany()
