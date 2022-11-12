@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HomeInv.Common.ServiceContracts.ItemDefinition
 {
-    public class CreateItemDefinitionRequest : BaseRequest
+    public class CreateItemDefinitionRequest : BaseHomeRelatedRequest
     {
         public ItemDefinitionEntity ItemEntity { get; set; }
         [Required]
-        public int HomeId { get; set; }
+        public string ImageFileExtension { get; set; }
     }
 }

@@ -16,5 +16,7 @@ namespace HomeInv.Common.Interfaces.Services
         GetItemDefinitionResponse GetItemDefinition(GetItemDefinitionRequest request);
 
         CreateItemDefinitionResponse CreateItemDefinition(CreateItemDefinitionRequest request);
+
+        UpdateItemDefinitionResponse UpdateItemDefinition(UpdateItemDefinitionRequest request);
     }
 }
