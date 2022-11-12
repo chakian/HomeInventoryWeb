@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HomeInv.Common.ServiceContracts.Area
 {
-    public class GetAreasOfHomeRequest : BaseRequest
+    public class GetAreasOfHomeRequest : BaseHomeRelatedRequest
     {
     }
 }
