@@ -23,18 +23,19 @@ namespace HomeInv.Business.Services
             ItemDefinitionEntity entity = ConvertBaseDboToEntityBase(dbo);
             entity.Name = dbo.Name;
             entity.Description = dbo.Description;
-            if(dbo.Category != null)
+            entity.ImageName = dbo.ImageName;
+            if (dbo.Category != null)
             {
-                entity.CategoryId= dbo.Category.Id;
-                entity.CategoryName= dbo.Category.Name;
+                entity.CategoryId = dbo.Category.Id;
+                entity.CategoryName = dbo.Category.Name;
 
-                if (dbo.Category.ParentCategoryId!= null)
+                if (dbo.Category.ParentCategoryId != null)
                 {
                     var parentsNames = "";
 
                     var parent = queryableCategories.Single(c => c.Id == dbo.Category.ParentCategoryId);
                     parentsNames = parent.Name;
-                    if(parent.ParentCategoryId != null)
+                    if (parent.ParentCategoryId != null)
                     {
                         var grandparent = queryableCategories.Single(c => c.Id == parent.ParentCategoryId);
                         parentsNames = grandparent.Name + " - " + parentsNames;
@@ -68,6 +69,7 @@ namespace HomeInv.Business.Services
                 ItemDefinition item = CreateNewAuditableObject(request);
                 item.Name = request.ItemEntity.Name;
                 item.Description = request.ItemEntity.Description;
+                item.ImageName = request.ItemEntity.ImageName;
                 item.CategoryId = request.ItemEntity.CategoryId;
                 item.IsExpirable = request.ItemEntity.IsExpirable;
 
@@ -92,6 +94,36 @@ namespace HomeInv.Business.Services
             }
 
             response.Items = itemList;
+
+            return response;
+        }
+
+        public GetFilteredItemDefinitionsInHomeResponse GetFilteredItemDefinitionsInHome(GetFilteredItemDefinitionsInHomeRequest request)
+        {
+            var response = new GetFilteredItemDefinitionsInHomeResponse() { Items = new List<ItemDefinitionEntity>() };
+
+            var queryableList = context.ItemDefinitions.Include(item => item.Category).Where(item => item.Category.HomeId == request.HomeId).AsQueryable();
+            if (request.AreaId > 0)
+            {
+                //var joinedQuery = context.ItemStocks.Join(queryableList, stock => stock.ItemDefinitionId, item => item.Id, )
+                queryableList.Join(context.ItemStocks, item => item.Id, stock => stock.ItemDefinitionId, (item, stock) => new
+                {
+                    ItemDef = item,
+                    Stock = stock
+                });
+                //queryableList.Include(item => item.ItemStocks).Where(item => item.ItemStocks.Any(itemStock => itemStock.AreaId == request.AreaId));
+            }
+            if (request.CategoryId > 0)
+            {
+                queryableList.Where(item => item.Category.Id == request.CategoryId
+                || item.Category.ParentCategoryId == request.CategoryId
+                || (item.Category.ParentCategory == null || item.Category.ParentCategory.ParentCategoryId == request.CategoryId));
+            }
+
+            foreach (var item in queryableList.ToList())
+            {
+                response.Items.Add(ConvertDboToEntity(item));
+            }
 
             return response;
         }

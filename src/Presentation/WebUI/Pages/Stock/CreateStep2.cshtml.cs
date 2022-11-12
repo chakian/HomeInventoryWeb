@@ -56,7 +56,7 @@ namespace WebUI.Pages.Stock
             if (int.TryParse(Request.Query["ItemDefinitionId"].ToString(), out int _itemDefinitionId))
             {
                 ItemDefinitionId = _itemDefinitionId;
-
+                //TODO: Get ItemDefinition info here
                 StockEntry = new ItemStockEntry()
                 {
                     ActionDate = DateTime.Now,

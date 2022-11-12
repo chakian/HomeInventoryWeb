@@ -11,6 +11,8 @@ namespace HomeInv.Common.Interfaces.Services
     {
         GetAllItemDefinitionsInHomeResponse GetAllItemDefinitionsInHome(GetAllItemDefinitionsInHomeRequest request, bool includeInactive = false);
 
+        GetFilteredItemDefinitionsInHomeResponse GetFilteredItemDefinitionsInHome(GetFilteredItemDefinitionsInHomeRequest request);
+
         GetItemDefinitionResponse GetItemDefinition(GetItemDefinitionRequest request);
 
         CreateItemDefinitionResponse CreateItemDefinition(CreateItemDefinitionRequest request);

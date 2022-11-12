@@ -58,6 +58,7 @@ namespace WebUI
             services.AddScoped<IAreaUserService, AreaUserService>();
             services.AddScoped<IUserSettingService, UserSettingService>();
             services.AddScoped<IItemDefinitionService, ItemDefinitionService>();
+            services.AddScoped<IItemStockService, ItemStockService>();
 
             services.AddScoped<IUpdateItemStockHandler, UpdateItemStockHandler>();
         }

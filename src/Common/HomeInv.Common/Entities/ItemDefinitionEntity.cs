@@ -9,6 +9,8 @@ namespace HomeInv.Common.Entities
 
         public string Description { get; set; }
 
+        public string ImageName { get; set; }
+
         [Required]
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
