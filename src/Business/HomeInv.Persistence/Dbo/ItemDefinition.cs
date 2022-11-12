@@ -17,6 +17,11 @@ namespace HomeInv.Persistence.Dbo
         public virtual Category Category { get; set; }
         #endregion
 
+        #region Size Properties
+        public int SizeUnitId { get; set; }
+        public virtual SizeUnit SizeUnit { get; set; }
+        #endregion
+
         #region Consumable
         public bool IsExpirable { get; set; }
         #endregion

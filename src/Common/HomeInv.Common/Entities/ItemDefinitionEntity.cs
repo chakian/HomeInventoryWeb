@@ -17,5 +17,8 @@ namespace HomeInv.Common.Entities
         public string CategoryFullName { get; set; }
 
         public bool IsExpirable { get; set; }
+
+        public int SizeUnitId { get; set; }
+        public string SizeUnitName { get; set; }
     }
 }

@@ -15,11 +15,6 @@ namespace HomeInv.Persistence.Dbo
         public int AreaId { get; set; }
         public virtual Area Area { get; set; }
 
-        #region Size Properties
-        public int SizeUnitId { get; set; }
-        public virtual SizeUnit SizeUnit { get; set; }
-        #endregion
-        
         #region Consumable
         public DateTime? ExpirationDate { get; set; }
         #endregion

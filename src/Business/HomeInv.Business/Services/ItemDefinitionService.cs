@@ -24,6 +24,8 @@ namespace HomeInv.Business.Services
             entity.Name = dbo.Name;
             entity.Description = dbo.Description;
             entity.ImageName = dbo.ImageName;
+            entity.SizeUnitId = dbo.SizeUnitId;
+            entity.SizeUnitName = dbo.SizeUnit.Name;
             if (dbo.Category != null)
             {
                 entity.CategoryId = dbo.Category.Id;
@@ -49,7 +51,7 @@ namespace HomeInv.Business.Services
 
         public CreateItemDefinitionResponse CreateItemDefinition(CreateItemDefinitionRequest request)
         {
-            CreateItemDefinitionResponse response = new CreateItemDefinitionResponse();
+            var response = new CreateItemDefinitionResponse();
 
             if (request.ItemEntity.CategoryId <= 0)
             {
@@ -85,9 +87,9 @@ namespace HomeInv.Business.Services
             var response = new GetAllItemDefinitionsInHomeResponse();
 
             var dbItemList = context.ItemDefinitions.Include(itemDef => itemDef.Category)
-                .Where(item => (includeInactive ? true : item.IsActive) && item.Category.HomeId == request.HomeId)
+                .Where(item => (includeInactive || item.IsActive) && item.Category.HomeId == request.HomeId)
                 .ToList();
-            List<ItemDefinitionEntity> itemList = new List<ItemDefinitionEntity>();
+            var itemList = new List<ItemDefinitionEntity>();
             foreach (var item in dbItemList)
             {
                 itemList.Add(ConvertDboToEntity(item));
@@ -102,7 +104,11 @@ namespace HomeInv.Business.Services
         {
             var response = new GetFilteredItemDefinitionsInHomeResponse() { Items = new List<ItemDefinitionEntity>() };
 
-            var queryableList = context.ItemDefinitions.Include(item => item.Category).Where(item => item.Category.HomeId == request.HomeId).AsQueryable();
+            var queryableList = context.ItemDefinitions
+                .Include(item => item.Category)
+                .Include(item => item.SizeUnit)
+                .Where(item => item.Category.HomeId == request.HomeId)
+                .AsQueryable();
             if (request.AreaId > 0)
             {
                 //var joinedQuery = context.ItemStocks.Join(queryableList, stock => stock.ItemDefinitionId, item => item.Id, )

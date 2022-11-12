@@ -25,9 +25,7 @@ namespace HomeInv.Business.Services
                 Quantity = dbo.RemainingAmount,
                 AreaId = dbo.AreaId,
                 AreaName = dbo.Area.Name,
-                ExpirationDate = (dbo.ExpirationDate.HasValue ? dbo.ExpirationDate.Value : DateTime.MinValue),
-                SizeUnitId = dbo.SizeUnitId,
-                SizeUnitName = dbo.SizeUnit.Name
+                ExpirationDate = (dbo.ExpirationDate.HasValue ? dbo.ExpirationDate.Value : DateTime.MinValue)
             };
             return entity;
         }
@@ -38,7 +36,6 @@ namespace HomeInv.Business.Services
 
             var stocks = context.ItemStocks
                 .Include(stock => stock.Area)
-                .Include(stock => stock.SizeUnit)
                 .Where(stock => request.ItemDefinitionIdList.Contains(stock.Id));
 
             foreach (var stock in stocks)

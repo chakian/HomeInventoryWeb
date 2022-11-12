@@ -60,7 +60,6 @@ namespace HomeInv.Business.Handlers
                     {
                         ItemDefinitionId = request.ItemDefinitionId,
                         AreaId = request.AreaId,
-                        SizeUnitId = request.SizeUnitId,
                         ExpirationDate = request.ExpirationDate,
                         RemainingAmount = request.Size,
                         IsActive = true,

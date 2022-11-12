@@ -42,13 +42,13 @@ namespace HomeInv.Persistence
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // --- ItemStock
-            builder.Entity<ItemStock>()
-                .HasOne(itemStock => itemStock.SizeUnit)
+            builder.Entity<ItemDefinition>()
+                .HasOne(item => item.SizeUnit)
                 .WithMany()
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // --- ItemStock
             builder.Entity<ItemStock>()
                 .HasOne(itemStock => itemStock.ItemDefinition)
                 .WithMany(item => item.ItemStocks)
