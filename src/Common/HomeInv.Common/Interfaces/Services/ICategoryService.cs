@@ -1,9 +1,4 @@
 ﻿using HomeInv.Common.ServiceContracts.Category;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeInv.Common.Interfaces.Services
 {
@@ -17,5 +12,6 @@ namespace HomeInv.Common.Interfaces.Services
         CreateCategoryResponse CreateCategory(CreateCategoryRequest request);
         GetCategoriesOfHomeResponse GetCategoriesOfHome_Hierarchial(GetCategoriesOfHomeRequest request);
         GetCategoriesOfHomeResponse GetCategoriesOfHome_Ordered(GetCategoriesOfHomeRequest request);
+        UpdateCategoryResponse UpdateCategory(UpdateCategoryRequest request);
     }
 }
