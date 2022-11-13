@@ -1,6 +1,8 @@
 ﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Category;
+using HomeInv.Common.ServiceContracts.ItemDefinition;
+using HomeInv.Language;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using System;
@@ -180,6 +182,39 @@ namespace HomeInv.Business.Services
                 }
             }
             return categoryEntities;
+        }
+
+        public UpdateCategoryResponse UpdateCategory(UpdateCategoryRequest request)
+        {
+            var response = new UpdateCategoryResponse();
+
+            if (request.CategoryId <= 0)
+            {
+                response.AddError("Yanlis kategori!");
+            }
+            if (string.IsNullOrEmpty(request.Name))
+            {
+                response.AddError("İsim boş olamaz!");
+            }
+            if (context.Categories.Any(category => category.Id != request.CategoryId
+                && category.HomeId == request.HomeId
+                && category.Name == request.Name
+                && category.ParentCategoryId == request.ParentCategoryId))
+            {
+                response.AddError(Language.Resources.Category_SameNameExists);
+            }
+
+            if (response.IsSuccessful)
+            {
+                var category = context.Categories.Find(request.CategoryId);
+                category.Name = request.Name;
+                category.Description = request.Description;
+                category.ParentCategoryId = request.ParentCategoryId;
+
+                context.SaveChanges();
+            }
+
+            return response;
         }
     }
 }
