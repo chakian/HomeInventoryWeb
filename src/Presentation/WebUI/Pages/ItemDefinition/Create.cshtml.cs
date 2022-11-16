@@ -94,7 +94,7 @@ namespace WebUI.Pages.ItemDefinition
 
             if (response.IsSuccessful)
             {
-                if (FormFile.Length > 0)
+                if (FormFile?.Length > 0)
                 {
                     string path = Path.Combine(_webHostEnvironment.WebRootPath,
                         "uploads",

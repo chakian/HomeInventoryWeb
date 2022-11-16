@@ -102,12 +102,12 @@ namespace WebUI.Base
 
                 return result;
             }
-            catch
+            catch(Exception ex)
             {
                 dbContext.Database.RollbackTransaction();
 
                 var error = TempData.Peek("Error");
-                if (error == null || string.IsNullOrEmpty(error.ToString())) SetErrorMessage("İşleminiz başarıyla gerçekleşemedi. Developer herhangi bir hata da belirtmemiş. Elimizde sadece bu var.");
+                if (error == null || string.IsNullOrEmpty(error.ToString())) SetErrorMessage("İşleminiz başarıyla gerçekleşemedi. Developer herhangi bir hata da belirtmemiş. Elimizde sadece bu var. | " + ex.Message + " | " + ex.StackTrace);
 
                 return Page();
             }
