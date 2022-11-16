@@ -10,5 +10,6 @@ namespace HomeInv.Common.Interfaces.Services
     public interface IItemStockService : IServiceBase
     {
         GetItemStocksByItemDefinitionIdsResponse GetItemStocksByItemDefinitionIds(GetItemStocksByItemDefinitionIdsRequest request);
+        GetSingleItemStockResponse GetSingleItemStock(GetSingleItemStockRequest request);
     }
 }
