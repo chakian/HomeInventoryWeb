@@ -112,7 +112,7 @@ namespace HomeInv.Business.Handlers
             _context.SaveChanges();
 
             //Insert unit price if this is a purchase action
-            if (IsPurchaseAction(request.ItemStockActionTypeId))
+            if (IsPurchaseAction(request.ItemStockActionTypeId) && request.Price > 0 && request.Size > 0)
             {
                 var unitPrice = new ItemUnitPrice()
                 {
