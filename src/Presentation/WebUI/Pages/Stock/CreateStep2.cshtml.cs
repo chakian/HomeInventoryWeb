@@ -40,6 +40,8 @@ namespace WebUI.Pages.Stock
         [BindProperty]
         public int ItemDefinitionId { get; set; }
 
+        [BindProperty] public string ItemName { get; set; }
+
         [BindProperty]
         public ItemStockEntry StockEntry { get; set; }
 
@@ -65,6 +67,8 @@ namespace WebUI.Pages.Stock
                     RequestUserId = UserId
                 });
 
+                ItemName = itemDefinition.ItemDefinition.Name + (!string.IsNullOrEmpty(itemDefinition.ItemDefinition.Description) ? " (" + itemDefinition.ItemDefinition.Description + ")" : "");
+
                 StockEntry = new ItemStockEntry()
                 {
                     ActionDate = DateTime.Now,
@@ -79,10 +83,7 @@ namespace WebUI.Pages.Stock
                     new SelectListItem(){ Text = "Hediye Geldi", Value = ((int)ItemStockActionTypeEnum.GiftedIn).ToString() }
                 };
 
-                AllAreas = new List<SelectListItem>
-                {
-                    new SelectListItem { Text = "-- Oda --", Value = "0", Selected = true }
-                };
+                AllAreas = new List<SelectListItem>();
                 var areas = _areaService.GetAreasOfHome(new GetAreasOfHomeRequest()
                 {
                     HomeId = UserSettings.DefaultHomeId,
@@ -93,9 +94,11 @@ namespace WebUI.Pages.Stock
                     AllAreas.Add(new SelectListItem()
                     {
                         Text = area.Name,
-                        Value = area.Id.ToString()
+                        Value = area.Id.ToString(),
+                        Selected = (areas.Areas.Count == 1) ? true : false
                     });
                 }
+                if (AllAreas.Count != 1) AllAreas.Insert(0, new SelectListItem { Text = "-- Oda --", Value = "0", Selected = (AllAreas.Count == 1) ? false : true });
             }
             else
             {

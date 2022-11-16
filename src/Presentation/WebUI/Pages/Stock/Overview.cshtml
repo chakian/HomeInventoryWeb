@@ -28,7 +28,17 @@
                 <td>@(itemDefinition.ItemName)</td>
                 <td>@(itemDefinition.CategoryName + (string.IsNullOrEmpty(itemDefinition.CategoryParentNames) ? "" : " (" + itemDefinition.CategoryParentNames + ")"))</td>
                 <td>@(itemDefinition.AreaName)</td>
-                <td><a class="btn btn-dark" asp-page="UpdateRemainingStock" asp-route-ItemStockId="@itemDefinition.StockId"><i class="bi bi-pencil"></i></a> @(itemDefinition.CurrentStockAmount + " " + itemDefinition.SizeUnitName)</td>
+                <td>
+                    @if (itemDefinition.StockId > 0)
+                    {
+                        <a class="btn btn-dark" asp-page="UpdateRemainingStock" asp-route-ItemStockId="@itemDefinition.StockId"><i class="bi bi-pencil"></i></a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-dark" asp-page="CreateStep2" asp-route-ItemDefinitionId="@itemDefinition.ItemDefinitionId"><i class="bi bi-cart-plus"></i></a>
+                    }
+                    &nbsp;
+                    @(itemDefinition.CurrentStockAmount + " " + itemDefinition.SizeUnitName)</td>
                 <td>@(itemDefinition.ExpirationDate == DateTime.MinValue ? "-" : itemDefinition.ExpirationDate)</td>
             </tr>
         }
