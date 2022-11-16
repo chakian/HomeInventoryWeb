@@ -48,7 +48,7 @@ namespace WebUI.Pages.Stock
                 HomeId = HomeId,
                 ItemDefinitionIdList = definitions.Items.Select(def => def.Id).ToList(),
                 RequestUserId = UserId
-            });
+            }).ItemStocks;
 
             OverviewList = new List<ItemStockOverview>();
 
@@ -65,7 +65,7 @@ namespace WebUI.Pages.Stock
                     ImageName = definition.ImageName,
 
                 };
-                var currentItemStocks = stocks.ItemStocks.Where(s => s.ItemDefinitionId == definition.Id).ToList();
+                var currentItemStocks = stocks.Where(s => s.ItemDefinitionId == definition.Id).ToList();
                 if (currentItemStocks.Any())
                 {
                     foreach (var stock in currentItemStocks)
