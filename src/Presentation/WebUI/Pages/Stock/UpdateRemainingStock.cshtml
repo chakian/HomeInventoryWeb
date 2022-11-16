@@ -1,0 +1,118 @@
+﻿@page
+@model WebUI.Pages.Stock.UpdateRemainingStockModel
+@{
+    ViewData["Title"] = "Stok Durumu Güncelleme";
+}
+
+<h1>Ürün: @Model.ItemName</h1>
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for=ItemStockId type="hidden" />
+
+    <div class="form-group">
+        <label asp-for="StockActionTypeId" class="control-label"></label>
+        <select asp-for="StockActionTypeId" asp-items="Model.StockActionTypes" class="form-select"></select>
+        <span asp-validation-for="StockActionTypeId" class="text-danger"></span>
+    </div>
+
+    <br />
+
+    <div class="accordion" id="stockAmountAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="updateByRemainingAmountHeading">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRemAmt" aria-expanded="true" aria-controls="collapseRemAmt">
+                    <i class="bi bi-droplet-half"></i>&nbsp;&nbsp;&nbsp;Stokta Kalan Miktara Göre Güncelleme
+                </button>
+            </h2>
+            <div id="collapseRemAmt" class="accordion-collapse collapse show" aria-labelledby="updateByRemainingAmountHeading" data-bs-parent="#stockAmountAccordion">
+                <div class="accordion-body">
+                    <div class="form-group">
+                        <label asp-for="RemainingAmount" class="control-label">Şu anda stokta bu üründen @Model.RemainingAmount @Model.SizeUnitName var. Yeni miktar ne olsun?</label>
+                        <input asp-for="RemainingAmount" class="form-control" />
+                        <span asp-validation-for="RemainingAmount" class="text-danger"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="updateByConsumedAmountHeading">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConAmt" aria-expanded="false" aria-controls="collapseConAmt">
+                    <i class="bi bi-moisture"></i>&nbsp;&nbsp;&nbsp;Tüketilen Miktara Göre Güncelleme
+                </button>
+            </h2>
+            <div id="collapseConAmt" class="accordion-collapse collapse" aria-labelledby="updateByConsumedAmountHeading" data-bs-parent="#stockAmountAccordion">
+                <div class="accordion-body">
+
+                    <div class="form-group">
+                        <label asp-for="ConsumedAmount" class="control-label">Şu anda stokta bu üründen @Model.RemainingAmount @Model.SizeUnitName var. Ne kadarı tüketildi?</label>
+                        <input asp-for="ConsumedAmount" class="form-control" />
+                        <span asp-validation-for="ConsumedAmount" class="text-danger"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="updateByEntryAmountHeading">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEntryAmt" aria-expanded="false" aria-controls="collapseEntryAmt">
+                    <i class="bi bi-moisture"></i>&nbsp;&nbsp;&nbsp;Miktarda Artış Yapma
+                </button>
+            </h2>
+            <div id="collapseEntryAmt" class="accordion-collapse collapse" aria-labelledby="updateByEntryAmountHeading" data-bs-parent="#stockAmountAccordion">
+                <div class="accordion-body">
+
+                    <div class="form-group">
+                        <label asp-for="EnteredAmount" class="control-label">Şu anda stokta bu üründen @Model.RemainingAmount @Model.SizeUnitName var. Ne kadar daha ekleniyor?</label>
+                        <input asp-for="EnteredAmount" class="form-control" />
+                        <span asp-validation-for="EnteredAmount" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Price" class="control-label"></label>
+                        <input asp-for="Price" class="form-control" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br />
+
+    <div class="form-group">
+        <label asp-for="ActionDate" class="control-label"></label>
+        <input asp-for="ActionDate" type="date" class="form-control" />
+        <span asp-validation-for="ActionDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ActionTarget" class="control-label"></label>
+        <input asp-for="ActionTarget" type="text" class="form-control" />
+        <span asp-validation-for="ActionTarget" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Kaydet" class="btn btn-primary" />
+        <a class="btn btn-secondary" asp-page="Overview">Vazgeç</a>
+    </div>
+
+</form>
+
+@section Scripts {
+    @{
+        //await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            $(".accordion-collapse").on("show.bs.collapse", function (e) {
+                $(this).find(':input').prop('disabled', false);
+            });
+
+            $(".accordion-collapse").on("hide.bs.collapse", function (e) {
+                $(this).find(':input').prop('disabled', "disabled");
+            });
+        });
+    </script>
+}

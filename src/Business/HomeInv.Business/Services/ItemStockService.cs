@@ -24,9 +24,9 @@ namespace HomeInv.Business.Services
                 ItemDefinitionId = dbo.ItemDefinitionId,
                 Quantity = dbo.RemainingAmount,
                 AreaId = dbo.AreaId,
-                AreaName = dbo.Area.Name,
                 ExpirationDate = (dbo.ExpirationDate.HasValue ? dbo.ExpirationDate.Value : DateTime.MinValue)
             };
+            if (dbo.Area != null) { entity.AreaName = dbo.Area.Name; }
             return entity;
         }
 
@@ -36,11 +36,26 @@ namespace HomeInv.Business.Services
 
             var stocks = context.ItemStocks
                 .Include(stock => stock.Area)
-                .Where(stock => request.ItemDefinitionIdList.Contains(stock.Id));
+                .Where(stock => request.ItemDefinitionIdList.Contains(stock.ItemDefinitionId));
 
             foreach (var stock in stocks)
             {
                 response.ItemStocks.Add(ConvertDboToEntity(stock));
+            }
+
+            return response;
+        }
+
+        public GetSingleItemStockResponse GetSingleItemStock(GetSingleItemStockRequest request)
+        {
+            var response = new GetSingleItemStockResponse() { Stock = new ItemStockEntity() };
+
+            var stock = context.ItemStocks
+                .SingleOrDefault(stock => stock.Id == request.ItemStockId);
+
+            if (stock != null)
+            {
+                response.Stock = ConvertDboToEntity(stock);
             }
 
             return response;
