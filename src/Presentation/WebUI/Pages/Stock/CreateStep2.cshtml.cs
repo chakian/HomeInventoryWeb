@@ -109,6 +109,9 @@ namespace WebUI.Pages.Stock
 
         protected override IActionResult OnModelPost()
         {
+            decimal.TryParse(StockEntry.EntryAmount, out var entryAmount);
+            decimal.TryParse(StockEntry.TotalPrice, out var totalPrice);
+
             var request = new UpdateItemStockRequest()
             {
                 HomeId = UserSettings.DefaultHomeId,
@@ -116,11 +119,11 @@ namespace WebUI.Pages.Stock
                 ItemDefinitionId = ItemDefinitionId,
                 AreaId = StockEntry.AreaId,
                 SizeUnitId = StockEntry.SizeUnitId,
-                Size = StockEntry.EntryAmount,
+                Size = entryAmount,
                 ExpirationDate = StockEntry.ExpirationDate,
                 ActionDate = StockEntry.ActionDate,
                 ActionTarget = StockEntry.ActionTarget,
-                Price = StockEntry.TotalPrice
+                Price = totalPrice
             };
 
             CallService(_updateItemStockHandler.Execute, request);
@@ -148,7 +151,8 @@ namespace WebUI.Pages.Stock
 
         [Display(Name = nameof(Resources.ItemStockEntry_EntryAmount), ResourceType = typeof(Resources))]
         [Required]
-        public decimal EntryAmount { get; set; }
+        [RegularExpression("\\d+(,\\d+)?", ErrorMessageResourceName = nameof(Resources.Error_DecimalsShouldBeSeparatedByComma), ErrorMessageResourceType = typeof(Resources))]
+        public string EntryAmount { get; set; }
 
         [Display(Name = nameof(Resources.ItemStockEntry_ExpirationDate), ResourceType = typeof(Resources))]
         public DateTime ExpirationDate { get; set; }
@@ -161,6 +165,7 @@ namespace WebUI.Pages.Stock
         public string ActionTarget { get; set; }
 
         [Display(Name = nameof(Resources.ItemStockEntry_TotalPrice), ResourceType = typeof(Resources))]
-        public decimal TotalPrice { get; set; }
+        [RegularExpression("\\d+(,\\d+)?", ErrorMessageResourceName = nameof(Resources.Error_DecimalsShouldBeSeparatedByComma), ErrorMessageResourceType = typeof(Resources))]
+        public string TotalPrice { get; set; }
     }
 }
