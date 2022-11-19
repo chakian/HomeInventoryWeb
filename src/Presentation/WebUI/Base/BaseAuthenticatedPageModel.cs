@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 
 namespace WebUI.Base
 {
@@ -25,6 +26,8 @@ namespace WebUI.Base
 
         public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
         {
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("tr-TR");
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("tr-TR");
             if (User != null && User.Identity.IsAuthenticated)
             {
                 var settings = ReadUserSettingsFromSession(context);

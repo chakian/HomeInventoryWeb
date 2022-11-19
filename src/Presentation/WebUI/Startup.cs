@@ -5,10 +5,13 @@ using HomeInv.Common.Interfaces.Services;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using System.Globalization;
 
 namespace WebUI
 {
@@ -43,6 +46,27 @@ namespace WebUI
             //services.AddMemoryCache();
 
             services.AddRazorPages();
+
+            //TODO: Changing culture: https://www.mikesdotnetting.com/article/345/localisation-in-asp-net-core-razor-pages-cultures
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                var supportedCultures = new[]
+                 {
+                    new CultureInfo("tr-TR"),
+                    //new CultureInfo("en"),
+                    //new CultureInfo("de"),
+                    //new CultureInfo("fr"),
+                    //new CultureInfo("es"),
+                    //new CultureInfo("ru"),
+                    //new CultureInfo("ja"),
+                    //new CultureInfo("ar"),
+                    //new CultureInfo("zh"),
+                    //new CultureInfo("en-GB")
+                };
+                options.DefaultRequestCulture = new RequestCulture("tr-TR");
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+            });
 
             ConfigureInternalServices(services);
         }
@@ -87,6 +111,10 @@ namespace WebUI
             app.UseSession();
 
             app.UseRouting();
+
+            //TODO: Changing culture: https://www.mikesdotnetting.com/article/345/localisation-in-asp-net-core-razor-pages-cultures
+            var localizationOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>().Value;
+            app.UseRequestLocalization(localizationOptions);
 
             app.UseAuthentication();
             app.UseAuthorization();

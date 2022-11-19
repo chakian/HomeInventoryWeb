@@ -3,6 +3,7 @@ using HomeInv.Common.Interfaces.Handlers;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.ItemDefinition;
 using HomeInv.Common.ServiceContracts.ItemStock;
+using HomeInv.Language;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -33,10 +34,14 @@ namespace WebUI.Pages.Stock
         [BindProperty] public string ItemName { get; set; }
         [BindProperty] public int ItemStockId { get; set; }
         [Display(Name = "Mevcutta Kalan Miktar")]
-        [BindProperty] public decimal RemainingAmount { get; set; }
-        [BindProperty] public decimal ConsumedAmount { get; set; }
-        [BindProperty] public decimal EnteredAmount { get; set; }
-        [BindProperty] public decimal Price { get; set; }
+        [RegularExpression("\\d+(,\\d+)?", ErrorMessageResourceName = nameof(Resources.Error_DecimalsShouldBeSeparatedByComma), ErrorMessageResourceType = typeof(Resources))]
+        [BindProperty] public string RemainingAmount { get; set; }
+        [RegularExpression("\\d+(,\\d+)?", ErrorMessageResourceName = nameof(Resources.Error_DecimalsShouldBeSeparatedByComma), ErrorMessageResourceType = typeof(Resources))]
+        [BindProperty] public string ConsumedAmount { get; set; }
+        [RegularExpression("\\d+(,\\d+)?", ErrorMessageResourceName = nameof(Resources.Error_DecimalsShouldBeSeparatedByComma), ErrorMessageResourceType = typeof(Resources))]
+        [BindProperty] public string EnteredAmount { get; set; }
+        [RegularExpression("\\d+(,\\d+)?", ErrorMessageResourceName = nameof(Resources.Error_DecimalsShouldBeSeparatedByComma), ErrorMessageResourceType = typeof(Resources))]
+        [BindProperty] public string Price { get; set; }
         [BindProperty] public string SizeUnitName { get; set; }
         [Display(Name = "Stok Güncelleme Tipi")]
         [BindProperty] public int StockActionTypeId { get; set; }
@@ -83,7 +88,7 @@ namespace WebUI.Pages.Stock
                 ItemStockId = ItemStockId,
                 RequestUserId = UserId
             }).Stock;
-            RemainingAmount = stock.Quantity;
+            RemainingAmount = stock.Quantity.ToString();
 
             var itemDefinition = _itemDefinitionService.GetItemDefinition(new GetItemDefinitionRequest()
             {
@@ -99,14 +104,19 @@ namespace WebUI.Pages.Stock
         protected override IActionResult OnModelPost()
         {
             //TODO: Eger hata gelir ve ekran tekrar acilirsa accordion'un ilgili kismi acik gelsin
+            decimal.TryParse(RemainingAmount, out decimal remainingAmount);
+            decimal.TryParse(ConsumedAmount, out decimal consumedAmount);
+            decimal.TryParse(EnteredAmount, out decimal enteredAmount);
+            decimal.TryParse(Price, out decimal price);
+
             var request = new UpdateRemainingStockAmountRequest()
             {
                 ItemStockId = ItemStockId,
                 ItemStockActionTypeId = StockActionTypeId,
-                RemainingAmount = RemainingAmount,
-                ConsumedAmount = ConsumedAmount,
-                EntryAmount = EnteredAmount,
-                Price = Price,
+                RemainingAmount = remainingAmount,
+                ConsumedAmount = consumedAmount,
+                EntryAmount = enteredAmount,
+                Price = price,
                 ActionDate = ActionDate,
                 ActionTarget = ActionTarget,
                 RequestUserId = UserId
