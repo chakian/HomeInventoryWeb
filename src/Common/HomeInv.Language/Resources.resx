@@ -126,6 +126,9 @@
   <data name="Category_SameNameExists" xml:space="preserve">
     <value>Aynı isimde başka bir kategori mevcut</value>
   </data>
+  <data name="Error_DecimalsShouldBeSeparatedByComma" xml:space="preserve">
+    <value>Ondalıklı sayılar virgülle ayrılmalıdır.</value>
+  </data>
   <data name="Error_LoggedOut" xml:space="preserve">
     <value>Oturum uçmus, giriş yapıp tekrar bir deneyin. Giriş sağ üstte bir yerlerde.</value>
   </data>
