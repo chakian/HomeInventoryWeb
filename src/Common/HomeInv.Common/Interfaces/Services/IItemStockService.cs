@@ -11,5 +11,6 @@ namespace HomeInv.Common.Interfaces.Services
     {
         GetItemStocksByItemDefinitionIdsResponse GetItemStocksByItemDefinitionIds(GetItemStocksByItemDefinitionIdsRequest request);
         GetSingleItemStockResponse GetSingleItemStock(GetSingleItemStockRequest request);
+        GetItemStocksByFilterResponse GetItemStocksByFilter(GetItemStocksByFilterRequest request);
     }
 }

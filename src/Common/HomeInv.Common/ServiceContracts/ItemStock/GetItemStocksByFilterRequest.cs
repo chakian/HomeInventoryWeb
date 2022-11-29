@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace HomeInv.Common.ServiceContracts.ItemStock
 {
-    public class GetItemStocksResponse : BaseResponse
+    public class GetItemStocksByFilterRequest : BaseHomeRelatedRequest
     {
+        public int CategoryId { get; set; }
     }
 }

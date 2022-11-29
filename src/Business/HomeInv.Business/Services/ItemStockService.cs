@@ -30,13 +30,34 @@ namespace HomeInv.Business.Services
             return entity;
         }
 
+        public GetItemStocksByFilterResponse GetItemStocksByFilter(GetItemStocksByFilterRequest request)
+        {
+            var response = new GetItemStocksByFilterResponse() { ItemStocks = new List<ItemStockEntity>() };
+            var stocks = context.ItemStocks
+                .Include(stock => stock.Area)
+                .Where(s => s.Area.HomeId == request.HomeId);
+
+            if (request.CategoryId > 0)
+            {
+                stocks = stocks.Include(stock => stock.ItemDefinition)
+                    .Where(stock => stock.ItemDefinition.CategoryId == request.CategoryId);
+            }
+
+            foreach (var stock in stocks.ToList())
+            {
+                response.ItemStocks.Add(ConvertDboToEntity(stock));
+            }
+
+            return response;
+        }
+
         public GetItemStocksByItemDefinitionIdsResponse GetItemStocksByItemDefinitionIds(GetItemStocksByItemDefinitionIdsRequest request)
         {
             var response = new GetItemStocksByItemDefinitionIdsResponse() { ItemStocks = new List<ItemStockEntity>() };
 
             var stocks = context.ItemStocks
                 .Include(stock => stock.Area)
-                .Where(stock => request.ItemDefinitionIdList.Contains(stock.ItemDefinitionId));
+                .Where(stock => stock.Area.HomeId == request.HomeId && request.ItemDefinitionIdList.Contains(stock.ItemDefinitionId));
 
             foreach (var stock in stocks)
             {
@@ -51,7 +72,7 @@ namespace HomeInv.Business.Services
             var response = new GetSingleItemStockResponse() { Stock = new ItemStockEntity() };
 
             var stock = context.ItemStocks
-                .SingleOrDefault(stock => stock.Id == request.ItemStockId);
+                .SingleOrDefault(stock => stock.Id == request.ItemStockId && stock.Area.HomeId == request.HomeId);
 
             if (stock != null)
             {

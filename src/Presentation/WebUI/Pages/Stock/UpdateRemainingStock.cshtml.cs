@@ -86,6 +86,7 @@ namespace WebUI.Pages.Stock
             var stock = _itemStockService.GetSingleItemStock(new GetSingleItemStockRequest()
             {
                 ItemStockId = ItemStockId,
+                HomeId = UserSettings.DefaultHomeId,
                 RequestUserId = UserId
             }).Stock;
             RemainingAmount = stock.Quantity.ToString();

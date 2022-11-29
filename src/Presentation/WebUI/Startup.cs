@@ -13,6 +13,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System.Globalization;
 using HomeInv.Persistence.Dbo;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Net;
+using Microsoft.AspNetCore.Identity;
 
 namespace WebUI
 {
@@ -47,6 +53,28 @@ namespace WebUI
             //services.AddMemoryCache();
 
             services.AddRazorPages();
+
+            services.AddAuthentication()
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Unauthorized/";
+                    options.AccessDeniedPath = "/Account/Forbidden/";
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        //ValidateLifetime = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    };
+                });
 
             //TODO: Changing culture: https://www.mikesdotnetting.com/article/345/localisation-in-asp-net-core-razor-pages-cultures
             services.Configure<RequestLocalizationOptions>(options =>

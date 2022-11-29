@@ -1,6 +1,6 @@
 ﻿namespace HomeInv.Common.ServiceContracts.ItemStock
 {
-    public class GetSingleItemStockRequest : BaseRequest
+    public class GetSingleItemStockRequest : BaseHomeRelatedRequest
     {
         public int ItemStockId { get; set; }
     }
