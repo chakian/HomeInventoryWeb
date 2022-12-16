@@ -106,6 +106,60 @@ namespace HomeInv.Language {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Miktar.
+        /// </summary>
+        public static string Generic_Amount {
+            get {
+                return ResourceManager.GetString("Generic_Amount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listeye Dön.
+        /// </summary>
+        public static string Generic_BackToList {
+            get {
+                return ResourceManager.GetString("Generic_BackToList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Açıklama.
+        /// </summary>
+        public static string Generic_Description {
+            get {
+                return ResourceManager.GetString("Generic_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ad.
+        /// </summary>
+        public static string Generic_Name {
+            get {
+                return ResourceManager.GetString("Generic_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Kaydet.
+        /// </summary>
+        public static string Generic_Save {
+            get {
+                return ResourceManager.GetString("Generic_Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Boyut Tipi.
+        /// </summary>
+        public static string Generic_Size {
+            get {
+                return ResourceManager.GetString("Generic_Size", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Aynı isimde başka bir eviniz var, lütfen farklı bir isim giriniz..
         /// </summary>
         public static string Home_Error_SameNameExists {

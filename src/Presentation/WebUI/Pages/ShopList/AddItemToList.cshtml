@@ -1,0 +1,47 @@
+﻿@page
+@model WebUI.Pages.ShopList.AddItemToListModel
+@{
+    ViewData["Title"] = "Listeye Kalem Ekle";
+}
+
+<h1>Listeye Kalem Ekleme: @Model.ListName</h1>
+
+<div class="row">
+    <div class="col">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input asp-for=ListId type="hidden" />
+
+            <div class="form-group">
+                <label asp-for="ItemName" class="control-label"></label>
+                <input asp-for="ItemName" class="form-control" />
+                <span asp-validation-for="ItemName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Amount" class="control-label"></label>
+                <input asp-for="Amount" type="text" class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SizeId" class="control-label"></label>
+                <select asp-for="SizeId" asp-items="Model.AllSizeUnits" class="form-select"></select>
+                <span asp-validation-for="SizeId" class="text-danger"></span>
+            </div>
+            
+            <hr />
+            <div class="form-group">
+                <label asp-for="AddAnother" class="form-check-label">Kaydettikten sonra bir tane daha ekle</label>
+                <input asp-for="AddAnother" type="checkbox" class="form-check-input" />
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Kaydet" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./EditList">Listeye Dön</a>
+</div>
