@@ -1,0 +1,53 @@
+﻿@page
+@model WebUI.Pages.ShopList.DetailsModel
+
+@{
+    ViewData["Title"] = "Liste Detayi";
+}
+
+<div>
+    <h4>Liste Detayi</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @(HomeInv.Language.Resources.Generic_Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ShoppingList.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @(HomeInv.Language.Resources.Generic_Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ShoppingList.Description)
+        </dd>
+        <dt class="col-sm-2">
+            Olusturulma Tarihi
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ShoppingList.InsertTime)
+        </dd>
+        <dt class="col-sm-2">
+            Son Guncelleme Tarihi
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ShoppingList.UpdateTime)
+        </dd>
+        <dt class="col-sm-2">
+            Olusturan
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ShoppingList.InsertUser.Email)
+        </dd>
+        <dt class="col-sm-2">
+            Guncelleyen
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ShoppingList.UpdateUser.Email)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.ShoppingList?.Id">Duzenle</a> |
+    <a asp-page="./Index">@(HomeInv.Language.Resources.Generic_BackToList)</a>
+</div>
