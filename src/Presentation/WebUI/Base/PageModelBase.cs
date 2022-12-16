@@ -156,6 +156,7 @@ namespace WebUI.Base
             }
             else
             {
+                context.HttpContext.Session.Clear();
                 SetErrorMessage(Resources.Error_LoggedOut);
                 context.Result = RedirectToPage("/");
             }
