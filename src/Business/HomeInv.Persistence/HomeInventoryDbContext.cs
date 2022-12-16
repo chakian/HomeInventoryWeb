@@ -23,6 +23,8 @@ namespace HomeInv.Persistence
         public virtual DbSet<SizeUnit> SizeUnits { get; set; }
         public virtual DbSet<UserSetting> UserSettings { get; set; }
         public virtual DbSet<ItemUnitPrice> ItemUnitPrices { get; set; }
+        public virtual DbSet<ShoppingList> ShoppingLists { get; set; }
+        public virtual DbSet<ShoppingListItem> ShoppingListItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -138,6 +140,25 @@ namespace HomeInv.Persistence
                 .WithOne()
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // --- ShoppingList & ShoppingListItem
+            builder.Entity<ShoppingList>()
+                .HasOne(list => list.Home)
+                .WithMany()
+                .IsRequired()
+                .HasForeignKey(list => list.HomeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ShoppingListItem>()
+                .HasOne(item => item.ShoppingList)
+                .WithMany(list => list.Items)
+                .IsRequired()
+                .HasForeignKey(item => item.ShoppingListId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ShoppingListItem>()
+                .Property(item => item.Amount)
+                .HasPrecision(18, 2);
         }
     }
 }
