@@ -17,7 +17,7 @@ public class EmailSenderService : IEmailSenderService
     {
         _emailSenderOptions = emailSenderOptions.Value;
     }
-
+    // TODO: Sample: https://codewithmukesh.com/blog/send-emails-with-aspnet-core/
     public async Task SendEmailAsync(MailRequest mailRequest)
     {
         var emailMessage = new MimeMessage();
