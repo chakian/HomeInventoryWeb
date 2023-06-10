@@ -5,6 +5,7 @@ using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using WebUI.Base;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace WebUI.Pages.ShopList
 {
@@ -21,6 +22,7 @@ namespace WebUI.Pages.ShopList
             if (dbContext.ShoppingLists != null)
             {
                 ShoppingList = await dbContext.ShoppingLists
+                    .Where(sl => sl.HomeId == UserSettings.DefaultHomeId)
                     .Include(s => s.Items)
                     .Include(s => s.InsertUser)
                     .Include(s => s.UpdateUser).ToListAsync();
