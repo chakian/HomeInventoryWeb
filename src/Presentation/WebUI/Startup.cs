@@ -1,5 +1,6 @@
 using HomeInv.Business.Handlers;
 using HomeInv.Business.Services;
+using HomeInv.Common.Configuration;
 using HomeInv.Common.Interfaces.Handlers;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Persistence;
@@ -67,6 +68,9 @@ namespace WebUI
                 options.SupportedCultures = supportedCultures;
                 options.SupportedUICultures = supportedCultures;
             });
+
+            services.Configure<EmailSenderOptions>(Configuration);
+            services.AddTransient<IEmailSenderService, EmailSenderService>();
 
             ConfigureInternalServices(services);
         }

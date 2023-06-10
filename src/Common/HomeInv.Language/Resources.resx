@@ -132,6 +132,24 @@
   <data name="Error_LoggedOut" xml:space="preserve">
     <value>Oturum uçmus, giriş yapıp tekrar bir deneyin. Giriş sağ üstte bir yerlerde.</value>
   </data>
+  <data name="Generic_Amount" xml:space="preserve">
+    <value>Miktar</value>
+  </data>
+  <data name="Generic_BackToList" xml:space="preserve">
+    <value>Listeye Dön</value>
+  </data>
+  <data name="Generic_Description" xml:space="preserve">
+    <value>Açıklama</value>
+  </data>
+  <data name="Generic_Name" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="Generic_Save" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="Generic_Size" xml:space="preserve">
+    <value>Boyut Tipi</value>
+  </data>
   <data name="HomeSelectionIsMandatory" xml:space="preserve">
     <value>Ev seçimi zorunludur.</value>
   </data>

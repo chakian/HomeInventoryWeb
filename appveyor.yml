@@ -21,7 +21,7 @@ deploy:
  - provider: Environment
    name: Stok - Test
    on:
-     branch: staging
+     branch: staging-net6
 
  - provider: Environment
    name: Stok - LIVE

@@ -4,6 +4,7 @@ using HomeInv.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeInv.Persistence.Migrations
 {
     [DbContext(typeof(HomeInventoryDbContext))]
-    partial class HomeInventoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221216170459_CreateShoppingListTables")]
+    partial class CreateShoppingListTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,7 +67,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("UpdateUserId");
 
-                    b.ToTable("Areas", (string)null);
+                    b.ToTable("Areas");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.AreaUser", b =>
@@ -114,7 +116,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AreaUsers", (string)null);
+                    b.ToTable("AreaUsers");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.Category", b =>
@@ -147,7 +149,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("ParentCategoryId");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.Home", b =>
@@ -188,7 +190,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("UpdateUserId");
 
-                    b.ToTable("Homes", (string)null);
+                    b.ToTable("Homes");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.HomeUser", b =>
@@ -242,7 +244,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("HomeUsers", (string)null);
+                    b.ToTable("HomeUsers");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemDefinition", b =>
@@ -299,7 +301,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("UpdateUserId");
 
-                    b.ToTable("ItemDefinitions", (string)null);
+                    b.ToTable("ItemDefinitions");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemStock", b =>
@@ -350,7 +352,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("UpdateUserId");
 
-                    b.ToTable("ItemStocks", (string)null);
+                    b.ToTable("ItemStocks");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemStockAction", b =>
@@ -408,7 +410,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("UpdateUserId");
 
-                    b.ToTable("ItemStockActions", (string)null);
+                    b.ToTable("ItemStockActions");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemStockActionType", b =>
@@ -431,7 +433,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ItemStockActionTypes", (string)null);
+                    b.ToTable("ItemStockActionTypes");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.ItemUnitPrice", b =>
@@ -466,7 +468,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("ItemStockActionId");
 
-                    b.ToTable("ItemUnitPrices", (string)null);
+                    b.ToTable("ItemUnitPrices");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.ShoppingList", b =>
@@ -509,7 +511,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("UpdateUserId");
 
-                    b.ToTable("ShoppingLists", (string)null);
+                    b.ToTable("ShoppingLists");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.ShoppingListItem", b =>
@@ -558,7 +560,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasIndex("UpdateUserId");
 
-                    b.ToTable("ShoppingListItems", (string)null);
+                    b.ToTable("ShoppingListItems");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.SizeUnit", b =>
@@ -591,7 +593,7 @@ namespace HomeInv.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SizeUnits", (string)null);
+                    b.ToTable("SizeUnits");
                 });
 
             modelBuilder.Entity("HomeInv.Persistence.Dbo.User", b =>
@@ -702,7 +704,7 @@ namespace HomeInv.Persistence.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("UserSettings", (string)null);
+                    b.ToTable("UserSettings");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

@@ -1,80 +1,17 @@
 ﻿using HomeInv.Common.ServiceContracts;
-using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.Language;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
-using System.Security.Claims;
 
 namespace WebUI.Base
 {
-    public abstract class BasePageModel<T> : PageModel
+    public abstract class BasePageModel<T> : PageModelBase<T>
     {
-        private readonly HomeInventoryDbContext dbContext;
-        protected readonly ILogger<T> logger;
-        private const string DEFAULT_LANDING_PAGE_FOR_LOGGEDIN = "/Stock/Overview";
-
-        public BasePageModel(ILogger<T> logger, HomeInventoryDbContext dbContext)
+        public BasePageModel(ILogger<T> logger, HomeInventoryDbContext dbContext) : base(logger, dbContext)
         {
-            this.logger = logger;
-            this.dbContext = dbContext;
-        }
-
-        protected string UserId
-        {
-            get
-            {
-                string id = "";
-                if (User != null && User.Identity.IsAuthenticated)
-                {
-                    var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-                    if (claim != null)
-                    {
-                        id = claim.Value;
-                    }
-                }
-                return id;
-            }
-        }
-
-        protected void SetErrorMessage(string message)
-        {
-            var key = "Error";
-            AddOrUpdateTempData(key, message);
-        }
-        protected void SetSuccessMessage(string message)
-        {
-            var key = "Success";
-            AddOrUpdateTempData(key, message);
-        }
-        protected void SetInfoMessage(string message)
-        {
-            var key = "Info";
-            AddOrUpdateTempData(key, message);
-        }
-        protected void SetWarningMessage(string message)
-        {
-            var key = "Warning";
-            AddOrUpdateTempData(key, message);
-        }
-        private void AddOrUpdateTempData(string key, string message)
-        {
-            var _tempData = TempData.Peek(key);
-            string currentText = (_tempData != null) ? _tempData.ToString() : "";
-            if (string.IsNullOrEmpty(currentText.ToString()))
-            {
-                TempData.Add(key, message);
-            }
-            else if(!currentText.Contains(message))
-            {
-                TempData.Remove(key);
-                currentText += " " + message;
-                TempData.Add(key, currentText);
-            }
         }
 
         public virtual IActionResult OnPost()
@@ -129,15 +66,6 @@ namespace WebUI.Base
         protected virtual IActionResult OnModelPost()
         {
             throw new NotImplementedException();
-        }
-
-        public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-        {
-            if (User != null && User.Identity.IsAuthenticated && (context.ActionDescriptor.ViewEnginePath == "/" || context.ActionDescriptor.ViewEnginePath == "/Index"))
-            {
-                context.Result = RedirectToPage(DEFAULT_LANDING_PAGE_FOR_LOGGEDIN);
-            }
-            base.OnPageHandlerExecuting(context);
         }
     }
 }
