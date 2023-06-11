@@ -16,7 +16,7 @@
 
 @inherits AuthorizedComponentBase
 
-<h3>Stok Durumu <img src="@GetPathOfAsset("nazarbonc.png")" height="32" /> <i>Maşallah Diyelim</i> <img src="@GetPathOfAsset("nazarbonc.png")" height="32" /></h3>
+<h3>Stok Durumu <img src="\assets\nazarbonc.png" height="32" /> <i>Maşallah Diyelim</i> <img src="/assets/nazarbonc.png" height="32" /></h3>
 
 <div class="form-group pull-right">
     <input type="text"
@@ -52,7 +52,7 @@
                     }
                     else
                     {
-                        <td><img src="@GetPathOfAsset("s-logo-blue-white.png")" height="30" /></td>
+                        <td><img src="/assets/s-logo-blue-white.png" height="30" /></td>
                     }
                     <td>@mainListItem.ItemName</td>
                     <td>@(mainListItem.CategoryName + (string.IsNullOrEmpty(mainListItem.CategoryParentNames) ? "" : " (" + mainListItem.CategoryParentNames + ")"))</td>

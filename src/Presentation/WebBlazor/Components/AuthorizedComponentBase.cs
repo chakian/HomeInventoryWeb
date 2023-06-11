@@ -11,32 +11,9 @@ namespace WebBlazor.Components
     {
         protected UserSettingEntity UserSettings { get; private set; }
 
-        protected string wwwrootPath
-        {
-            get
-            {
-                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot");
-                if (path.Contains("\\Debug\\"))
-                {
-                    path = path.Replace("bin\\Debug\\net6.0\\", "");
-                }
-                return path;
-            }
-        }
-
-        private string getFullPath(string fileName, string pathInWwwroot)
-        {
-            return Path.Combine(wwwrootPath, pathInWwwroot, fileName);
-        }
-
-        protected string GetPathOfAsset(string fileName)
-        {
-            return getFullPath(fileName, "assets");
-        }
-
         protected string GetPathOfImageInHome(string fileName, int homeId)
         {
-            return getFullPath(fileName, Path.Combine("uploads", homeId.ToString()));
+            return $"/uploads/{homeId}/{fileName}";
         }
 
         protected void GetUserSettings(AuthenticationStateProvider authenticationStateProvider, SignInManager<User> signInManager, UserManager<User> userManager, HomeInventoryDbContext dbContext)
