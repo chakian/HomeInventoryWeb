@@ -6,6 +6,7 @@ using HomeInv.Common.Interfaces.Handlers;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Business.Services;
 using HomeInv.Business.Handlers;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,9 @@ builder.Services.AddScoped<IItemDefinitionService, ItemDefinitionService>();
 builder.Services.AddScoped<IItemStockService, ItemStockService>();
 builder.Services.AddScoped<IUpdateItemStockHandler, UpdateItemStockHandler>();
 builder.Services.AddScoped<IUpdateRemainingStockAmountHandler, UpdateRemainingStockAmountHandler>();
+builder.Services.AddScoped<ISmartUpdateItemStockHandler, SmartUpdateItemStockHandler>();
+
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 

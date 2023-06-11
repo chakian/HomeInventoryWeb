@@ -2,18 +2,41 @@
 
 <PageTitle>Stok</PageTitle>
 
-<div class="page">
-    <div class="sidebar">
+<MudThemeProvider IsDarkMode="true" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <img src="/assets/s-logo-blue-white.png" height="32" />&nbsp;Stok
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_drawerOpen">
         <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4 auth bg-dark text-white">
-            <LoginDisplay />
-        </div>
-
-        <article class="content px-4">
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
             @Body
-        </article>
-    </main>
-</div>
+        </MudContainer>
+    </MudMainContent>
+    @*<div class="page">
+        <main>
+            <div class="top-row px-4 auth bg-dark text-white">
+                <LoginDisplay />
+            </div>
+
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
+    </div>*@
+</MudLayout>
+
+@code{
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
