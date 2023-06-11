@@ -35,7 +35,7 @@ namespace WebUI.Pages.ShopList
             ShoppingList.HomeId = UserSettings.DefaultHomeId;
             ShoppingList.IsActive = true;
             ShoppingList.InsertUserId = UserId;
-            ShoppingList.InsertTime = DateTime.Now;
+            ShoppingList.InsertTime = DateTime.UtcNow;
 
             dbContext.ShoppingLists.Add(ShoppingList);
             await dbContext.SaveChangesAsync();

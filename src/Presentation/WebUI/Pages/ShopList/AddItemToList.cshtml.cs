@@ -96,7 +96,7 @@ namespace WebUI.Pages.ShopList
                 Amount = _amount,
                 SizeUnitId = SizeId,
                 InsertUserId = UserId,
-                InsertTime = DateTime.Now,
+                InsertTime = DateTime.UtcNow,
                 IsActive = true
             };
             dbContext.Entry(item).State= EntityState.Added;
