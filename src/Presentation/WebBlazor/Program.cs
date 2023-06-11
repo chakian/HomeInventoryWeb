@@ -2,8 +2,10 @@ using HomeInv.Persistence;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using WebBlazor.Areas.Identity;
-using WebBlazor.Data;
-using Microsoft.AspNetCore.Identity;
+using HomeInv.Common.Interfaces.Handlers;
+using HomeInv.Common.Interfaces.Services;
+using HomeInv.Business.Services;
+using HomeInv.Business.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +28,18 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<HomeInv.Persistence.Dbo.User>>();
 
-builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<IHomeUserService, HomeUserService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ISizeUnitService, SizeUnitService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAreaService, AreaService>();
+builder.Services.AddScoped<IAreaUserService, AreaUserService>();
+builder.Services.AddScoped<IUserSettingService, UserSettingService>();
+builder.Services.AddScoped<IItemDefinitionService, ItemDefinitionService>();
+builder.Services.AddScoped<IItemStockService, ItemStockService>();
+builder.Services.AddScoped<IUpdateItemStockHandler, UpdateItemStockHandler>();
+builder.Services.AddScoped<IUpdateRemainingStockAmountHandler, UpdateRemainingStockAmountHandler>();
 
 var app = builder.Build();
 
