@@ -21,7 +21,7 @@ deploy:
  - provider: Environment
    name: Stok - Test
    on:
-     branch: staging
+     branch: blazor-app
 
  - provider: Environment
    name: Stok - LIVE
