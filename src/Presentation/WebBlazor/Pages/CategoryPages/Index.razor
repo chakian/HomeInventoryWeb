@@ -1,0 +1,59 @@
+﻿@page "/categories"
+@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.Category;
+@using HomeInv.Persistence;
+@using HomeInv.Persistence.Dbo;
+@using Microsoft.AspNetCore.Identity;
+@using WebBlazor.Components;
+
+@inject ICategoryService categoryService
+
+@inject HomeInventoryDbContext dbContext
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
+
+@inherits AuthorizedComponentBase
+
+<h3>Kategoriler</h3>
+
+@if (Categories == null)
+{
+    <p><em>Yükleniyor...</em></p>
+}
+else
+{
+    foreach (var category in Categories)
+    {
+        <CategoryListItem category="category" indent="1" />
+    }
+}
+
+@code {
+    List<CategoryEntity> Categories { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        GetList();
+
+        //aTimer = new System.Timers.Timer(1000);
+        //aTimer.Elapsed += OnUserFinish;
+        //aTimer.AutoReset = false;
+    }
+
+    protected void GetList()
+    {
+        var request = new GetCategoriesOfHomeRequest()
+            {
+                HomeId = UserSettings.DefaultHomeId,
+                RequestUserId = UserSettings.UserId
+            };
+        var categoriesResponse = categoryService.GetCategoriesOfHome_Hierarchial(request);
+        if (categoriesResponse.IsSuccessful)
+        {
+            Categories = categoriesResponse.Categories;
+        }
+    }
+}
