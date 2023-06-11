@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Business\HomeInv.Business\HomeInv.Business.csproj" />
     <ProjectReference Include="..\..\Business\HomeInv.Persistence\HomeInv.Persistence.csproj" />
   </ItemGroup>
 

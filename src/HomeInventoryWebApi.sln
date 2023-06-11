@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeInv.Language", "Common\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeInv.Business.Handlers.Tests", "Tests\HomeInv.Business.Handlers.Tests\HomeInv.Business.Handlers.Tests.csproj", "{8E01B61E-21FF-4B15-8DDD-A4997A1573F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBlazor", "Presentation\WebBlazor\WebBlazor.csproj", "{32B4FEAB-38CE-47E1-A727-6552846BC4C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBlazor", "Presentation\WebBlazor\WebBlazor.csproj", "{32B4FEAB-38CE-47E1-A727-6552846BC4C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
