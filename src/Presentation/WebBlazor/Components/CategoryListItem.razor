@@ -1,46 +1,21 @@
 ﻿@*<td class="text-end"><a class="btn btn-secondary" href="/Category/Edit?Id=@(category.Id)">Düzenle</a></td>*@
 @if (category.HasChild)
 {
-    <div class="accordion">
-        <div class="accordion-item bg-dark text-white">
-            <h2 class="accordion-header" id="category-header-@(category.Id)">
-                <button class="accordion-button"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#category-children-@(category.Id)"
-                    aria-expanded="true"
-                    aria-controls="category-children-@(category.Id)">
-                    @category.Name
-                    <br />
-                    <span style="font-size: 0.9em">@category.Description</span>
-                </button>
-            </h2>
-            <div id="category-children-@(category.Id)" class="accordion-collapse collapse show" aria-labelledby="category-header-@(category.Id)">
-                <div class="accordion-body">
-                    @foreach (var child in category.Children)
-                    {
-                        <CategoryListItem category="child" indent="2" />
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
+    <MudExpansionPanels MultiExpansion="true">
+        <MudExpansionPanel Text="@category.Name">
+            @foreach (var child in category.Children)
+            {
+                <CategoryListItem category="child" indent="2" />
+            }
+        </MudExpansionPanel>
+    </MudExpansionPanels>
 }
 else
 {
-    <div class="panel border">
-        @category.Name
-        <br />
-        <span style="font-size: 0.9em">@category.Description</span>
-    </div>
+    @category.Name
 }
 
 @code {
     [Parameter] public HomeInv.Common.Entities.CategoryEntity category { get; set; }
     [Parameter] public int indent { get; set; }
-
-    void SwitchToEditMode(int categoryId)
-    {
-
-    }
 }

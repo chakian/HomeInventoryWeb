@@ -16,7 +16,7 @@
 
 @inherits AuthorizedComponentBase
 
-<h3>Kategoriler</h3>
+<MudText Typo="Typo.h4">Kategoriler</MudText>
 
 @if (Categories == null)
 {
@@ -30,8 +30,10 @@ else
     }
 }
 
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" />
+
 @code {
-    List<CategoryEntity> Categories { get; set; }
+    List<CategoryEntity> Categories { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
