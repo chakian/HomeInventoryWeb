@@ -35,7 +35,6 @@ else
           ReadOnly="false"
           @bind-SelectedItem="SelectedStock"
           CommitEditTooltip="Değişiklikleri Kaydet"
-          OnCommitEditClick="@(() => Snackbar.Add("Commit Edit Handler Invoked"))"
           RowEditPreview="BackupItem"
           RowEditCancel="ResetItemToOriginalValues"
           RowEditCommit="ItemHasBeenCommitted"
@@ -167,23 +166,22 @@ else
         DateTime? oldExpirationDate = elementBeforeEdit.ExpirationDate,
             newExpirationDate = ((ItemStockOverview)element).ExpirationDate;
         int oldAreaId = elementBeforeEdit.AreaId,
-    newAreaId = ((ItemStockOverview)element).AreaId;
+        newAreaId = ((ItemStockOverview)element).AreaId;
 
         int itemDefId = ((ItemStockOverview)element).ItemDefinitionId;
         int itemStockId = ((ItemStockOverview)element).StockId;
 
-        // TODO: Update values in DB if they are changed.
         if (oldItemName != newItemName)
         {
             var itemDb = dbContext.ItemDefinitions.Find(itemDefId);
-            if(itemDb != null)
+            if (itemDb != null)
             {
                 itemDb.Name = newItemName;
                 dbContext.SaveChanges();
             }
         }
-        //TODO: Expiration Date isn't being updated in db??? When definition is IsExpirable=false then we don't display the value. Okay.
-        if (oldStockAmount != newStockAmount 
+        
+        if (oldStockAmount != newStockAmount
             || oldExpirationDate != newExpirationDate
             || oldAreaId != newAreaId)
         {
@@ -202,6 +200,10 @@ else
             if (!response.IsSuccessful)
             {
                 Snackbar.Add(response.Result.Messages.FirstOrDefault()?.Text, Severity.Error);
+            }
+            else
+            {
+                Snackbar.Add($"{newItemName} başarıyla güncellendi", Severity.Success);
             }
         }
     }
