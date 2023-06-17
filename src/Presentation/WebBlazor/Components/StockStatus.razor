@@ -199,7 +199,7 @@ else
 
             if (!response.IsSuccessful)
             {
-                Snackbar.Add(response.Result.Messages.FirstOrDefault()?.Text, Severity.Error);
+                Snackbar.Add(response.Result.ToString(), Severity.Error);
             }
             else
             {
