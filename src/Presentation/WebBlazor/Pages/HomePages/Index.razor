@@ -1,0 +1,101 @@
+﻿@page "/homes"
+@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.Area;
+@using HomeInv.Common.ServiceContracts.Category;
+@using HomeInv.Common.ServiceContracts.Home;
+@using HomeInv.Common.ServiceContracts.ItemDefinition;
+@using HomeInv.Persistence;
+@using HomeInv.Persistence.Dbo;
+@using Microsoft.AspNetCore.Identity;
+@using WebBlazor.Components;
+
+@inject IHomeService homeService
+
+@inject HomeInventoryDbContext dbContext
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
+
+@inject ISnackbar Snackbar
+
+@inherits AuthorizedComponentBase
+
+@if (Homes == null)
+{
+    <p><em>Yükleniyor...</em></p>
+}
+else
+{
+    <MudTable Items="Homes"
+          Hover="true"
+          Dense="true"
+          SortLabel="Sort By"
+          Filter="new Func<HomeEntity,bool>(FilterFunc1)"
+          ReadOnly="true"
+          Elevation="0">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Evler</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="SearchKeyword"
+                      Placeholder="Arama çalışıyor"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <ColGroup>
+            <col />
+            <col />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<HomeEntity, object>(x=>x.Name)">Oda Adı</MudTableSortLabel></MudTh>
+            <MudTh>Açıklama</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Area Name">@(context.Name)</MudTd>
+                <MudTd DataLabel="Description">@context.Description</MudTd>
+            </RowTemplate>
+        </MudTable>
+}
+
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" />
+
+@code {
+    List<HomeEntity> Homes { get; set; } = null;
+    public string SearchKeyword { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        await GetList();
+    }
+
+    protected async Task GetList()
+    {
+        var request = new GetHomesOfUserRequest()
+            {
+                RequestUserId = UserSettings.UserId
+            };
+        var response = homeService.GetHomesOfUser(request);
+
+        if (!response.IsSuccessful)
+        {
+            Snackbar.Add(response.Result.ToString(), Severity.Error);
+        }
+        else
+        {
+            Homes = response.Homes;
+        }
+    }
+
+    private bool FilterFunc1(HomeEntity element) => FilterFunc(element, SearchKeyword);
+    private bool FilterFunc(HomeEntity element, string searchKeyword)
+    {
+        if (string.IsNullOrWhiteSpace(searchKeyword))
+            return true;
+        if (element.Name.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

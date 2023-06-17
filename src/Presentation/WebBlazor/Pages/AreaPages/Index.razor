@@ -1,6 +1,7 @@
-﻿@page "/itemdefinitions"
+﻿@page "/rooms"
 @using HomeInv.Common.Entities;
 @using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.Area;
 @using HomeInv.Common.ServiceContracts.Category;
 @using HomeInv.Common.ServiceContracts.ItemDefinition;
 @using HomeInv.Persistence;
@@ -8,7 +9,7 @@
 @using Microsoft.AspNetCore.Identity;
 @using WebBlazor.Components;
 
-@inject IItemDefinitionService itemDefinitionService
+@inject IAreaService areaService
 
 @inject HomeInventoryDbContext dbContext
 @inject AuthenticationStateProvider authenticationStateProvider
@@ -19,21 +20,21 @@
 
 @inherits AuthorizedComponentBase
 
-@if (ItemDefinitions == null)
+@if (Areas == null)
 {
     <p><em>Yükleniyor...</em></p>
 }
 else
 {
-    <MudTable Items="ItemDefinitions"
+    <MudTable Items="Areas"
           Hover="true"
           Dense="true"
           SortLabel="Sort By"
-          Filter="new Func<ItemDefinitionEntity,bool>(FilterFunc1)"
+          Filter="new Func<AreaEntity,bool>(FilterFunc1)"
           ReadOnly="true"
           Elevation="0">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Ürün Tanımları</MudText>
+            <MudText Typo="Typo.h6">Odalar</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="SearchKeyword"
                       Placeholder="Arama çalışıyor"
@@ -43,34 +44,16 @@ else
                       Class="mt-0"></MudTextField>
         </ToolBarContent>
         <ColGroup>
-            <col style="width:50px;" />
-            <col />
-            <col />
-            <col />
             <col />
             <col />
         </ColGroup>
         <HeaderContent>
-            <MudTh>Görsel</MudTh>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ItemDefinitionEntity, object>(x=>x.Name)">Tanım Adı</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<AreaEntity, object>(x=>x.Name)">Oda Adı</MudTableSortLabel></MudTh>
             <MudTh>Açıklama</MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<ItemDefinitionEntity, object>(x=>x.CategoryName)">Kategori</MudTableSortLabel></MudTh>
-            <MudTh>Ölçü Birimi</MudTh>
-            <MudTh>Bozulan Bir Şey Mi?</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Item Image">
-                <MudImage Src="@(!string.IsNullOrEmpty(context.ImageName) ? $"/uploads/{UserSettings.DefaultHomeId}/{context.ImageName}" : $"/assets/s-logo-blue-white.png")"
-                      Alt="@context.Name"
-                      Width="64"
-                      Elevation="25"
-                      Class="rounded-lg" />
-            </MudTd>
-            <MudTd DataLabel="Item Definition Name">@(context.Name)</MudTd>
+            <MudTd DataLabel="Area Name">@(context.Name)</MudTd>
                 <MudTd DataLabel="Description">@context.Description</MudTd>
-                <MudTd DataLabel="Category">@(context.CategoryName + (string.IsNullOrEmpty(context.CategoryFullName) ? "" : " (" + context.CategoryFullName + ")"))</MudTd>
-                <MudTd DataLabel="Size Unit">@(context.SizeUnitName)</MudTd>
-                <MudTd DataLabel="Is Expirable">@(context.IsExpirable ? "Evet" : "Hayır")</MudTd>
             </RowTemplate>
         </MudTable>
 }
@@ -78,23 +61,23 @@ else
 <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" />
 
 @code {
-    List<ItemDefinitionEntity> ItemDefinitions { get; set; } = null;
+    List<AreaEntity> Areas { get; set; } = null;
     public string SearchKeyword { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
-        GetList();
+        await GetList();
     }
 
     protected async Task GetList()
     {
-        var request = new GetAllItemDefinitionsInHomeRequest()
+        var request = new GetAreasOfHomeRequest()
             {
                 HomeId = UserSettings.DefaultHomeId,
                 RequestUserId = UserSettings.UserId
             };
-        var response = itemDefinitionService.GetAllItemDefinitionsInHome(request, true);
+        var response = areaService.GetAreasOfHome(request);
 
         if (!response.IsSuccessful)
         {
@@ -102,20 +85,16 @@ else
         }
         else
         {
-            ItemDefinitions = response.Items;
+            Areas = response.Areas;
         }
     }
 
-    private bool FilterFunc1(ItemDefinitionEntity element) => FilterFunc(element, SearchKeyword);
-    private bool FilterFunc(ItemDefinitionEntity element, string searchKeyword)
+    private bool FilterFunc1(AreaEntity element) => FilterFunc(element, SearchKeyword);
+    private bool FilterFunc(AreaEntity element, string searchKeyword)
     {
         if (string.IsNullOrWhiteSpace(searchKeyword))
             return true;
         if (element.Name.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.CategoryName.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if ($"{element.Description}".Contains(searchKeyword))
             return true;
         return false;
     }
