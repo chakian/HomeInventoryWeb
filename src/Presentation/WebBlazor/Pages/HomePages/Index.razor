@@ -18,6 +18,7 @@
 @inject UserManager<User> userManager
 
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 @inherits AuthorizedComponentBase
 
@@ -44,25 +45,30 @@ else
                       Class="mt-0"></MudTextField>
         </ToolBarContent>
         <ColGroup>
+            <col width="20px" />
             <col />
             <col />
         </ColGroup>
         <HeaderContent>
+            <MudTh></MudTh>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<HomeEntity, object>(x=>x.Name)">Ev Adı</MudTableSortLabel></MudTh>
             <MudTh>Açıklama</MudTh>
         </HeaderContent>
         <RowTemplate>
+            <MudTd DataLabel="Edit"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditHomeDialog(context))" /></MudTd>
             <MudTd DataLabel="Home Name">@(context.Name)</MudTd>
-                <MudTd DataLabel="Description">@context.Description</MudTd>
-            </RowTemplate>
-        </MudTable>
+            <MudTd DataLabel="Description">@(context.Description)</MudTd>
+        </RowTemplate>
+    </MudTable>
 }
 
-<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" />
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditHomeDialog(null))" />
 
 @code {
     List<HomeEntity> Homes { get; set; } = null;
     public string SearchKeyword { get; set; } = string.Empty;
+
+    HomeEntity SelectedHome { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -85,6 +91,8 @@ else
         else
         {
             Homes = response.Homes;
+
+            StateHasChanged();
         }
     }
 
@@ -96,5 +104,30 @@ else
         if (element.Name.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
+    }
+
+    async Task DisplayEditHomeDialog(HomeEntity home)
+    {
+        string title = "Ev güncelleme";
+
+        if(home == null)
+        {
+            home = new HomeEntity();
+            title = "Yeni ev";
+        }
+        
+        var parameters = new DialogParameters
+            {
+                ["home"] = home,
+                ["userId"] = UserSettings.UserId
+            };
+
+        var dialog = await DialogService.ShowAsync<CreateUpdateHomeDialog>(title, parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetList();
+        }
     }
 }
