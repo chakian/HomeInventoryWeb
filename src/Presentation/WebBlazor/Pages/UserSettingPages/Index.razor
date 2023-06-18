@@ -1,0 +1,82 @@
+﻿@page "/usersettings"
+@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.Area;
+@using HomeInv.Common.ServiceContracts.Category;
+@using HomeInv.Common.ServiceContracts.Home;
+@using HomeInv.Common.ServiceContracts.ItemDefinition;
+@using HomeInv.Common.ServiceContracts.UserSetting;
+@using HomeInv.Persistence;
+@using HomeInv.Persistence.Dbo;
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.EntityFrameworkCore;
+@using WebBlazor.Components;
+
+@inject IHomeService homeService
+@inject IUserSettingService userSettingService
+
+@inject HomeInventoryDbContext dbContext
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
+
+@inject ISnackbar Snackbar
+
+@inherits AuthorizedComponentBase
+
+@if (UserSettings == null)
+{
+    <p><em>Yükleniyor...</em></p>
+}
+else
+{
+    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        <MudSelect @bind-Value="SelectedHomeId" Label="Varsayılan Ev" OpenIcon="@Icons.Material.Filled.Home" AdornmentColor="Color.Primary">
+            @if (HomeList != null)
+            {
+                foreach (HomeEntity item in HomeList)
+                {
+                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                }
+            }
+        </MudSelect>
+    </MudForm>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>SaveSettings())">Kaydet</MudButton>
+}
+
+@code {
+    bool success;
+    string[] errors = { };
+    MudForm? form;
+
+    List<HomeEntity> HomeList { get; set; } = null;
+    int SelectedHomeId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+
+        var homeRequest = new GetHomesOfUserRequest()
+            {
+                RequestUserId = UserSettings.UserId
+            };
+        var homesResponse = homeService.GetHomesOfUser(homeRequest);
+        HomeList = homesResponse.Homes;
+
+        SelectedHomeId = UserSettings.DefaultHomeId;
+    }
+
+    async Task SaveSettings()
+    {
+        var updateUserSettingsRequest = new UpdateUserSettingsRequest()
+            {
+                UserSettingEntity = new UserSettingEntity()
+                {
+                    DefaultHomeId = SelectedHomeId,
+                    UserId = UserSettings.UserId
+                },
+                RequestUserId = UserSettings.UserId
+            };
+        var response = userSettingService.UpdateUserSettings(updateUserSettingsRequest);
+    }
+}
