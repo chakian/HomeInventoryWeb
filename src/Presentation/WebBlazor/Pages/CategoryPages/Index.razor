@@ -22,14 +22,14 @@
 
 @if (Categories == null)
 {
-    <p><em>Yükleniyor...</em></p>
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
 else
 {
     <MudPaper>
         @foreach (var category in Categories)
         {
-            <CategoryListItem category="category" indent="1" />
+            <CategoryListItem category="category" indent="1" homeId="UserSettings.DefaultHomeId" userId="UserSettings.UserId" />
         }
     </MudPaper>
 }
@@ -76,7 +76,7 @@ else
                 ["selectedParentCategoryId"] = category.ParentCategoryId
             };
 
-        var dialog = await DialogService.ShowAsync<CreateCategoryDialog>("Yeni Kategori", parameters);
+        var dialog = await DialogService.ShowAsync<CreateUpdateCategoryDialog>("Yeni Kategori", parameters);
         var result = await dialog.Result;
 
         if (!result.Canceled)

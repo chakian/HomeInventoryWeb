@@ -77,14 +77,25 @@
 
     private void UpdateCategory()
     {
-        if (true)
+        category.ParentCategoryId = selectedParentCategoryId == 0 ? null : selectedParentCategoryId;
+        var updateCategoryRequest = new UpdateCategoryRequest()
+            {
+                CategoryId = category.Id,
+                Name = category.Name,
+                Description = category.Description,
+                ParentCategoryId = category.ParentCategoryId,
+                RequestUserId = userId
+            };
+        var categoryResponse = categoryService.UpdateCategory(updateCategoryRequest);
+
+        if (categoryResponse.IsSuccessful)
         {
             Snackbar.Add("Kategori güncellendi", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         else
         {
-            Snackbar.Add("Hata oldu", Severity.Error);
+            Snackbar.Add($"Hata oldu: {categoryResponse.Result.ToString()}", Severity.Error);
         }
     }
 }

@@ -1,0 +1,80 @@
+﻿@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.Category;
+
+@inject ICategoryService categoryService
+@inject IDialogService DialogService
+
+@if (category.HasChild)
+{
+    <MudPaper>
+        <MudExpansionPanels MultiExpansion="true">
+            <MudExpansionPanel>
+                <TitleContent>
+                    <div class="d-flex">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="DisplayEditCategory" />
+                        <MudText>@category.Name</MudText>
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    @foreach (var child in category.Children)
+                    {
+                        <CategoryListItem category="child" indent="2" homeId="@homeId" userId="@userId" />
+                    }
+                </ChildContent>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudPaper>
+}
+else
+{
+    <MudPaper>
+        <MudItem>
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="DisplayEditCategory" />
+            <MudText>@category.Name</MudText>
+        </MudItem>
+    </MudPaper>
+}
+
+@code {
+    [Parameter] public CategoryEntity category { get; set; }
+    [Parameter] public int indent { get; set; }
+
+    [Parameter] public int homeId { get; set; }
+    [Parameter] public string userId { get; set; }
+
+    async Task DisplayEditCategory()
+    {
+        int id = category.Id;
+        var tempCategoryList = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest()
+            {
+                HomeId = homeId
+            }).Categories;
+        CategoryEntity editingCategory = tempCategoryList.SingleOrDefault(cat => cat.Id == id);
+
+        if (editingCategory != null)
+        {
+            var categoryList = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest()
+                {
+                    HomeId = homeId
+                }).Categories;
+
+            var parameters = new DialogParameters
+                {
+                    ["category"] = editingCategory,
+                    ["allCategories"] = categoryList,
+                    ["homeId"] = homeId,
+                    ["userId"] = userId,
+                    ["selectedParentCategoryId"] = editingCategory.ParentCategoryId
+                };
+
+            var dialog = await DialogService.ShowAsync<CreateUpdateCategoryDialog>($"Kategori Güncelleme: '{editingCategory.Name}'", parameters);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                //TODO: Trigger parent page to reload the list somehow
+            }
+        }
+    }
+}

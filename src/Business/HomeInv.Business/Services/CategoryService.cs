@@ -207,10 +207,30 @@ namespace HomeInv.Business.Services
             {
                 response.AddError(Language.Resources.Category_SameNameExists);
             }
+            if (request.ParentCategoryId != null && request.ParentCategoryId > 0)
+            {
+                var parent = context.Categories.Find(request.ParentCategoryId);
+                if (parent != null && (parent.ParentCategoryId ?? 0) > 0)
+                {
+                    var grandparent = context.Categories.Find(parent.ParentCategoryId);
+                    if (grandparent != null && (grandparent.ParentCategoryId ?? 0) > 0)
+                    {
+                        response.AddError("Üçüncü seviyede kategori olamıyor maalesef.");
+                    }
+                }
+            }
+            var category = context.Categories.Find(request.CategoryId);
+            if (category == null)
+            {
+                response.AddError("Buraya normalde gelememiş olmanız gerekirdi. Lütfen gider misiniz?");
+            }
+            else if(category.ParentCategoryId != request.ParentCategoryId && context.Categories.Any(c => c.ParentCategoryId == category.Id))
+            {
+                response.AddError("Bu kategorinin mevcutta alt kategorileri bulunmakta. Önce alt kategorileri taşımalısınız.");
+            }
 
             if (response.IsSuccessful)
             {
-                var category = context.Categories.Find(request.CategoryId);
                 category.Name = request.Name;
                 category.Description = request.Description;
                 category.ParentCategoryId = request.ParentCategoryId;
