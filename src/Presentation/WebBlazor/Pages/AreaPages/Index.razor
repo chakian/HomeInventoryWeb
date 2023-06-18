@@ -17,6 +17,7 @@
 @inject UserManager<User> userManager
 
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 @inherits AuthorizedComponentBase
 
@@ -97,5 +98,31 @@ else
         if (element.Name.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
+    }
+
+    async Task DisplayEditDialog(AreaEntity entity)
+    {
+        string title = $"Oda Güncelleme: '{entity?.Name}'";
+
+        if (entity == null)
+        {
+            entity = new AreaEntity();
+            title = "Yeni oda";
+        }
+
+        var parameters = new DialogParameters
+            {
+                ["area"] = entity,
+                ["userId"] = UserSettings.UserId,
+                ["defHomeId"] = UserSettings.DefaultHomeId
+            };
+
+        var dialog = await DialogService.ShowAsync<CreateUpdateAreaDialog>(title, parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetList();
+        }
     }
 }
