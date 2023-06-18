@@ -1,0 +1,92 @@
+﻿@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.Category;
+@using HomeInv.Common.ServiceContracts;
+
+@inject ICategoryService categoryService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Category" Class="mr-3 mb-n1"/> @MudDialog.Title
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="category.Name" Label="Kategori Adı" />
+        <MudTextField @bind-Value="category.Description" Label="Açıklama" />
+        <MudSelect @bind-Value="selectedParentCategoryId" Label="Üst Kategorisi" OpenIcon="@Icons.Material.Filled.ArrowCircleUp" AdornmentColor="Color.Primary">
+            <MudSelectItem Value="0">Bu bir ana kategoridir</MudSelectItem>
+            @if (allCategories != null)
+            {
+                foreach (CategoryEntity item in allCategories)
+                {
+                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                }
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">İptal</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveInfo">Kaydet</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public CategoryEntity category { get; set; } = new CategoryEntity();
+    [Parameter] public List<CategoryEntity> allCategories { get; set; }
+    [Parameter] public int homeId { get; set; }
+    [Parameter] public string userId { get; set; }
+    [Parameter] public int selectedParentCategoryId { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void SaveInfo()
+    {
+        string entityDisplayName = "Kategori";
+        BaseResponse response;
+        string successMessage;
+        if(category.Id > 0)
+        {
+            successMessage = $"{entityDisplayName} güncellendi";
+
+            category.ParentCategoryId = selectedParentCategoryId == 0 ? null : selectedParentCategoryId;
+            var updateCategoryRequest = new UpdateCategoryRequest()
+                {
+                    CategoryId = category.Id,
+                    Name = category.Name,
+                    Description = category.Description,
+                    ParentCategoryId = category.ParentCategoryId,
+                    RequestUserId = userId
+                };
+            response = categoryService.UpdateCategory(updateCategoryRequest);
+        }
+        else
+        {
+            successMessage = $"{entityDisplayName} oluşturuldu";
+
+            category.ParentCategoryId = selectedParentCategoryId == 0 ? null : selectedParentCategoryId;
+            var createCategoryRequest = new CreateCategoryRequest()
+                {
+                    CategoryEntity = category,
+                    HomeId = homeId,
+                    RequestUserId = userId
+                };
+            response = categoryService.CreateCategory(createCategoryRequest);
+        }
+        
+        if (response.IsSuccessful)
+        {
+            Snackbar.Add(successMessage, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Snackbar.Add($"Hata oldu: {response.Result.ToString()}", Severity.Error);
+        }
+    }
+}

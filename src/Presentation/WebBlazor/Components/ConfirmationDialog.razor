@@ -1,0 +1,19 @@
+﻿<MudDialog>
+    <DialogContent>
+        @DialogText
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">@CancelText</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">@SubmitText</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public string DialogText { get; set; } = "Onaylıyor musunuz?";
+    [Parameter] public string CancelText { get; set; } = "İptal";
+    [Parameter] public string SubmitText { get; set; } = "Onaylıyorum";
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}

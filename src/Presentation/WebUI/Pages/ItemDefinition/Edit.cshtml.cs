@@ -92,7 +92,7 @@ namespace WebUI.Pages.ItemDefinition
                 Name = Item.Name,
                 Description = Item.Description,
                 CategoryId = Item.CategoryId,
-                ImageFileName = newFileName,
+                //ImageFileName = newFileName,
                 IsExpirable = Item.IsExpirable,
                 HomeId = UserSettings.DefaultHomeId,
                 RequestUserId = UserId

@@ -1,0 +1,131 @@
+﻿@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts;
+@using HomeInv.Common.ServiceContracts.Home;
+@using HomeInv.Common.ServiceContracts.ItemDefinition;
+@using HomeInv.Common.ServiceContracts.SizeUnit;
+@using HomeInv.Persistence.Dbo;
+@using HomeInv.Persistence;
+
+@inject ISnackbar Snackbar
+@inject HomeInventoryDbContext dbContext
+@inject IItemDefinitionService itemDefinitionService
+@inject ISizeUnitService sizeUnitService
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.AddShoppingCart" Class="mr-3 mb-n1" /> @MudDialog.Title
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudSelect Label="Ürün Tanımı" @bind-Value="shopItem.ItemDefinitionId" AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem Value="0">Kendim Yazcam</MudSelectItem>
+            @foreach (var item in itemDefinitions)
+            {
+                <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+            }
+        </MudSelect>
+        @if (shopItem.ItemDefinitionId == 0)
+        {
+            <MudTextField @bind-Value="shopItem.Name" Label="Ürün Adı" Disabled="@(shopItem.ItemDefinitionId > 0)" />
+        }
+        <MudNumericField @bind-Value="shopItem.Amount" Label="Miktar" />
+        @if (shopItem.ItemDefinitionId != 0)
+        {
+            <span>@(itemDefinitions.First(d => d.Id == shopItem.ItemDefinitionId).SizeUnitName)</span>
+        }
+        else
+        {
+            <MudSelect Label="Ölçü Birimi" @bind-Value="shopItem.SizeUnitId" Disabled="@(shopItem.ItemDefinitionId != 0)" Required="@(shopItem.ItemDefinitionId == 0)" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="0">Ürün tanımı varsa bu lazım değil</MudSelectItem>
+                @foreach (var item in sizeUnits)
+                {
+                    <MudSelectItem Value="item.Id">@(item.Description ?? item.Name)</MudSelectItem>
+                }
+            </MudSelect>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">İptal</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveInfo">Kaydet</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public int shoppingListId { get; set; }
+    [Parameter] public int defHomeId { get; set; }
+    [Parameter] public string userId { get; set; }
+
+    ShopItem shopItem = new ShopItem();
+    List<ItemDefinitionEntity> itemDefinitions;
+    List<SizeUnitEntity> sizeUnits;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        itemDefinitions = itemDefinitionService.GetAllItemDefinitionsInHome(new GetAllItemDefinitionsInHomeRequest()
+            {
+                HomeId = defHomeId,
+                RequestUserId = userId
+            }).Items;
+        sizeUnits = sizeUnitService.GetAllSizes(new GetAllSizesRequest()
+            {
+                RequestUserId = userId
+            }).SizeUnits;
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task SaveInfo()
+    {
+        string entityDisplayName = "Alınacak ürün";
+        string successMessage;
+
+        if (shopItem.ItemDefinitionId == 0 && string.IsNullOrEmpty(shopItem.Name))
+        {
+            Snackbar.Add("İsimsiz şeyleri markette bulmak zor oluyor", Severity.Error);
+        }
+        else if (shopItem.ItemDefinitionId == 0 && shopItem.SizeUnitId == 0)
+        {
+            Snackbar.Add("Ölçü! Birimini! Seçmek! Şart! Şart yav!", Severity.Error);
+        }
+        else
+        {
+            successMessage = $"{entityDisplayName} oluşturuldu";
+
+            ShoppingListItem shoppingListItem = new ShoppingListItem()
+                {
+                    ShoppingListId = shoppingListId,
+                    ItemDefinitionId = shopItem.ItemDefinitionId == 0 ? null : shopItem.ItemDefinitionId,
+                    SizeUnitId = shopItem.ItemDefinitionId == 0 ? shopItem.SizeUnitId : null,
+                    ItemName = shopItem.ItemDefinitionId == 0 ? shopItem.Name : null,
+                    Amount = shopItem.Amount,
+                    InsertTime = DateTime.UtcNow,
+                    InsertUserId = userId,
+                    IsActive = true
+                };
+
+            dbContext.Add(shoppingListItem);
+            dbContext.SaveChanges();
+
+            Snackbar.Add(successMessage, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+
+    public class ShopItem
+    {
+        public int ItemDefinitionId { get; set; }
+
+        public string Name { get; set; } = "";
+
+        public int SizeUnitId { get; set; }
+
+        public decimal Amount { get; set; }
+    }
+}

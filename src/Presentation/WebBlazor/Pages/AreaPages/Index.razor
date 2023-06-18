@@ -1,0 +1,128 @@
+﻿@page "/rooms"
+@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.Area;
+@using HomeInv.Common.ServiceContracts.Category;
+@using HomeInv.Common.ServiceContracts.ItemDefinition;
+@using HomeInv.Persistence;
+@using HomeInv.Persistence.Dbo;
+@using Microsoft.AspNetCore.Identity;
+@using WebBlazor.Components;
+
+@inject IAreaService areaService
+
+@inject HomeInventoryDbContext dbContext
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
+
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+@inherits AuthorizedComponentBase
+
+@if (Areas == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="Areas"
+          Hover="true"
+          Dense="false"
+          SortLabel="Sort By"
+          Filter="new Func<AreaEntity,bool>(FilterFunc1)"
+          ReadOnly="true"
+          Elevation="0">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Odalar</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="SearchKeyword"
+                      Placeholder="Arama çalışıyor"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <ColGroup>
+            <col />
+            <col />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<AreaEntity, object>(x=>x.Name)">Oda Adı</MudTableSortLabel></MudTh>
+            <MudTh>Açıklama</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Area Name">@(context.Name)</MudTd>
+                <MudTd DataLabel="Description">@context.Description</MudTd>
+            </RowTemplate>
+        </MudTable>
+}
+
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" />
+
+@code {
+    List<AreaEntity> Areas { get; set; } = null;
+    public string SearchKeyword { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        await GetList();
+    }
+
+    protected async Task GetList()
+    {
+        var request = new GetAreasOfHomeRequest()
+            {
+                HomeId = UserSettings.DefaultHomeId,
+                RequestUserId = UserSettings.UserId
+            };
+        var response = areaService.GetAreasOfHome(request);
+
+        if (!response.IsSuccessful)
+        {
+            Snackbar.Add(response.Result.ToString(), Severity.Error);
+        }
+        else
+        {
+            Areas = response.Areas;
+        }
+    }
+
+    private bool FilterFunc1(AreaEntity element) => FilterFunc(element, SearchKeyword);
+    private bool FilterFunc(AreaEntity element, string searchKeyword)
+    {
+        if (string.IsNullOrWhiteSpace(searchKeyword))
+            return true;
+        if (element.Name.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    async Task DisplayEditDialog(AreaEntity entity)
+    {
+        string title = $"Oda Güncelleme: '{entity?.Name}'";
+
+        if (entity == null)
+        {
+            entity = new AreaEntity();
+            title = "Yeni oda";
+        }
+
+        var parameters = new DialogParameters
+            {
+                ["area"] = entity,
+                ["userId"] = UserSettings.UserId,
+                ["defHomeId"] = UserSettings.DefaultHomeId
+            };
+
+        var dialog = await DialogService.ShowAsync<CreateUpdateAreaDialog>(title, parameters, dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetList();
+        }
+    }
+}

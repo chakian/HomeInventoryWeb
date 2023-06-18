@@ -1,0 +1,338 @@
+﻿@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Handlers;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.ItemDefinition;
+@using HomeInv.Common.ServiceContracts.ItemStock;
+@using HomeInv.Persistence;
+@using HomeInv.Persistence.Dbo;
+@using Microsoft.AspNetCore.Identity;
+@using System.Timers;
+
+@inject ISnackbar Snackbar
+
+@inject IItemDefinitionService _itemDefinitionService
+@inject IItemStockService _itemStockService
+@inject ISmartUpdateItemStockHandler _smartUpdateItemStockHandler
+
+@inject HomeInventoryDbContext dbContext
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
+
+@inherits AuthorizedComponentBase
+
+@if (OverviewList == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="OverviewList"
+          Hover="true"
+          Dense="true"
+          SortLabel="Sort By"
+          Filter="new Func<ItemStockOverview,bool>(FilterFunc1)"
+          ReadOnly="false"
+          @bind-SelectedItem="SelectedStock"
+          CommitEditTooltip="Değişiklikleri Kaydet"
+          RowEditPreview="BackupItem"
+          RowEditCancel="ResetItemToOriginalValues"
+          RowEditCommit="ItemHasBeenCommitted"
+          IsEditRowSwitchingBlocked="true"
+          ApplyButtonPosition="TableApplyButtonPosition.Start"
+          EditButtonPosition="TableEditButtonPosition.Start"
+          EditTrigger="TableEditTrigger.EditButton"
+          CanCancelEdit="true"
+          Elevation="0">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Stok Durumu</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="SearchKeyword"
+                      Placeholder="Arama çalışıyor"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <ColGroup>
+            <col style="width:50px;" />
+            <col style="width:25%;" />
+            <col />
+            <col />
+            <col />
+            <col />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh>Görsel</MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ItemStockOverview, object>(x=>x.ItemName)">Ürün Adı</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ItemStockOverview, object>(x=>x.CategoryName)">Kategori</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ItemStockOverview, object>(x=>x.AreaName)">Oda</MudTableSortLabel></MudTh>
+            <MudTh>Stok</MudTh>
+            <MudTh>Son Kullanma Tarihi</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Item Image">
+                <MudImage Src="@(!string.IsNullOrEmpty(context.ImageName) ? $"/uploads/{UserSettings.DefaultHomeId}/{context.ImageName}" : $"/assets/s-logo-blue-white.png")"
+                      Alt="@context.ItemName"
+                      Width="64"
+                      Elevation="25"
+                      Class="rounded-lg" />
+            </MudTd>
+            <MudTd DataLabel="Item Name">@context.ItemName</MudTd>
+            <MudTd DataLabel="Category Name">@context.CategoryName</MudTd>
+            <MudTd DataLabel="Area Name">@context.AreaName</MudTd>
+            <MudTd DataLabel="Current Stock Amount">
+                @(context.CurrentStockAmount + " " + context.SizeUnitName)
+            </MudTd>
+            <MudTd DataLabel="Expiration Date">@(context.ExpirationDate == DateTime.MinValue ? "-" : context.ExpirationDate)</MudTd>
+            </RowTemplate>
+            <RowEditingTemplate>
+                <MudTd DataLabel="Item Image">Image</MudTd>
+                <MudTd DataLabel="Item Name">
+                    <MudTextField @bind-Value="@context.ItemName" Required />
+                </MudTd>
+                <MudTd DataLabel="Category Name">@context.CategoryName</MudTd>
+                <MudTd DataLabel="Area Name">
+                    <MudSelect T="AreaEntity" Label="Oda" @bind-Value="context.Area" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var area in AreaList)
+                    {
+                        <MudSelectItem Value="area" />
+                    }
+                </MudSelect>
+            </MudTd>
+            <MudTd DataLabel="Current Stock Amount">
+                <MudNumericField @bind-Value="@context.CurrentStockAmount" Required />&nbsp;@(context.SizeUnitName)
+            </MudTd>
+            <MudTd DataLabel="Expiration Date">
+                <MudDatePicker @bind-Date="context.ExpirationDate" Clearable="true"></MudDatePicker>
+            </MudTd>
+        </RowEditingTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{25, 50, 100, int.MaxValue}" RowsPerPageString="Sayfadaki ürün sayısı" AllItemsText="Tümü" InfoFormat="Toplam {all_items} üründen {first_item}-{last_item} arası" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    List<ItemStockOverview> OverviewList = null;
+    List<AreaEntity> AreaList = null;
+    ItemStockOverview SelectedStock = null;
+    public string SearchKeyword { get; set; } = string.Empty;
+
+    private ItemStockOverview elementBeforeEdit;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        GetList();
+        AreaList = dbContext.Areas.Where(a => a.HomeId == UserSettings.DefaultHomeId).Select(a => new AreaEntity()
+            {
+                Id = a.Id,
+                Name = a.Name
+            }).ToList();
+    }
+
+    private bool FilterFunc1(ItemStockOverview element) => FilterFunc(element, SearchKeyword);
+    private bool FilterFunc(ItemStockOverview element, string searchKeyword)
+    {
+        if (string.IsNullOrWhiteSpace(searchKeyword))
+            return true;
+        if (element.ItemName.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.CategoryName.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.AreaName} {element.ImageName}".Contains(searchKeyword))
+            return true;
+        return false;
+    }
+
+    private void BackupItem(object element)
+    {
+        elementBeforeEdit = new()
+            {
+                ItemName = ((ItemStockOverview)element).ItemName,
+                CurrentStockAmount = ((ItemStockOverview)element).CurrentStockAmount,
+                ExpirationDate = ((ItemStockOverview)element).ExpirationDate,
+                Area = ((ItemStockOverview)element).Area
+            };
+    }
+
+    private void ItemHasBeenCommitted(object element)
+    {
+        string oldItemName = elementBeforeEdit.ItemName,
+            newItemName = ((ItemStockOverview)element).ItemName;
+        decimal oldStockAmount = elementBeforeEdit.CurrentStockAmount,
+            newStockAmount = ((ItemStockOverview)element).CurrentStockAmount;
+        DateTime? oldExpirationDate = elementBeforeEdit.ExpirationDate,
+            newExpirationDate = ((ItemStockOverview)element).ExpirationDate;
+        int oldAreaId = elementBeforeEdit.AreaId,
+        newAreaId = ((ItemStockOverview)element).AreaId;
+
+        int itemDefId = ((ItemStockOverview)element).ItemDefinitionId;
+        int itemStockId = ((ItemStockOverview)element).StockId;
+
+        if (oldItemName != newItemName)
+        {
+            var itemDb = dbContext.ItemDefinitions.Find(itemDefId);
+            if (itemDb != null)
+            {
+                itemDb.Name = newItemName;
+                dbContext.SaveChanges();
+            }
+        }
+
+        if (oldStockAmount != newStockAmount
+            || oldExpirationDate != newExpirationDate
+            || oldAreaId != newAreaId)
+        {
+            var request = new SmartUpdateItemStockRequest()
+                {
+                    RequestUserId = UserSettings.UserId,
+                    ActionDate = DateTime.UtcNow
+                };
+            request.ItemDefinitionDetail.Id = itemDefId;
+            request.ItemStockDetail.Id = itemStockId;
+            request.ItemStockDetail.RemainingAmount = newStockAmount;
+            request.ItemStockDetail.ExpirationDate = newExpirationDate;
+            request.ItemStockDetail.AreaId = newAreaId;
+            var response = _smartUpdateItemStockHandler.Execute(request);
+
+            if (!response.IsSuccessful)
+            {
+                Snackbar.Add(response.Result.ToString(), Severity.Error);
+            }
+            else
+            {
+                Snackbar.Add($"{newItemName} başarıyla güncellendi", Severity.Success);
+            }
+        }
+    }
+
+    private void ResetItemToOriginalValues(object element)
+    {
+        ((ItemStockOverview)element).ItemName = elementBeforeEdit.ItemName;
+        ((ItemStockOverview)element).CurrentStockAmount = elementBeforeEdit.CurrentStockAmount;
+        ((ItemStockOverview)element).ExpirationDate = elementBeforeEdit.ExpirationDate;
+        ((ItemStockOverview)element).Area = elementBeforeEdit.Area;
+    }
+
+    void GetList()
+    {
+        var definitions = _itemDefinitionService.GetFilteredItemDefinitionsInHome(new GetFilteredItemDefinitionsInHomeRequest()
+            {
+                HomeId = UserSettings.DefaultHomeId,
+                AreaId = 0,
+                CategoryId = 0,
+                RequestUserId = UserSettings.UserId
+            });
+
+        if (!string.IsNullOrEmpty(SearchKeyword) && SearchKeyword.Length > 1)
+        {
+            definitions.Items = definitions.Items.Where(d =>
+                (!string.IsNullOrEmpty(d.Name) && d.Name.Contains(SearchKeyword, StringComparison.InvariantCultureIgnoreCase))
+                || (!string.IsNullOrEmpty(d.Description) && d.Description.Contains(SearchKeyword, StringComparison.InvariantCultureIgnoreCase))
+                || (!string.IsNullOrEmpty(d.CategoryName) && d.CategoryName.Contains(SearchKeyword, StringComparison.InvariantCultureIgnoreCase))
+                || (!string.IsNullOrEmpty(d.CategoryFullName) && d.CategoryFullName.Contains(SearchKeyword, StringComparison.InvariantCultureIgnoreCase))
+                || (!string.IsNullOrEmpty(d.SizeUnitName) && d.SizeUnitName.Contains(SearchKeyword, StringComparison.InvariantCultureIgnoreCase))
+            ).ToList();
+        }
+
+        var stocks = _itemStockService.GetItemStocksByItemDefinitionIds(new GetItemStocksByItemDefinitionIdsRequest()
+            {
+                HomeId = UserSettings.DefaultHomeId,
+                ItemDefinitionIdList = definitions.Items.Select(def => def.Id).ToList(),
+                RequestUserId = UserSettings.UserId
+            }).ItemStocks;
+
+        OverviewList = new List<ItemStockOverview>();
+
+        foreach (var definition in definitions.Items)
+        {
+            var overview = new ItemStockOverview
+                {
+                    ItemDefinitionId = definition.Id,
+                    ItemName = definition.Name,
+                    ItemDescription = definition.Description,
+                    CategoryId = definition.CategoryId,
+                    CategoryName = definition.CategoryName,
+                    CategoryParentNames = definition.CategoryFullName,
+                    ImageName = definition.ImageName,
+                    SizeUnitId = definition.SizeUnitId,
+                    SizeUnitName = definition.SizeUnitName
+                };
+            var currentItemStocks = stocks.Where(s => s.ItemDefinitionId == definition.Id).ToList();
+            if (currentItemStocks.Any())
+            {
+                foreach (var stock in currentItemStocks)
+                {
+                    var stockOverview = overview.Clone();
+                    stockOverview.StockId = stock.Id;
+                    stockOverview.Area = new AreaEntity() { Id = stock.AreaId, Name = stock.AreaName };
+                    stockOverview.CurrentStockAmount = stock.Quantity;
+                    stockOverview.ExpirationDate = definition.IsExpirable ? stock.ExpirationDate : DateTime.MinValue;
+                    OverviewList.Add(stockOverview);
+                }
+            }
+            else
+            {
+                OverviewList.Add(overview);
+            }
+        }
+    }
+
+    public class ItemStockOverview
+    {
+        public int StockId { get; set; }
+        public int ItemDefinitionId { get; set; }
+        public string ImageName { get; set; }
+
+        public int AreaId
+        {
+            get
+            {
+                return Area == null ? 0 : Area.Id;
+            }
+        }
+        public string AreaName
+        {
+            get
+            {
+                return Area == null ? "" : Area.Name;
+            }
+        }
+        public AreaEntity Area { get; set; } = null;
+
+        public int SizeUnitId { get; set; }
+        public string SizeUnitName { get; set; }
+
+        public string ItemName { get; set; }
+        public string ItemDescription { get; set; }
+
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
+        public string CategoryParentNames { get; set; }
+
+        public DateTime? ExpirationDate { get; set; }
+        public decimal CurrentStockAmount { get; set; }
+
+        public ItemStockOverview Clone()
+        {
+            return new ItemStockOverview()
+                {
+                    StockId = StockId,
+                    ItemDefinitionId = ItemDefinitionId,
+                    ImageName = ImageName,
+                    Area = AreaId == null ? null : new AreaEntity() { Id = AreaId, Name = AreaName },
+                    SizeUnitId = SizeUnitId,
+                    SizeUnitName = SizeUnitName,
+                    ItemName = ItemName,
+                    ItemDescription = ItemDescription,
+                    CategoryId = CategoryId,
+                    CategoryName = CategoryName,
+                    CategoryParentNames = CategoryParentNames,
+                    ExpirationDate = ExpirationDate,
+                    CurrentStockAmount = CurrentStockAmount,
+                };
+        }
+    }
+}

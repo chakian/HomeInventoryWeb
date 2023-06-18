@@ -1,0 +1,133 @@
+﻿@page "/homes"
+@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.Area;
+@using HomeInv.Common.ServiceContracts.Category;
+@using HomeInv.Common.ServiceContracts.Home;
+@using HomeInv.Common.ServiceContracts.ItemDefinition;
+@using HomeInv.Persistence;
+@using HomeInv.Persistence.Dbo;
+@using Microsoft.AspNetCore.Identity;
+@using WebBlazor.Components;
+
+@inject IHomeService homeService
+
+@inject HomeInventoryDbContext dbContext
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
+
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+@inherits AuthorizedComponentBase
+
+@if (Homes == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="Homes"
+          Hover="true"
+          SortLabel="Sort By"
+          Filter="new Func<HomeEntity,bool>(FilterFunc1)"
+          ReadOnly="true"
+          Elevation="0">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Evler</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="SearchKeyword"
+                      Placeholder="Arama çalışıyor"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <ColGroup>
+            <col style="width:20px;" />
+            <col />
+            <col />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<HomeEntity, object>(x=>x.Name)">Ev Adı</MudTableSortLabel></MudTh>
+            <MudTh>Açıklama</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Edit"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
+            <MudTd DataLabel="Home Name">@(context.Name)</MudTd>
+            <MudTd DataLabel="Description">@(context.Description)</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
+
+@code {
+    List<HomeEntity> Homes { get; set; } = null;
+    public string SearchKeyword { get; set; } = string.Empty;
+
+    HomeEntity SelectedHome { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        await GetList();
+    }
+
+    protected async Task GetList()
+    {
+        var request = new GetHomesOfUserRequest()
+            {
+                RequestUserId = UserSettings.UserId
+            };
+        var response = homeService.GetHomesOfUser(request);
+
+        if (!response.IsSuccessful)
+        {
+            Snackbar.Add(response.Result.ToString(), Severity.Error);
+        }
+        else
+        {
+            Homes = response.Homes;
+
+            StateHasChanged();
+        }
+    }
+
+    private bool FilterFunc1(HomeEntity element) => FilterFunc(element, SearchKeyword);
+    private bool FilterFunc(HomeEntity element, string searchKeyword)
+    {
+        if (string.IsNullOrWhiteSpace(searchKeyword))
+            return true;
+        if (element.Name.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    async Task DisplayEditDialog(HomeEntity home)
+    {
+        string title = $"Ev Güncelleme: '{home?.Name}'";
+
+        if(home == null)
+        {
+            home = new HomeEntity();
+            title = "Yeni ev";
+        }
+        
+        var parameters = new DialogParameters
+            {
+                ["home"] = home,
+                ["userId"] = UserSettings.UserId
+            };
+
+        var dialog = await DialogService.ShowAsync<CreateUpdateHomeDialog>(title, parameters, dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetList();
+        }
+    }
+}

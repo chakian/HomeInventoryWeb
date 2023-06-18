@@ -1,0 +1,318 @@
+﻿@page "/shoppinglists/{Id:int}"
+
+@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.SizeUnit;
+@using HomeInv.Persistence;
+@using HomeInv.Persistence.Dbo;
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.EntityFrameworkCore;
+@using System.ComponentModel.DataAnnotations;
+@using WebBlazor.Components;
+
+@inject HomeInventoryDbContext dbContext
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
+
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject ISizeUnitService sizeUnitService
+
+@inherits AuthorizedComponentBase
+
+@if (shoppingList == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayAddDialog())" />
+    <MudTable Items="listItems"
+          Hover="true"
+          SortLabel="Sort By"
+          Filter="new Func<ShopItem,bool>(FilterFunc1)"
+          ReadOnly="false"
+          @bind-SelectedItem="SelectedListItem"
+          CommitEditTooltip="Değişiklikleri Kaydet"
+          RowEditPreview="BackupItem"
+          RowEditCancel="ResetItemToOriginalValues"
+          RowEditCommit="ItemHasBeenCommitted"
+          IsEditRowSwitchingBlocked="true"
+          ApplyButtonPosition="TableApplyButtonPosition.Start"
+          EditButtonPosition="TableEditButtonPosition.Start"
+          EditTrigger="TableEditTrigger.EditButton"
+          CanCancelEdit="true"
+          Elevation="0">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Alışveriş Listesi: @(shoppingList.Name)</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="SearchKeyword"
+                      Placeholder="Arama çalışıyor"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <ColGroup>
+                <col style="width:50px;" />
+                <col style="width:25%;" />
+                <col />
+                <col />
+                <col style="width:70px;" />
+            </ColGroup>
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<ShopItem, object>(x=>x.Name)">Ürün Adı</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<ShopItem, object>(x=>x.Amount)">Miktar</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ShopItem, object>(x=>x.ChangeTime.ToLocalTime())">Tarih</MudTableSortLabel></MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Item Name">@context.Name</MudTd>
+                <MudTd DataLabel="Amount">
+                    @(context.Amount + " " + context.SizeUnitName)
+            </MudTd>
+            <MudTd DataLabel="Change Date">@(context.ChangeTime.ToLocalTime())</MudTd>
+                <MudTd DataLabel="Actions">
+                    <MudIconButton Title="Sil" Icon="@Icons.Material.Filled.DeleteForever" OnClick="@(() => DeleteShoppingItem(context))" />
+                </MudTd>
+            </RowTemplate>
+            <RowEditingTemplate>
+
+                <MudTd DataLabel="Item Name">
+                    @if (context.ItemDefinitionId > 0)
+                {
+                    <span>@(context.Name)</span>
+                }
+                else
+                {
+                    <MudTextField @bind-Value="@context.Name" Required />
+                }
+            </MudTd>
+
+            <MudTd DataLabel="Current Stock Amount">
+                <MudNumericField @bind-Value="@context.Amount" Required />
+                @if (context.ItemDefinitionId > 0)
+                {
+                    <span>@(context.SizeUnitName)</span>
+                }
+                else
+                {
+                    <MudSelect Label="Ölçü Birimi" @bind-Value="context.SizeUnitId" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value="0">Bunu seçmek lazım</MudSelectItem>
+                        @foreach (var item in sizeUnitEntities)
+                    {
+                        <MudSelectItem Value="item.Id">@(item.Description ?? item.Name)</MudSelectItem>
+                    }
+                </MudSelect>
+                }
+            </MudTd>
+            
+            <MudTd DataLabel="Change Date">@(context.ChangeTime.ToLocalTime())</MudTd>
+        </RowEditingTemplate>
+    </MudTable>
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayAddDialog())" />
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    ShoppingList? shoppingList;
+    List<ShopItem> listItems { get; set; }
+    ShopItem SelectedListItem { get; set; }
+    ShopItem elementBeforeEdit;
+
+    List<SizeUnitEntity> sizeUnitEntities { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        var temp = dbContext.ShoppingLists.Find(Id);
+        if (temp?.HomeId == UserSettings.DefaultHomeId)
+        {
+            shoppingList = temp;
+            GetList().GetAwaiter().GetResult();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        sizeUnitEntities = sizeUnitService.GetAllSizes(new GetAllSizesRequest()
+            {
+                RequestUserId = UserSettings.UserId
+            }).SizeUnits;
+    }
+
+    private void ItemHasBeenCommitted(object element)
+    {
+        var editedElement = (ShopItem)element;
+
+        ShoppingListItem editingItem = dbContext.ShoppingListItems.Find(editedElement.Id);
+        editingItem.Amount = editedElement.Amount;
+        editingItem.UpdateTime = DateTime.UtcNow;
+        editingItem.UpdateUserId = UserSettings.UserId;
+
+        bool problem = false;
+        if(editedElement.ItemDefinitionId == 0)
+        {
+            if (string.IsNullOrEmpty(editedElement.Name))
+            {
+                Snackbar.Add("Adı yoksa olmaz", Severity.Error);
+                problem = true;
+            }
+            else if (editedElement.SizeUnitId == 0)
+            {
+                Snackbar.Add($"hmmmm.... {editedElement.Amount} ışık yılı mı alıyoruz? Ne kadar alacağız?", Severity.Error);
+                problem = true;
+            }
+            editingItem.ItemName = editedElement.Name;
+            editingItem.SizeUnitId = editedElement.SizeUnitId;
+        }
+
+        dbContext.SaveChanges();
+
+        GetList().GetAwaiter().GetResult();
+
+        Snackbar.Add($"{elementBeforeEdit.Name} başarıyla güncellendi", Severity.Success);
+    }
+    private void BackupItem(object element)
+    {
+        var niceElement = (ShopItem)element;
+        elementBeforeEdit = new();
+        elementBeforeEdit.Id = niceElement.Id;
+        elementBeforeEdit.Name = niceElement.Name;
+        elementBeforeEdit.Description = niceElement.Description;
+        elementBeforeEdit.ItemDefinitionId = niceElement.ItemDefinitionId;
+        elementBeforeEdit.SizeUnitId = niceElement.SizeUnitId;
+        elementBeforeEdit.SizeUnitName = niceElement.SizeUnitName;
+        elementBeforeEdit.Amount = niceElement.Amount;
+        elementBeforeEdit.ChangeTime = niceElement.ChangeTime;
+    }
+    private void ResetItemToOriginalValues(object element)
+    {
+        ((ShopItem)element).Id = elementBeforeEdit.Id;
+        ((ShopItem)element).Name = elementBeforeEdit.Name;
+        ((ShopItem)element).Description = elementBeforeEdit.Description;
+        ((ShopItem)element).ItemDefinitionId = elementBeforeEdit.ItemDefinitionId;
+        ((ShopItem)element).SizeUnitId = elementBeforeEdit.SizeUnitId;
+        ((ShopItem)element).SizeUnitName = elementBeforeEdit.SizeUnitName;
+        ((ShopItem)element).Amount = elementBeforeEdit.Amount;
+        ((ShopItem)element).ChangeTime = elementBeforeEdit.ChangeTime;
+    }
+
+    public string SearchKeyword { get; set; } = string.Empty;
+    private bool FilterFunc1(ShopItem element) => FilterFunc(element, SearchKeyword);
+    private bool FilterFunc(ShopItem element, string searchKeyword)
+    {
+        if (string.IsNullOrWhiteSpace(searchKeyword))
+            return true;
+        if (element.Name.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Description.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    async Task GetList()
+    {
+        listItems = new List<ShopItem>();
+
+        var items = dbContext.ShoppingListItems
+            .Where(sli => sli.ShoppingListId == Id)
+            .Include(sli => sli.ItemDefinition).ToList();
+        if (items != null && items.Count > 0)
+        {
+            foreach (var item in items)
+            {
+                ShopItem shopItem = new();
+                shopItem.Id = item.Id;
+                shopItem.Amount = item.Amount;
+                shopItem.ChangeTime = item.UpdateTime ?? item.InsertTime;
+
+                if (item.ItemDefinition != null)
+                {
+                    shopItem.Name = item.ItemDefinition.Name;
+                    shopItem.Description = item.ItemDefinition.Description;
+                    shopItem.ItemDefinitionId = item.ItemDefinitionId.Value;
+                    shopItem.SizeUnitId = item.ItemDefinition.SizeUnitId;
+                    shopItem.SizeUnitName = item.ItemDefinition.SizeUnit.Description ?? item.ItemDefinition.SizeUnit.Name;
+                }
+                else
+                {
+                    var sizeUnit = dbContext.SizeUnits.Find(item.SizeUnitId);
+
+                    shopItem.Name = item.ItemName;
+                    shopItem.Description = "";
+                    shopItem.ItemDefinitionId = 0;
+                    shopItem.SizeUnitId = item.SizeUnitId.Value;
+                    shopItem.SizeUnitName = sizeUnit.Description ?? sizeUnit.Name;
+                }
+                listItems.Add(shopItem);
+            }
+        }
+
+        StateHasChanged();
+    }
+
+    async Task DisplayAddDialog()
+    {
+        var parameters = new DialogParameters
+            {
+                ["shoppingListId"] = shoppingList.Id,
+                ["userId"] = UserSettings.UserId,
+                ["defHomeId"] = UserSettings.DefaultHomeId
+            };
+
+        var dialog = await DialogService.ShowAsync<AddItemToListDialog>("Alışveriş kalemi ekle", parameters, dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetList();
+        }
+    }
+
+    async Task DeleteShoppingItem(ShopItem shopItem)
+    {
+        var parameters = new DialogParameters
+            {
+                ["DialogText"] = "Silmenin geri dönüşü olmuyor yalnız. Silme konusunda net miyiz?",
+                ["SubmitText"] = "Netik"
+            };
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("", parameters, dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && (bool)result.Data == true)
+        {
+            var realItem = dbContext.ShoppingListItems.Find(shopItem.Id);
+            dbContext.Remove(realItem);
+
+            await dbContext.SaveChangesAsync();
+
+            GetList();
+            StateHasChanged();
+
+            Snackbar.Add($"{shopItem.Name} silindi gitti", Severity.Success);
+        }
+    }
+
+    public class ShopItem
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; } = "";
+
+        public string Description { get; set; } = "";
+
+        [Range(1, int.MaxValue, ErrorMessage = "Ürün tanımı seçmek lazım gibi görünüyor")]
+        public int ItemDefinitionId { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "Ölçü birimini seçmek lazım gibi görünüyor")]
+        public int SizeUnitId { get; set; }
+
+        public string SizeUnitName { get; set; } = "";
+
+        public decimal Amount { get; set; }
+
+        public DateTime ChangeTime { get; set; } = DateTime.UtcNow;
+    }
+}

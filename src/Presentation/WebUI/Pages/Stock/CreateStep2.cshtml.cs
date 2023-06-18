@@ -71,8 +71,8 @@ namespace WebUI.Pages.Stock
 
                 StockEntry = new ItemStockEntry()
                 {
-                    ActionDate = DateTime.Now,
-                    ExpirationDate = DateTime.Now,
+                    ActionDate = DateTime.UtcNow,
+                    ExpirationDate = DateTime.UtcNow,
                     SizeUnitId = itemDefinition.ItemDefinition.SizeUnitId,
                     SizeUnitName = itemDefinition.ItemDefinition.SizeUnitName,
                 };

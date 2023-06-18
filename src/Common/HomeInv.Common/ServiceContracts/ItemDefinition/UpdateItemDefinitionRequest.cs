@@ -7,7 +7,7 @@
         public string Name { get; set; }
         public string Description { get; set; }
         public int CategoryId { get; set; }
-        public string ImageFileName { get; set; }
+        public string NewImageFileExtension { get; set; }
         public bool IsExpirable { get; set; }
     }
 }

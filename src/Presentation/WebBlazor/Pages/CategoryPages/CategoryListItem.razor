@@ -1,0 +1,89 @@
+﻿@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.Category;
+
+@inject ICategoryService categoryService
+@inject IDialogService DialogService
+
+@if (category.HasChild)
+{
+    <MudPaper Elevation="@(2 + indent * 2)">
+        <MudExpansionPanels MultiExpansion="true" Elevation="0">
+            <MudExpansionPanel Class="ma-2">
+                <TitleContent>
+                    <MudItem>
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="DisplayEditCategory" /> @category.Name
+                        @if (!string.IsNullOrWhiteSpace(category.Description))
+                        {
+                            <i>&nbsp; &nbsp;[ @category.Description ]</i>
+                        }
+                    </MudItem>
+                </TitleContent>
+                <ChildContent>
+                    @foreach (var child in category.Children)
+                    {
+                        <CategoryListItem category="child" indent="2" homeId="@homeId" userId="@userId" func="@func" />
+                    }
+                </ChildContent>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudPaper>
+}
+else
+{
+    <MudPaper Elevation="@(2 + indent * 2)" Class="ma-2 pa-4">
+        <MudItem>
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="DisplayEditCategory" /> @category.Name
+            @if (!string.IsNullOrWhiteSpace(category.Description))
+            {
+                <i>&nbsp; &nbsp;[ @category.Description ]</i>
+            }
+        </MudItem>
+    </MudPaper>
+}
+
+@code {
+    [Parameter] public CategoryEntity category { get; set; }
+    [Parameter] public int indent { get; set; }
+
+    [Parameter] public int homeId { get; set; }
+    [Parameter] public string userId { get; set; }
+
+    [Parameter] public Func<bool> func{ get; set; }
+
+    async Task DisplayEditCategory()
+    {
+        int id = category.Id;
+        var tempCategoryList = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest()
+            {
+                HomeId = homeId
+            }).Categories;
+        CategoryEntity editingCategory = tempCategoryList.SingleOrDefault(cat => cat.Id == id);
+
+        if (editingCategory != null)
+        {
+            var categoryList = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest()
+                {
+                    HomeId = homeId
+                }).Categories;
+
+            var parameters = new DialogParameters
+                {
+                    ["category"] = editingCategory,
+                    ["allCategories"] = categoryList,
+                    ["homeId"] = homeId,
+                    ["userId"] = userId,
+                    ["selectedParentCategoryId"] = editingCategory.ParentCategoryId
+                };
+
+            DialogOptions dialogOptions = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true, DisableBackdropClick = true };
+            var dialog = await DialogService.ShowAsync<CreateUpdateCategoryDialog>($"Kategori Güncelleme: '{editingCategory.Name}'", parameters, dialogOptions);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                func.Invoke();
+            }
+        }
+    }
+}

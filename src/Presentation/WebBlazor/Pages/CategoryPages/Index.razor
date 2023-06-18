@@ -1,0 +1,93 @@
+﻿@page "/categories"
+@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.Category;
+@using HomeInv.Persistence;
+@using HomeInv.Persistence.Dbo;
+@using Microsoft.AspNetCore.Identity;
+@using WebBlazor.Components;
+
+@inject ICategoryService categoryService
+
+@inject IDialogService DialogService
+
+@inject HomeInventoryDbContext dbContext
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
+
+@inherits AuthorizedComponentBase
+
+<MudText Typo="Typo.h4">Kategoriler</MudText>
+
+@if (Categories == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudPaper>
+        @foreach (var category in Categories)
+        {
+            <CategoryListItem category="category" indent="1" homeId="UserSettings.DefaultHomeId" userId="UserSettings.UserId" func="@(() => GetList())" />
+        }
+    </MudPaper>
+}
+
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayCreateCategory())" />
+
+@code {
+    List<CategoryEntity> Categories { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        GetList();
+    }
+
+    protected bool GetList()
+    {
+        var request = new GetCategoriesOfHomeRequest()
+            {
+                HomeId = UserSettings.DefaultHomeId,
+                RequestUserId = UserSettings.UserId
+            };
+        var categoriesResponse = categoryService.GetCategoriesOfHome_Hierarchial(request);
+        if (categoriesResponse.IsSuccessful)
+        {
+            Categories = categoriesResponse.Categories;
+
+            StateHasChanged();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    async Task DisplayCreateCategory()
+    {
+        CategoryEntity category = new CategoryEntity();
+        var categoryList = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest()
+            {
+                HomeId = UserSettings.DefaultHomeId
+            }).Categories;
+
+        var parameters = new DialogParameters
+            {
+                ["category"] = category,
+                ["allCategories"] = categoryList,
+                ["homeId"] = UserSettings.DefaultHomeId,
+                ["userId"] = UserSettings.UserId,
+                ["selectedParentCategoryId"] = category.ParentCategoryId
+            };
+
+        var dialog = await DialogService.ShowAsync<CreateUpdateCategoryDialog>("Yeni Kategori", parameters, dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            GetList();
+        }
+    }
+}

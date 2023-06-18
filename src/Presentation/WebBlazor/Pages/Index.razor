@@ -1,0 +1,16 @@
+﻿@page "/"
+
+<AuthorizeView>
+    <Authorized>
+        <WebBlazor.Components.StockStatus></WebBlazor.Components.StockStatus>
+    </Authorized>
+    <NotAuthorized>
+        <PageTitle>Buldunuz!!!1</PageTitle>
+
+        <h1>Çabuk hemen üye olun</h1>
+
+        <a href="Identity/Account/Register">Buradan üye olun</a>
+        <br />
+        <a href="Identity/Account/Login">Zaten üye iseniz buradan buyrun</a>
+    </NotAuthorized>
+</AuthorizeView>

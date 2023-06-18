@@ -1,0 +1,64 @@
+﻿@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts;
+@using HomeInv.Common.ServiceContracts.Home;
+
+@inject IAreaService areaService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Room" Class="mr-3 mb-n1"/> @MudDialog.Title
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="area.Name" Label="Oda Adı" />
+        <MudTextField @bind-Value="area.Description" Label="Açıklama" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">İptal</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveInfo">Kaydet</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public AreaEntity area { get; set; } = new AreaEntity();
+    [Parameter] public int defHomeId { get; set; }
+    [Parameter] public string userId { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void SaveInfo()
+    {
+        string entityDisplayName = "Oda";
+        BaseResponse response = null;
+        string successMessage;
+        if(area.Id > 0)
+        {
+            successMessage = $"{entityDisplayName} güncellendi";
+
+            //TODO: Update Area
+        }
+        else
+        {
+            successMessage = $"{entityDisplayName} oluşturuldu";
+
+            //TODO: Create Area
+        }
+        
+        if (response.IsSuccessful)
+        {
+            Snackbar.Add(successMessage, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Snackbar.Add($"Hata oldu: {response.Result.ToString()}", Severity.Error);
+        }
+    }
+}
