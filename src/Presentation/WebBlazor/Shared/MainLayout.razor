@@ -7,32 +7,43 @@
 <MudSnackbarProvider />
 
 <MudLayout>
+
     <MudAppBar>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <img src="/assets/s-logo-blue-white.png" height="32" />&nbsp;Stok
+        <AuthorizeView>
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        </AuthorizeView>
+        <MudImage Src="/assets/s-logo-blue-white.png"
+                  Alt="Stok"
+                  Width="32"
+                  Elevation="25"
+                  Class="rounded-lg" />&nbsp;Stok
+        <MudSpacer />
+        <LoginDisplay />
     </MudAppBar>
-    <MudDrawer @bind-Open="@_drawerOpen">
-        <NavMenu />
-    </MudDrawer>
+    <AuthorizeView>
+        <MudDrawer @bind-Open="@_drawerOpen">
+            <NavMenu />
+        </MudDrawer>
+    </AuthorizeView>
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
             @Body
         </MudContainer>
     </MudMainContent>
     @*<div class="page">
-        <main>
-            <div class="top-row px-4 auth bg-dark text-white">
-                <LoginDisplay />
-            </div>
+    <main>
+    <div class="top-row px-4 auth bg-dark text-white">
+    <LoginDisplay />
+    </div>
 
-            <article class="content px-4">
-                @Body
-            </article>
-        </main>
+    <article class="content px-4">
+    @Body
+    </article>
+    </main>
     </div>*@
 </MudLayout>
 
-@code{
+@code {
     bool _drawerOpen = true;
 
     void DrawerToggle()
