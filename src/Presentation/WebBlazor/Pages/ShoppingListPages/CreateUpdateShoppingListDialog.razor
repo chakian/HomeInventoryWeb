@@ -1,0 +1,75 @@
+﻿@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts;
+@using HomeInv.Common.ServiceContracts.Home;
+@using HomeInv.Persistence.Dbo;
+@using HomeInv.Persistence;
+
+@inject ISnackbar Snackbar
+@inject HomeInventoryDbContext dbContext
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" Class="mr-3 mb-n1" /> @MudDialog.Title
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="shoppingList.Name" Label="Liste Adı" />
+        <MudTextField @bind-Value="shoppingList.Description" Label="Açıklama" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">İptal</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveInfo">Kaydet</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public ShoppingList shoppingList { get; set; } = new ShoppingList();
+    [Parameter] public int defHomeId { get; set; }
+    [Parameter] public string userId { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task SaveInfo()
+    {
+        string entityDisplayName = "Alışveriş listesi";
+        string successMessage;
+
+        if (string.IsNullOrEmpty(shoppingList.Name))
+        {
+            Snackbar.Add("İsimsiz listeleri kabul edemiyoruz", Severity.Error);
+        }
+        else
+        {
+            if (shoppingList.Id > 0)
+            {
+                successMessage = $"{entityDisplayName} güncellendi";
+
+                shoppingList.UpdateUserId = userId;
+                shoppingList.UpdateTime = DateTime.UtcNow;
+                dbContext.Update(shoppingList);
+                await dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                successMessage = $"{entityDisplayName} oluşturuldu";
+
+                shoppingList.HomeId = defHomeId;
+                shoppingList.InsertUserId = userId;
+                shoppingList.InsertTime = DateTime.UtcNow;
+                shoppingList.IsActive = true;
+
+                dbContext.Add(shoppingList);
+                dbContext.SaveChanges();
+            }
+
+            Snackbar.Add(successMessage, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+}

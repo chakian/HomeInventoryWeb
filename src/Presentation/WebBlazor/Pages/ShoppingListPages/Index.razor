@@ -19,6 +19,7 @@
 @inject UserManager<User> userManager
 
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 @inherits AuthorizedComponentBase
 
@@ -30,7 +31,6 @@ else
 {
     <MudTable Items="ShoppingLists"
           Hover="true"
-          Dense="true"
           SortLabel="Sort By"
           Filter="new Func<ShoppingList,bool>(FilterFunc1)"
           ReadOnly="true"
@@ -46,21 +46,24 @@ else
                       Class="mt-0"></MudTextField>
         </ToolBarContent>
         <ColGroup>
+            <col style="width:20px;" />
             <col />
             <col />
         </ColGroup>
         <HeaderContent>
+            <MudTh></MudTh>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ShoppingList, object>(x=>x.Name)">Liste Adı</MudTableSortLabel></MudTh>
             <MudTh>Açıklama</MudTh>
         </HeaderContent>
         <RowTemplate>
+            <MudTd DataLabel="Edit"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
             <MudTd DataLabel="List Name">@(context.Name)</MudTd>
                 <MudTd DataLabel="Description">@context.Description</MudTd>
             </RowTemplate>
         </MudTable>
 }
 
-<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" />
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
 
 @code {
     List<ShoppingList> ShoppingLists { get; set; } = null;
@@ -98,5 +101,31 @@ else
         if (element.Items.Any(item => item.ItemName.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase)))
             return true;
         return false;
+    }
+
+    async Task DisplayEditDialog(ShoppingList entity)
+    {
+        string title = $"Alışveriş Listesi Güncelleme: '{entity?.Name}'";
+
+        if (entity == null)
+        {
+            entity = new ShoppingList();
+            title = "Yeni liste";
+        }
+
+        var parameters = new DialogParameters
+            {
+                ["shoppingList"] = entity,
+                ["userId"] = UserSettings.UserId,
+                ["defHomeId"] = UserSettings.DefaultHomeId
+            };
+
+        var dialog = await DialogService.ShowAsync<CreateUpdateShoppingListDialog>(title, parameters, dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetList();
+        }
     }
 }
