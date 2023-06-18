@@ -170,6 +170,7 @@ else
 
             await dbContext.SaveChangesAsync();
 
+            await GetList();
             StateHasChanged();
 
             Snackbar.Add("Another happy shopping. Bu iş bu kadar.", Severity.Success);
@@ -192,6 +193,7 @@ else
 
             await dbContext.SaveChangesAsync();
 
+            await GetList();
             StateHasChanged();
 
             Snackbar.Add("Sildim gitti. Artık önümüzdeki listelere bakacağız.", Severity.Success);
