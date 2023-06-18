@@ -47,6 +47,12 @@ builder.Services.AddMudServices();
 
 var app = builder.Build();
 
+using(var scope = app.Services.CreateScope())
+{
+    HomeInventoryDbContext context = scope.ServiceProvider.GetRequiredService<HomeInventoryDbContext>();
+    context.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
