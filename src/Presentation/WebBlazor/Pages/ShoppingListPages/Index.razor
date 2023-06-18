@@ -90,7 +90,7 @@ else
         if (dbContext.ShoppingLists != null)
         {
             ShoppingLists = await dbContext.ShoppingLists
-                .Where(sl => sl.HomeId == UserSettings.DefaultHomeId)
+                .Where(sl => sl.HomeId == UserSettings.DefaultHomeId && sl.IsActive)
                 .Include(s => s.Items)
                 .Include(s => s.InsertUser)
                 .Include(s => s.UpdateUser).ToListAsync();
