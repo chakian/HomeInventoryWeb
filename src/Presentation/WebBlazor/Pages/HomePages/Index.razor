@@ -55,14 +55,14 @@ else
             <MudTh>Açıklama</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Edit"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditHomeDialog(context))" /></MudTd>
+            <MudTd DataLabel="Edit"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
             <MudTd DataLabel="Home Name">@(context.Name)</MudTd>
             <MudTd DataLabel="Description">@(context.Description)</MudTd>
         </RowTemplate>
     </MudTable>
 }
 
-<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditHomeDialog(null))" />
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
 
 @code {
     List<HomeEntity> Homes { get; set; } = null;
@@ -106,7 +106,7 @@ else
         return false;
     }
 
-    async Task DisplayEditHomeDialog(HomeEntity home)
+    async Task DisplayEditDialog(HomeEntity home)
     {
         string title = $"Ev Güncelleme: '{home?.Name}'";
 

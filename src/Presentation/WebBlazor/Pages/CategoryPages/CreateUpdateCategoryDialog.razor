@@ -28,7 +28,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">İptal</MudButton>
-        <MudButton Color="Color.Primary" OnClick="SaveCategory">Kaydet</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveInfo">Kaydet</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -45,13 +45,14 @@
         MudDialog.Cancel();
     }
 
-    private void SaveCategory()
+    private void SaveInfo()
     {
+        string entityDisplayName = "Kategori";
         BaseResponse response;
         string successMessage;
         if(category.Id > 0)
         {
-            successMessage = "Kategori güncellendi";
+            successMessage = $"{entityDisplayName} güncellendi";
 
             category.ParentCategoryId = selectedParentCategoryId == 0 ? null : selectedParentCategoryId;
             var updateCategoryRequest = new UpdateCategoryRequest()
@@ -66,7 +67,7 @@
         }
         else
         {
-            successMessage = "Yeni kategori oluşturuldu";
+            successMessage = $"{entityDisplayName} oluşturuldu";
 
             category.ParentCategoryId = selectedParentCategoryId == 0 ? null : selectedParentCategoryId;
             var createCategoryRequest = new CreateCategoryRequest()

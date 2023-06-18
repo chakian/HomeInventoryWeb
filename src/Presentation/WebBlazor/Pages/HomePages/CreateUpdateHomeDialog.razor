@@ -18,7 +18,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">İptal</MudButton>
-        <MudButton Color="Color.Primary" OnClick="SaveHome">Kaydet</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveInfo">Kaydet</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -32,13 +32,14 @@
         MudDialog.Cancel();
     }
 
-    private void SaveHome()
+    private void SaveInfo()
     {
+        string entityDisplayName = "Ev";
         BaseResponse response;
         string successMessage;
         if(home.Id > 0)
         {
-            successMessage = "Ev güncellendi";
+            successMessage = $"{entityDisplayName} güncellendi";
 
             var updateHomeRequest = new UpdateHomeRequest()
                 {
@@ -49,7 +50,7 @@
         }
         else
         {
-            successMessage = "Yeni ev oluşturuldu";
+            successMessage = $"{entityDisplayName} oluşturuldu";
 
             var createHomeRequest = new CreateHomeRequest()
                 {
