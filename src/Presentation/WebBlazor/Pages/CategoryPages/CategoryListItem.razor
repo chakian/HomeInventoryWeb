@@ -7,14 +7,13 @@
 
 @if (category.HasChild)
 {
-    <MudPaper>
-        <MudExpansionPanels MultiExpansion="true">
-            <MudExpansionPanel>
+    <MudPaper Elevation="@(2 + indent * 2)">
+        <MudExpansionPanels MultiExpansion="true" Elevation="0">
+            <MudExpansionPanel Class="ma-2">
                 <TitleContent>
-                    <div class="d-flex">
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="DisplayEditCategory" />
-                        <MudText>@category.Name</MudText>
-                    </div>
+                    <MudItem>
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="DisplayEditCategory" /> @category.Name
+                    </MudItem>
                 </TitleContent>
                 <ChildContent>
                     @foreach (var child in category.Children)
@@ -28,10 +27,9 @@
 }
 else
 {
-    <MudPaper>
+    <MudPaper Elevation="@(2 + indent * 2)" Class="ma-2 pa-4">
         <MudItem>
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="DisplayEditCategory" />
-            <MudText>@category.Name</MudText>
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="DisplayEditCategory" /> @category.Name
         </MudItem>
     </MudPaper>
 }
