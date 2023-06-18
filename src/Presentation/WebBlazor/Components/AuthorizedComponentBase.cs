@@ -11,7 +11,13 @@ namespace WebBlazor.Components
     public class AuthorizedComponentBase : ComponentBase
     {
         protected UserSettingEntity UserSettings { get; private set; }
-        protected DialogOptions dialogOptions = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true, DisableBackdropClick = true };
+        protected DialogOptions dialogOptions = new DialogOptions()
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            DisableBackdropClick = true,
+            CloseOnEscapeKey = true
+        };
 
         protected string GetPathOfImageInHome(string fileName, int homeId)
         {

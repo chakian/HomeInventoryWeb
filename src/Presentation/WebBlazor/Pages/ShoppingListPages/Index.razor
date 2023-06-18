@@ -49,16 +49,22 @@ else
             <col style="width:20px;" />
             <col />
             <col />
+            <col style="width:140px;" />
         </ColGroup>
         <HeaderContent>
             <MudTh></MudTh>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ShoppingList, object>(x=>x.Name)">Liste Adı</MudTableSortLabel></MudTh>
             <MudTh>Açıklama</MudTh>
+            <MudTh></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Edit"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
             <MudTd DataLabel="List Name">@(context.Name)</MudTd>
                 <MudTd DataLabel="Description">@context.Description</MudTd>
+                <MudTd DataLabel="Actions">
+                    <MudIconButton Title="Tamamla" Icon="@Icons.Material.Filled.Check" OnClick="@(() => CompleteShoppingList(context))" />
+                    <MudIconButton Title="Sil" Icon="@Icons.Material.Filled.DeleteForever" OnClick="@(() => DeleteShoppingList(context))" />
+                </MudTd>
             </RowTemplate>
         </MudTable>
 }
@@ -91,6 +97,19 @@ else
         }
     }
 
+    int _defaultAreaId = 0;
+    int defaultAreaId
+    {
+        get
+        {
+            if(_defaultAreaId == 0)
+            {
+                _defaultAreaId = dbContext.Areas.First(a => a.HomeId == UserSettings.DefaultHomeId).Id;
+            }
+            return _defaultAreaId;
+        }
+    }
+
     private bool FilterFunc1(ShoppingList element) => FilterFunc(element, SearchKeyword);
     private bool FilterFunc(ShoppingList element, string searchKeyword)
     {
@@ -101,6 +120,76 @@ else
         if (element.Items.Any(item => item.ItemName.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase)))
             return true;
         return false;
+    }
+
+    async Task CompleteShoppingList(ShoppingList entity)
+    {
+        var parameters = new DialogParameters
+            {
+                ["DialogText"] = "Listeyi 'Tamamlandı' olarak işaretlediğinizde alışveriş listesine 'Ürün Tanımı' kullanılarak eklenmiş olan tüm ürünlerin stokları liste içeriği baz alınarak güncellenecek. Emin misiniz?"
+            };
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("", parameters, dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && (bool)result.Data == true)
+        {
+            foreach (var listItem in entity.Items)
+            {
+                if(listItem.ItemDefinitionId != null && listItem.ItemDefinitionId > 0)
+                {
+                    var itemStock = dbContext.ItemStocks.FirstOrDefault(s => s.ItemDefinitionId == listItem.ItemDefinitionId);
+                    if (itemStock == null) {itemStock = new ItemStock()
+                        {
+                            AreaId = defaultAreaId,
+                            InsertTime = DateTime.UtcNow,
+                            InsertUserId = UserSettings.UserId,
+                            IsActive = true,
+                            ItemDefinitionId = listItem.ItemDefinitionId.Value,
+                            RemainingAmount = listItem.Amount
+                        };
+                        dbContext.Add(itemStock);
+                    }
+                    else
+                    {
+                        itemStock.RemainingAmount += listItem.Amount;
+                    }
+                    await dbContext.SaveChangesAsync();
+                }
+            }
+
+            entity.UpdateUserId = UserSettings.UserId;
+            entity.UpdateTime = DateTime.UtcNow;
+            entity.IsActive = false;
+            dbContext.Update(entity);
+
+            await dbContext.SaveChangesAsync();
+
+            StateHasChanged();
+
+            Snackbar.Add("Another happy shopping. Bu iş bu kadar.", Severity.Success);
+        }
+    }
+
+    async Task DeleteShoppingList(ShoppingList entity)
+    {
+        var parameters = new DialogParameters
+            {
+                ["DialogText"] = "Listeyi 'Silindi' olarak işaretlediğinizde, listeye eklenmiş tüm kalemler ve listenin kendisi geri dönüşü olmayacak şekilde silinecek. Emin misiniz?"
+            };
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("", parameters, dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && (bool)result.Data == true)
+        {
+            dbContext.RemoveRange(entity.Items);
+            dbContext.Remove(entity);
+
+            await dbContext.SaveChangesAsync();
+
+            StateHasChanged();
+
+            Snackbar.Add("Sildim gitti. Artık önümüzdeki listelere bakacağız.", Severity.Success);
+        }
     }
 
     async Task DisplayEditDialog(ShoppingList entity)

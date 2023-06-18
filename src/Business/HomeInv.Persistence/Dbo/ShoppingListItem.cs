@@ -7,6 +7,9 @@ public class ShoppingListItem : BaseAuditableDbo
 
     public string ItemName { get; set; }
 
+    public int? ItemDefinitionId { get; set; }
+    public virtual ItemDefinition ItemDefinition { get; set; }
+
     public decimal Amount { get; set; }
 
     #region Size Properties
