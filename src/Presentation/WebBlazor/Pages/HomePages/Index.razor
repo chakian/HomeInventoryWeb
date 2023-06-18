@@ -48,11 +48,11 @@ else
             <col />
         </ColGroup>
         <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<HomeEntity, object>(x=>x.Name)">Oda Adı</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<HomeEntity, object>(x=>x.Name)">Ev Adı</MudTableSortLabel></MudTh>
             <MudTh>Açıklama</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Area Name">@(context.Name)</MudTd>
+            <MudTd DataLabel="Home Name">@(context.Name)</MudTd>
                 <MudTd DataLabel="Description">@context.Description</MudTd>
             </RowTemplate>
         </MudTable>
