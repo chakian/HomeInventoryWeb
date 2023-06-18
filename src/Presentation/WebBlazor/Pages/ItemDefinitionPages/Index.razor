@@ -3,12 +3,15 @@
 @using HomeInv.Common.Interfaces.Services;
 @using HomeInv.Common.ServiceContracts.Category;
 @using HomeInv.Common.ServiceContracts.ItemDefinition;
+@using HomeInv.Common.ServiceContracts.SizeUnit;
 @using HomeInv.Persistence;
 @using HomeInv.Persistence.Dbo;
 @using Microsoft.AspNetCore.Identity;
 @using WebBlazor.Components;
 
 @inject IItemDefinitionService itemDefinitionService
+@inject ICategoryService categoryService
+@inject ISizeUnitService sizeUnitService
 
 @inject HomeInventoryDbContext dbContext
 @inject AuthenticationStateProvider authenticationStateProvider
@@ -16,6 +19,7 @@
 @inject UserManager<User> userManager
 
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 @inherits AuthorizedComponentBase
 
@@ -43,6 +47,7 @@ else
                       Class="mt-0"></MudTextField>
         </ToolBarContent>
         <ColGroup>
+            <col style="width:20px;" />
             <col style="width:50px;" />
             <col />
             <col />
@@ -51,6 +56,7 @@ else
             <col />
         </ColGroup>
         <HeaderContent>
+            <MudTh></MudTh>
             <MudTh>Görsel</MudTh>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ItemDefinitionEntity, object>(x=>x.Name)">Tanım Adı</MudTableSortLabel></MudTh>
             <MudTh>Açıklama</MudTh>
@@ -59,6 +65,7 @@ else
             <MudTh>Bozulan Bir Şey Mi?</MudTh>
         </HeaderContent>
         <RowTemplate>
+            <MudTd DataLabel="Edit"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
             <MudTd DataLabel="Item Image">
                 <MudImage Src="@(!string.IsNullOrEmpty(context.ImageName) ? $"/uploads/{UserSettings.DefaultHomeId}/{context.ImageName}" : $"/assets/s-logo-blue-white.png")"
                       Alt="@context.Name"
@@ -75,7 +82,7 @@ else
         </MudTable>
 }
 
-<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" />
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
 
 @code {
     List<ItemDefinitionEntity> ItemDefinitions { get; set; } = null;
@@ -103,6 +110,8 @@ else
         else
         {
             ItemDefinitions = response.Items;
+
+            StateHasChanged();
         }
     }
 
@@ -118,5 +127,39 @@ else
         if ($"{element.Description}".Contains(searchKeyword))
             return true;
         return false;
+    }
+
+    async Task DisplayEditDialog(ItemDefinitionEntity entity)
+    {
+        string title = $"Ürün tanımı güncelleme: '{entity?.Name}'";
+
+        if (entity == null)
+        {
+            entity = new ItemDefinitionEntity();
+            title = "Yeni ürün tanımı";
+        }
+
+        var allCategories = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest() { HomeId = UserSettings.DefaultHomeId }).Categories;
+
+        var allSizeUnits = sizeUnitService.GetAllSizes(new GetAllSizesRequest() { RequestUserId = UserSettings.UserId }).SizeUnits;
+
+        var parameters = new DialogParameters
+            {
+                ["itemDef"] = entity,
+                ["userId"] = UserSettings.UserId,
+                ["defHomeId"] = UserSettings.DefaultHomeId,
+                ["allCategories"] = allCategories,
+                ["allSizeUnits"] = allSizeUnits,
+                ["selectedCategoryId"] = entity.CategoryId,
+                ["selectedSizeUnitId"] = entity.SizeUnitId
+            };
+
+        var dialog = await DialogService.ShowAsync<CreateUpdateItemDefDialog>(title, parameters, dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetList();
+        }
     }
 }

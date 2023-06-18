@@ -85,14 +85,23 @@ namespace HomeInv.Business.Services
 
                 if (!string.IsNullOrEmpty(request.ImageFileExtension))
                 {
-                    item.ImageName = string.Concat("item_", item.Id.ToString(), request.ImageFileExtension);
-                    context.SaveChanges();
-                    response.ImageFileName = item.ImageName;
+                    if (allowedImageExtensions.Contains(request.ImageFileExtension))
+                    {
+                        item.ImageName = string.Concat("item_", item.Id.ToString(), request.ImageFileExtension);
+                        context.SaveChanges();
+                        response.ImageFileName = item.ImageName;
+                    }
+                    else
+                    {
+                        response.AddWarning("Seçilen dosya yüklenemedi. Dosya uzantısı bunlardan biri olmalı: '" + string.Join(',', allowedImageExtensions) + "'");
+                    }
                 }
             }
 
             return response;
         }
+
+        string[] allowedImageExtensions = new string[] { ".png", ".jpg", ".jpeg", ".gif", ".tiff", ".bmp", ".svg" };
 
         public GetAllItemDefinitionsInHomeResponse GetAllItemDefinitionsInHome(GetAllItemDefinitionsInHomeRequest request, bool includeInactive = false)
         {
@@ -192,9 +201,21 @@ namespace HomeInv.Business.Services
                 var item = context.ItemDefinitions.Find(request.ItemDefinitionId);
                 item.Name = request.Name;
                 item.Description = request.Description;
-                if (!string.IsNullOrEmpty(request.ImageFileName)) item.ImageName = request.ImageFileName;
                 item.CategoryId = request.CategoryId;
                 item.IsExpirable = request.IsExpirable;
+
+                if (!string.IsNullOrEmpty(request.NewImageFileExtension))
+                {
+                    if (allowedImageExtensions.Contains(request.NewImageFileExtension))
+                    {
+                        item.ImageName = string.Concat("item_", item.Id.ToString(), request.NewImageFileExtension);
+                        response.ImageFileName = item.ImageName;
+                    }
+                    else
+                    {
+                        response.AddWarning("Seçilen dosya yüklenemedi. Dosya uzantısı bunlardan biri olmalı: '" + string.Join("; ", allowedImageExtensions) + "'");
+                    }
+                }
 
                 context.SaveChanges();
             }
