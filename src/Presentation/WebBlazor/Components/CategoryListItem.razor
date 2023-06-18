@@ -1,18 +1,22 @@
 ﻿@*<td class="text-end"><a class="btn btn-secondary" href="/Category/Edit?Id=@(category.Id)">Düzenle</a></td>*@
 @if (category.HasChild)
 {
-    <MudExpansionPanels MultiExpansion="true">
-        <MudExpansionPanel Text="@category.Name">
-            @foreach (var child in category.Children)
-            {
-                <CategoryListItem category="child" indent="2" />
-            }
-        </MudExpansionPanel>
-    </MudExpansionPanels>
+    <MudPaper>
+        <MudExpansionPanels MultiExpansion="true">
+            <MudExpansionPanel Text="@category.Name">
+                @foreach (var child in category.Children)
+                {
+                    <CategoryListItem category="child" indent="2" />
+                }
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudPaper>
 }
 else
 {
-    @category.Name
+    <MudPaper>
+        <MudText>@category.Name</MudText>
+    </MudPaper>
 }
 
 @code {

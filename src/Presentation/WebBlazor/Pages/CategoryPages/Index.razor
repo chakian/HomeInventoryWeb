@@ -24,10 +24,12 @@
 }
 else
 {
-    foreach (var category in Categories)
-    {
-        <CategoryListItem category="category" indent="1" />
-    }
+    <MudPaper>
+        @foreach (var category in Categories)
+        {
+            <CategoryListItem category="category" indent="1" />
+        }
+    </MudPaper>
 }
 
 <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" />
@@ -39,10 +41,6 @@ else
     {
         GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
         GetList();
-
-        //aTimer = new System.Timers.Timer(1000);
-        //aTimer.Elapsed += OnUserFinish;
-        //aTimer.AutoReset = false;
     }
 
     protected void GetList()
