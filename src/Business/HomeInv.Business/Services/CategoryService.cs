@@ -26,7 +26,11 @@ namespace HomeInv.Business.Services
         {
             var response = new CreateCategoryResponse();
 
-            if (request.HomeId == 0)
+            if (string.IsNullOrWhiteSpace(request.CategoryEntity.Name))
+            {
+                response.AddError("Adı bomboş olan bir kategori olamamalı diye düşünüyorum");
+            }
+            else if (request.HomeId == 0)
             {
                 response.AddError(Language.Resources.Category_HomeIsMandatory);
             }

@@ -9,6 +9,8 @@
 
 @inject ICategoryService categoryService
 
+@inject IDialogService DialogService
+
 @inject HomeInventoryDbContext dbContext
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject SignInManager<User> signInManager
@@ -32,7 +34,7 @@ else
     </MudPaper>
 }
 
-<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" />
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayCreateCategory())" />
 
 @code {
     List<CategoryEntity> Categories { get; set; } = null;
@@ -54,6 +56,32 @@ else
         if (categoriesResponse.IsSuccessful)
         {
             Categories = categoriesResponse.Categories;
+        }
+    }
+
+    async Task DisplayCreateCategory()
+    {
+        CategoryEntity category = new CategoryEntity();
+        var categoryList = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest()
+            {
+                HomeId = UserSettings.DefaultHomeId
+            }).Categories;
+
+        var parameters = new DialogParameters
+            {
+                ["category"] = category,
+                ["allCategories"] = categoryList,
+                ["homeId"] = UserSettings.DefaultHomeId,
+                ["userId"] = UserSettings.UserId,
+                ["selectedParentCategoryId"] = category.ParentCategoryId
+            };
+
+        var dialog = await DialogService.ShowAsync<CreateCategoryDialog>("Yeni Kategori", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            GetList();
         }
     }
 }
