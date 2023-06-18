@@ -59,14 +59,18 @@ else
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Edit"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
-            <MudTd DataLabel="List Name">@(context.Name)</MudTd>
-                <MudTd DataLabel="Description">@context.Description</MudTd>
-                <MudTd DataLabel="Actions">
-                    <MudIconButton Title="Tamamla" Icon="@Icons.Material.Filled.Check" OnClick="@(() => CompleteShoppingList(context))" />
-                    <MudIconButton Title="Sil" Icon="@Icons.Material.Filled.DeleteForever" OnClick="@(() => DeleteShoppingList(context))" />
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
+            <MudTd DataLabel="List Name">
+                <MudLink Href="@($"/shoppinglists/{context.Id}")">
+                    @(context.Name)
+                </MudLink>
+            </MudTd>
+            <MudTd DataLabel="Description">@context.Description</MudTd>
+            <MudTd DataLabel="Actions">
+                <MudIconButton Title="Tamamla" Icon="@Icons.Material.Filled.Check" OnClick="@(() => CompleteShoppingList(context))" />
+                <MudIconButton Title="Sil" Icon="@Icons.Material.Filled.DeleteForever" OnClick="@(() => DeleteShoppingList(context))" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
 }
 
 <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
@@ -102,7 +106,7 @@ else
     {
         get
         {
-            if(_defaultAreaId == 0)
+            if (_defaultAreaId == 0)
             {
                 _defaultAreaId = dbContext.Areas.First(a => a.HomeId == UserSettings.DefaultHomeId).Id;
             }
@@ -135,18 +139,20 @@ else
         {
             foreach (var listItem in entity.Items)
             {
-                if(listItem.ItemDefinitionId != null && listItem.ItemDefinitionId > 0)
+                if (listItem.ItemDefinitionId != null && listItem.ItemDefinitionId > 0)
                 {
                     var itemStock = dbContext.ItemStocks.FirstOrDefault(s => s.ItemDefinitionId == listItem.ItemDefinitionId);
-                    if (itemStock == null) {itemStock = new ItemStock()
-                        {
-                            AreaId = defaultAreaId,
-                            InsertTime = DateTime.UtcNow,
-                            InsertUserId = UserSettings.UserId,
-                            IsActive = true,
-                            ItemDefinitionId = listItem.ItemDefinitionId.Value,
-                            RemainingAmount = listItem.Amount
-                        };
+                    if (itemStock == null)
+                    {
+                        itemStock = new ItemStock()
+                            {
+                                AreaId = defaultAreaId,
+                                InsertTime = DateTime.UtcNow,
+                                InsertUserId = UserSettings.UserId,
+                                IsActive = true,
+                                ItemDefinitionId = listItem.ItemDefinitionId.Value,
+                                RemainingAmount = listItem.Amount
+                            };
                         dbContext.Add(itemStock);
                     }
                     else
