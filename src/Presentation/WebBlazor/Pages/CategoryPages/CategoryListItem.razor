@@ -13,6 +13,10 @@
                 <TitleContent>
                     <MudItem>
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="DisplayEditCategory" /> @category.Name
+                        @if (!string.IsNullOrWhiteSpace(category.Description))
+                        {
+                            <i>&nbsp; &nbsp;[ @category.Description ]</i>
+                        }
                     </MudItem>
                 </TitleContent>
                 <ChildContent>
@@ -30,6 +34,10 @@ else
     <MudPaper Elevation="@(2 + indent * 2)" Class="ma-2 pa-4">
         <MudItem>
             <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="DisplayEditCategory" /> @category.Name
+            @if (!string.IsNullOrWhiteSpace(category.Description))
+            {
+                <i>&nbsp; &nbsp;[ @category.Description ]</i>
+            }
         </MudItem>
     </MudPaper>
 }

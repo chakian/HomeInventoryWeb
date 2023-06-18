@@ -108,7 +108,7 @@ else
 
     async Task DisplayEditHomeDialog(HomeEntity home)
     {
-        string title = "Ev güncelleme";
+        string title = $"Ev Güncelleme: '{home?.Name}'";
 
         if(home == null)
         {
