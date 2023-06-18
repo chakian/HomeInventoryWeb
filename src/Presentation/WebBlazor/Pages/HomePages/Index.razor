@@ -45,7 +45,7 @@ else
                       Class="mt-0"></MudTextField>
         </ToolBarContent>
         <ColGroup>
-            <col width="20px" />
+            <col style="width:20px;" />
             <col />
             <col />
         </ColGroup>
@@ -122,7 +122,7 @@ else
                 ["userId"] = UserSettings.UserId
             };
 
-        var dialog = await DialogService.ShowAsync<CreateUpdateHomeDialog>(title, parameters);
+        var dialog = await DialogService.ShowAsync<CreateUpdateHomeDialog>(title, parameters, dialogOptions);
         var result = await dialog.Result;
 
         if (!result.Canceled)

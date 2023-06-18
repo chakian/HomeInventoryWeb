@@ -4,12 +4,14 @@ using HomeInv.Persistence.Dbo;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using MudBlazor;
 
 namespace WebBlazor.Components
 {
     public class AuthorizedComponentBase : ComponentBase
     {
         protected UserSettingEntity UserSettings { get; private set; }
+        protected DialogOptions dialogOptions = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true, DisableBackdropClick = true };
 
         protected string GetPathOfImageInHome(string fileName, int homeId)
         {

@@ -82,7 +82,7 @@ else
                 ["selectedParentCategoryId"] = category.ParentCategoryId
             };
 
-        var dialog = await DialogService.ShowAsync<CreateUpdateCategoryDialog>("Yeni Kategori", parameters);
+        var dialog = await DialogService.ShowAsync<CreateUpdateCategoryDialog>("Yeni Kategori", parameters, dialogOptions);
         var result = await dialog.Result;
 
         if (!result.Canceled)

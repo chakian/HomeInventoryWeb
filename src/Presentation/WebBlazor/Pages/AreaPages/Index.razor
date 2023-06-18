@@ -117,7 +117,7 @@ else
                 ["defHomeId"] = UserSettings.DefaultHomeId
             };
 
-        var dialog = await DialogService.ShowAsync<CreateUpdateAreaDialog>(title, parameters);
+        var dialog = await DialogService.ShowAsync<CreateUpdateAreaDialog>(title, parameters, dialogOptions);
         var result = await dialog.Result;
 
         if (!result.Canceled)
