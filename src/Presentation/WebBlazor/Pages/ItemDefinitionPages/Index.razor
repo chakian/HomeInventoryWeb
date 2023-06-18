@@ -1,0 +1,165 @@
+﻿@page "/itemdefinitions"
+@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts.Category;
+@using HomeInv.Common.ServiceContracts.ItemDefinition;
+@using HomeInv.Common.ServiceContracts.SizeUnit;
+@using HomeInv.Persistence;
+@using HomeInv.Persistence.Dbo;
+@using Microsoft.AspNetCore.Identity;
+@using WebBlazor.Components;
+
+@inject IItemDefinitionService itemDefinitionService
+@inject ICategoryService categoryService
+@inject ISizeUnitService sizeUnitService
+
+@inject HomeInventoryDbContext dbContext
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
+
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+@inherits AuthorizedComponentBase
+
+@if (ItemDefinitions == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="ItemDefinitions"
+          Hover="true"
+          Dense="true"
+          SortLabel="Sort By"
+          Filter="new Func<ItemDefinitionEntity,bool>(FilterFunc1)"
+          ReadOnly="true"
+          Elevation="0">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Ürün Tanımları</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="SearchKeyword"
+                      Placeholder="Arama çalışıyor"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <ColGroup>
+            <col style="width:20px;" />
+            <col style="width:50px;" />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh></MudTh>
+            <MudTh>Görsel</MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ItemDefinitionEntity, object>(x=>x.Name)">Tanım Adı</MudTableSortLabel></MudTh>
+            <MudTh>Açıklama</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ItemDefinitionEntity, object>(x=>x.CategoryName)">Kategori</MudTableSortLabel></MudTh>
+            <MudTh>Ölçü Birimi</MudTh>
+            <MudTh>Bozulan Bir Şey Mi?</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Edit"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
+            <MudTd DataLabel="Item Image">
+                <MudImage Src="@(!string.IsNullOrEmpty(context.ImageName) ? $"/uploads/{UserSettings.DefaultHomeId}/{context.ImageName}" : $"/assets/s-logo-blue-white.png")"
+                      Alt="@context.Name"
+                      Width="64"
+                      Elevation="25"
+                      Class="rounded-lg" />
+            </MudTd>
+            <MudTd DataLabel="Item Definition Name">@(context.Name)</MudTd>
+                <MudTd DataLabel="Description">@context.Description</MudTd>
+                <MudTd DataLabel="Category">@(context.CategoryName + (string.IsNullOrEmpty(context.CategoryFullName) ? "" : " (" + context.CategoryFullName + ")"))</MudTd>
+                <MudTd DataLabel="Size Unit">@(context.SizeUnitName)</MudTd>
+                <MudTd DataLabel="Is Expirable">@(context.IsExpirable ? "Evet" : "Hayır")</MudTd>
+            </RowTemplate>
+        </MudTable>
+}
+
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
+
+@code {
+    List<ItemDefinitionEntity> ItemDefinitions { get; set; } = null;
+    public string SearchKeyword { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        GetList();
+    }
+
+    protected async Task GetList()
+    {
+        var request = new GetAllItemDefinitionsInHomeRequest()
+            {
+                HomeId = UserSettings.DefaultHomeId,
+                RequestUserId = UserSettings.UserId
+            };
+        var response = itemDefinitionService.GetAllItemDefinitionsInHome(request, true);
+
+        if (!response.IsSuccessful)
+        {
+            Snackbar.Add(response.Result.ToString(), Severity.Error);
+        }
+        else
+        {
+            ItemDefinitions = response.Items;
+
+            StateHasChanged();
+        }
+    }
+
+    private bool FilterFunc1(ItemDefinitionEntity element) => FilterFunc(element, SearchKeyword);
+    private bool FilterFunc(ItemDefinitionEntity element, string searchKeyword)
+    {
+        if (string.IsNullOrWhiteSpace(searchKeyword))
+            return true;
+        if (element.Name.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.CategoryName.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Description}".Contains(searchKeyword))
+            return true;
+        return false;
+    }
+
+    async Task DisplayEditDialog(ItemDefinitionEntity entity)
+    {
+        string title = $"Ürün tanımı güncelleme: '{entity?.Name}'";
+
+        if (entity == null)
+        {
+            entity = new ItemDefinitionEntity();
+            title = "Yeni ürün tanımı";
+        }
+
+        var allCategories = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest() { HomeId = UserSettings.DefaultHomeId }).Categories;
+
+        var allSizeUnits = sizeUnitService.GetAllSizes(new GetAllSizesRequest() { RequestUserId = UserSettings.UserId }).SizeUnits;
+
+        var parameters = new DialogParameters
+            {
+                ["itemDef"] = entity,
+                ["userId"] = UserSettings.UserId,
+                ["defHomeId"] = UserSettings.DefaultHomeId,
+                ["allCategories"] = allCategories,
+                ["allSizeUnits"] = allSizeUnits,
+                ["selectedCategoryId"] = entity.CategoryId,
+                ["selectedSizeUnitId"] = entity.SizeUnitId
+            };
+
+        var dialog = await DialogService.ShowAsync<CreateUpdateItemDefDialog>(title, parameters, dialogOptions);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetList();
+        }
+    }
+}

@@ -12,16 +12,16 @@ build:
 
 after_build:
 - ps: >-
-    dotnet publish --self-contained -r win-x86 -o publish/WebUI -c Release src\Presentation\WebUI/WebUI.csproj
+    dotnet publish --self-contained -r win-x86 -o publish/WebBlazor -c Release src\Presentation\WebBlazor/WebBlazor.csproj
 
-    7z a WebUI.zip .\publish\WebUI\*
+    7z a WebBlazor.zip .\publish\WebBlazor\*
 
-    appveyor PushArtifact WebUI.zip
+    appveyor PushArtifact WebBlazor.zip
 deploy:
  - provider: Environment
    name: Stok - Test
    on:
-     branch: staging
+     branch: blazor-app
 
  - provider: Environment
    name: Stok - LIVE

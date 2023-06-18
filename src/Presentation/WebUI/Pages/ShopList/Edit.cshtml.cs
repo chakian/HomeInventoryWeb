@@ -53,7 +53,7 @@ namespace WebUI.Pages.ShopList
             shoppinglist.Name = ShoppingList.Name;
             shoppinglist.Description = ShoppingList.Description;
             shoppinglist.UpdateUserId = UserId;
-            shoppinglist.UpdateTime = DateTime.Now;
+            shoppinglist.UpdateTime = DateTime.UtcNow;
 
             dbContext.Attach(shoppinglist).State = EntityState.Modified;
 

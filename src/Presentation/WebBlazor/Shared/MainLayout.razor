@@ -1,0 +1,42 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>Stok</PageTitle>
+
+<MudThemeProvider IsDarkMode="true" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+
+    <MudAppBar>
+        <AuthorizeView>
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        </AuthorizeView>
+        <MudImage Src="/assets/s-logo-blue-white.png"
+                  Alt="Stok"
+                  Width="32"
+                  Elevation="25"
+                  Class="rounded-lg" />&nbsp;Stok
+        <MudSpacer />
+        <LoginDisplay />
+    </MudAppBar>
+    <AuthorizeView>
+        <MudDrawer @bind-Open="@_drawerOpen">
+            <NavMenu />
+        </MudDrawer>
+    </AuthorizeView>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}

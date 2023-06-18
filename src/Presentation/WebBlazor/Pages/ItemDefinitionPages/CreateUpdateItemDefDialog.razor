@@ -1,0 +1,205 @@
+﻿@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts;
+@using HomeInv.Common.ServiceContracts.Home;
+@using HomeInv.Common.ServiceContracts.ItemDefinition;
+
+@inject IItemDefinitionService itemDefinitionService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Home" Class="mr-3 mb-n1" /> @MudDialog.Title
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (!string.IsNullOrEmpty(itemDef.ImageName))
+        {
+            string imageSource = $"/uploads/{defHomeId}/{itemDef.ImageName}";
+            <MudImage Src="@(imageSource)"
+                  Alt="@itemDef.Name"
+                  Width="512"
+                  Elevation="25"
+                  Class="rounded-lg" />
+        }
+        <MudFileUpload T="IBrowserFile" FilesChanged="SetUploadedFile" id="uploadPhotoForItem">
+            <ButtonTemplate>
+                <MudFab HtmlTag="label"
+                        Color="Color.Primary"
+                        Icon="@Icons.Material.Filled.PhotoCamera"
+                        Label="Fotoğraf Yükle"
+                        for="uploadPhotoForItem" />
+            </ButtonTemplate>
+        </MudFileUpload>
+        @if (uploadedFile != null)
+        {
+            <MudItem>
+                @uploadedFile.Name <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="RemoveUploadedFile" />
+            </MudItem>
+        }
+        <MudTextField @bind-Value="itemDef.Name" Label="Ürün Adı" />
+        <MudTextField @bind-Value="itemDef.Description" Label="Açıklama" />
+
+        <MudSelect @bind-Value="selectedCategoryId" Label="Kategori" OpenIcon="@Icons.Material.Filled.Category" AdornmentColor="Color.Primary">
+            <MudSelectItem Value="0">-- Kategori Seçiniz --</MudSelectItem>
+            @if (allCategories != null)
+            {
+                foreach (CategoryEntity item in allCategories)
+                {
+                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                }
+            }
+        </MudSelect>
+
+        <MudSelect @bind-Value="selectedSizeUnitId" Label="Ölçü Birimi" Disabled="@(itemDef.Id > 0)" OpenIcon="@Icons.Material.Filled.FormatSize" AdornmentColor="Color.Primary">
+            <MudSelectItem Value="0">-- Ölçü Birimi Seçiniz --</MudSelectItem>
+            @if (allSizeUnits != null)
+            {
+                foreach (SizeUnitEntity item in allSizeUnits)
+                {
+                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                }
+            }
+        </MudSelect>
+
+        <MudCheckBox @bind-Checked="itemDef.IsExpirable" Label="Bozulan Bir Şey Mi?" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">İptal</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveInfo">Kaydet</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public ItemDefinitionEntity itemDef { get; set; } = new ItemDefinitionEntity();
+    [Parameter] public string userId { get; set; }
+    [Parameter] public int defHomeId { get; set; }
+    [Parameter] public List<CategoryEntity> allCategories { get; set; }
+    [Parameter] public List<SizeUnitEntity> allSizeUnits { get; set; }
+
+    [Parameter] public int selectedCategoryId { get; set; }
+    [Parameter] public int selectedSizeUnitId { get; set; }
+
+    long maxAllowedFileSize = 20 * 1024 * 1024;
+
+    IBrowserFile uploadedFile;
+    private void SetUploadedFile(IBrowserFile file)
+    {
+        if (file.Size < maxAllowedFileSize)
+        {
+            uploadedFile = file;
+        }
+        else
+        {
+            Snackbar.Add("Yüklenen dosya boyutu 20 MB'tan daha büyük olamaz, olmasın lütfen.", Severity.Warning);
+        }
+    }
+    private void RemoveUploadedFile()
+    {
+        uploadedFile = null;
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task SaveInfo()
+    {
+        string entityDisplayName = "Ürün tanımı";
+        BaseResponse response = new BaseResponse();
+        string successMessage;
+
+        string imageFileExtension = "";
+        if (uploadedFile != null && uploadedFile.Size > 0 && !string.IsNullOrEmpty(uploadedFile.Name))
+        {
+            imageFileExtension = uploadedFile.Name.Substring(uploadedFile.Name.LastIndexOf("."));
+        }
+
+        if (itemDef.Id > 0)
+        {
+            successMessage = $"{entityDisplayName} güncellendi";
+
+            var updateRequest = new UpdateItemDefinitionRequest()
+                {
+                    ItemDefinitionId = itemDef.Id,
+                    Name = itemDef.Name,
+                    Description = itemDef.Description,
+                    CategoryId = itemDef.CategoryId,
+                    IsExpirable = itemDef.IsExpirable,
+                    NewImageFileExtension = imageFileExtension,
+                    HomeId = defHomeId,
+                    RequestUserId = userId
+                };
+            response = itemDefinitionService.UpdateItemDefinition(updateRequest);
+
+            if (response.IsSuccessful && uploadedFile != null)
+            {
+                string fileName = ((UpdateItemDefinitionResponse)response).ImageFileName;
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    await UploadNewFile(fileName, itemDef.ImageName);
+                }
+            }
+        }
+        else
+        {
+            successMessage = $"{entityDisplayName} oluşturuldu";
+
+            itemDef.CategoryId = selectedCategoryId;
+            itemDef.SizeUnitId = selectedSizeUnitId;
+
+            var createRequest = new CreateItemDefinitionRequest()
+                {
+                    ItemEntity = itemDef,
+                    ImageFileExtension = imageFileExtension,
+                    HomeId = defHomeId,
+                    RequestUserId = userId
+                };
+            response = itemDefinitionService.CreateItemDefinition(createRequest);
+
+            if (response.IsSuccessful && uploadedFile != null)
+            {
+                string fileName = ((CreateItemDefinitionResponse)response).ImageFileName;
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    await UploadNewFile(fileName, null);
+                }
+            }
+        }
+
+        if (response.IsSuccessful)
+        {
+            Snackbar.Add(successMessage, Severity.Success);
+            if (response.Result.Messages.Count > 0)
+            {
+                foreach (var msg in response.Result.Messages)
+                {
+                    Snackbar.Add(msg.Text, (msg.Type == BaseResponse.OperationResult.OperationalMessage.MessageType.Info ? Severity.Info : Severity.Warning));
+                }
+            }
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Snackbar.Add($"Hata oldu: {response.Result.ToString()}", Severity.Error);
+        }
+    }
+
+    private async Task UploadNewFile(string fileName, string oldFileName)
+    {
+        var path = Path.Combine(Environment.CurrentDirectory, "wwwroot", "uploads", defHomeId.ToString());
+
+        if (!string.IsNullOrEmpty(oldFileName) && File.Exists(Path.Combine(path, oldFileName)))
+        {
+            File.Delete(Path.Combine(path, oldFileName));
+        }
+
+        Directory.CreateDirectory(path);
+
+        await using FileStream fs = new(Path.Combine(path, fileName), FileMode.Create);
+        await uploadedFile.OpenReadStream(maxAllowedFileSize).CopyToAsync(fs);
+    }
+}

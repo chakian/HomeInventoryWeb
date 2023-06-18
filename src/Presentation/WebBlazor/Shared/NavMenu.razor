@@ -1,0 +1,14 @@
+﻿<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Anasayfa</MudNavLink>
+    <MudNavLink Href="/shoppinglists" Match="NavLinkMatch.Prefix">Alışveriş Listeleri</MudNavLink>
+    <MudNavGroup Title="Stok Yönetimi" Expanded="true">
+        <MudNavLink Href="/itemdefinitions" Match="NavLinkMatch.Prefix">Ürün Tanımları</MudNavLink>
+        <MudNavLink Href="/categories" Match="NavLinkMatch.Prefix">Kategoriler</MudNavLink>
+    </MudNavGroup>
+    <MudNavGroup Title="Ev Yönetimi" Expanded="true">
+        <MudNavLink Href="/rooms" Match="NavLinkMatch.Prefix">Odalar</MudNavLink>
+        <MudNavLink Href="/homes" Match="NavLinkMatch.Prefix">Evler</MudNavLink>
+    </MudNavGroup>
+    <MudDivider />
+    <MudNavLink Href="/usersettings" Match="NavLinkMatch.Prefix">Ayarlar</MudNavLink>
+</MudNavMenu>

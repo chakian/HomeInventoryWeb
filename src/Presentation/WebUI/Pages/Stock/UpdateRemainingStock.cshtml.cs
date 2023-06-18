@@ -70,7 +70,7 @@ namespace WebUI.Pages.Stock
 
         private void InitializePage()
         {
-            ActionDate = DateTime.Now;
+            ActionDate = DateTime.UtcNow;
             ActionTarget = "";
             StockActionTypes = new List<SelectListItem>() {
                     new SelectListItem(){ Text = "Tuketildi", Value = ((int)ItemStockActionTypeEnum.Consumed).ToString(), Selected = true },

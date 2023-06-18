@@ -1,0 +1,73 @@
+﻿@using HomeInv.Common.Entities;
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.ServiceContracts;
+@using HomeInv.Common.ServiceContracts.Home;
+
+@inject IHomeService homeService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Home" Class="mr-3 mb-n1"/> @MudDialog.Title
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="home.Name" Label="Ev Adı" />
+        <MudTextField @bind-Value="home.Description" Label="Açıklama" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">İptal</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveInfo">Kaydet</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public HomeEntity home { get; set; } = new HomeEntity();
+    [Parameter] public string userId { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void SaveInfo()
+    {
+        string entityDisplayName = "Ev";
+        BaseResponse response;
+        string successMessage;
+        if(home.Id > 0)
+        {
+            successMessage = $"{entityDisplayName} güncellendi";
+
+            var updateHomeRequest = new UpdateHomeRequest()
+                {
+                    HomeEntity = home,
+                    RequestUserId = userId
+                };
+            response = homeService.UpdateHome(updateHomeRequest);
+        }
+        else
+        {
+            successMessage = $"{entityDisplayName} oluşturuldu";
+
+            var createHomeRequest = new CreateHomeRequest()
+                {
+                    HomeEntity = home,
+                    RequestUserId = userId
+                };
+            response = homeService.CreateHome(createHomeRequest);
+        }
+        
+        if (response.IsSuccessful)
+        {
+            Snackbar.Add(successMessage, Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Snackbar.Add($"Hata oldu: {response.Result.ToString()}", Severity.Error);
+        }
+    }
+}
