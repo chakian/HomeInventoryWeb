@@ -29,7 +29,7 @@ else
     <MudPaper>
         @foreach (var category in Categories)
         {
-            <CategoryListItem category="category" indent="1" homeId="UserSettings.DefaultHomeId" userId="UserSettings.UserId" />
+            <CategoryListItem category="category" indent="1" homeId="UserSettings.DefaultHomeId" userId="UserSettings.UserId" func="@(() => GetList())" />
         }
     </MudPaper>
 }
@@ -45,7 +45,7 @@ else
         GetList();
     }
 
-    protected void GetList()
+    protected bool GetList()
     {
         var request = new GetCategoriesOfHomeRequest()
             {
@@ -56,7 +56,13 @@ else
         if (categoriesResponse.IsSuccessful)
         {
             Categories = categoriesResponse.Categories;
+
+            StateHasChanged();
+
+            return true;
         }
+
+        return false;
     }
 
     async Task DisplayCreateCategory()

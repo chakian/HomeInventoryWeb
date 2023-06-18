@@ -19,7 +19,7 @@
                 <ChildContent>
                     @foreach (var child in category.Children)
                     {
-                        <CategoryListItem category="child" indent="2" homeId="@homeId" userId="@userId" />
+                        <CategoryListItem category="child" indent="2" homeId="@homeId" userId="@userId" func="@func" />
                     }
                 </ChildContent>
             </MudExpansionPanel>
@@ -42,6 +42,8 @@ else
 
     [Parameter] public int homeId { get; set; }
     [Parameter] public string userId { get; set; }
+
+    [Parameter] public Func<bool> func{ get; set; }
 
     async Task DisplayEditCategory()
     {
@@ -73,7 +75,7 @@ else
 
             if (!result.Canceled)
             {
-                //TODO: Trigger parent page to reload the list somehow
+                func.Invoke();
             }
         }
     }
