@@ -1,7 +1,6 @@
 ﻿@page "/usersettings"
 @using HomeInv.Common.Entities;
 @using HomeInv.Common.Interfaces.Services;
-@using HomeInv.Common.ServiceContracts.Area;
 @using HomeInv.Common.ServiceContracts.Category;
 @using HomeInv.Common.ServiceContracts.Home;
 @using HomeInv.Common.ServiceContracts.ItemDefinition;
@@ -19,6 +18,7 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject SignInManager<User> signInManager
 @inject UserManager<User> userManager
+@inject NavigationManager navigationManager
 
 @inject ISnackbar Snackbar
 
@@ -49,13 +49,12 @@ else
     string[] errors = { };
     MudForm? form;
 
-    List<HomeEntity> HomeList { get; set; } = null;
+    List<HomeEntity> HomeList { get; set; } = default!;
     int SelectedHomeId;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
-
+        GetUserSettings();
         var homeRequest = new GetHomesOfUserRequest()
             {
                 RequestUserId = UserSettings.UserId
@@ -66,7 +65,7 @@ else
         SelectedHomeId = UserSettings.DefaultHomeId;
     }
 
-    async Task SaveSettings()
+    void SaveSettings()
     {
         var updateUserSettingsRequest = new UpdateUserSettingsRequest()
             {

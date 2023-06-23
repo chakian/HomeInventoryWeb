@@ -12,16 +12,24 @@ build:
 
 after_build:
 - ps: >-
-    dotnet publish --self-contained -r win-x86 -o publish/WebBlazor -c Release src\Presentation\WebBlazor/WebBlazor.csproj
-
-    7z a WebBlazor.zip .\publish\WebBlazor\*
-
-    appveyor PushArtifact WebBlazor.zip
+    If ($env:APPVEYOR_REPO_BRANCH -eq "master" -Or $env:APPVEYOR_REPO_BRANCH -eq "staging") {
+        Write-Host "Starting publish"
+    
+        dotnet publish --self-contained -r win-x86 -o publish/WebBlazor -c Release src\Presentation\WebBlazor/WebBlazor.csproj
+        
+        7z a WebBlazor.zip .\publish\WebBlazor\*
+        
+        appveyor PushArtifact WebBlazor.zip
+    }
+    Else
+    {
+        Write-Host $env:APPVEYOR_REPO_BRANCH
+    }
 deploy:
  - provider: Environment
    name: Stok - Test
    on:
-     branch: blazor-app
+     branch: staging
 
  - provider: Environment
    name: Stok - LIVE

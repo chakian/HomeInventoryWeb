@@ -1,7 +1,6 @@
 ﻿@page "/homes"
 @using HomeInv.Common.Entities;
 @using HomeInv.Common.Interfaces.Services;
-@using HomeInv.Common.ServiceContracts.Area;
 @using HomeInv.Common.ServiceContracts.Category;
 @using HomeInv.Common.ServiceContracts.Home;
 @using HomeInv.Common.ServiceContracts.ItemDefinition;
@@ -11,11 +10,6 @@
 @using WebBlazor.Components;
 
 @inject IHomeService homeService
-
-@inject HomeInventoryDbContext dbContext
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject SignInManager<User> signInManager
-@inject UserManager<User> userManager
 
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
@@ -55,9 +49,9 @@ else
             <MudTh>Açıklama</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Edit"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
-            <MudTd DataLabel="Home Name">@(context.Name)</MudTd>
-            <MudTd DataLabel="Description">@(context.Description)</MudTd>
+            <MudTd DataLabel="Düzenle"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
+            <MudTd DataLabel="Ad">@(context.Name)</MudTd>
+            <MudTd DataLabel="Açıklama">@(context.Description)</MudTd>
         </RowTemplate>
     </MudTable>
 }
@@ -65,18 +59,18 @@ else
 <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
 
 @code {
-    List<HomeEntity> Homes { get; set; } = null;
-    public string SearchKeyword { get; set; } = string.Empty;
+    List<HomeEntity> Homes { get; set; } = default!;
+    public string SearchKeyword { get; set; } = default!;
 
-    HomeEntity SelectedHome { get; set; } = null;
+    HomeEntity SelectedHome { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
-        await GetList();
+        GetUserSettings();
+        GetList();
     }
 
-    protected async Task GetList()
+    protected void GetList()
     {
         var request = new GetHomesOfUserRequest()
             {
@@ -106,7 +100,7 @@ else
         return false;
     }
 
-    async Task DisplayEditDialog(HomeEntity home)
+    async Task DisplayEditDialog(HomeEntity? home)
     {
         string title = $"Ev Güncelleme: '{home?.Name}'";
 
@@ -127,7 +121,7 @@ else
 
         if (!result.Canceled)
         {
-            await GetList();
+            GetList();
         }
     }
 }

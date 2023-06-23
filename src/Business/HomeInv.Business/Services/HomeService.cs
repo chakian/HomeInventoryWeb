@@ -39,7 +39,7 @@ namespace HomeInv.Business.Services
 
         public CreateHomeResponse CreateHome(CreateHomeRequest request)
         {
-            CreateHomeResponse response = new CreateHomeResponse();
+            CreateHomeResponse response = new();
 
             var homesOfUser = GetHomesOfUserInternal(request.RequestUserId);
             if(homesOfUser != null && homesOfUser.Any(home => home.Name.Trim() == request.HomeEntity.Name.Trim()))
@@ -110,7 +110,7 @@ namespace HomeInv.Business.Services
         {
             var response = new GetHomesOfUserResponse();
             var homes = GetHomesOfUserInternal(request.RequestUserId);
-            List<HomeEntity> homeEntities = new List<HomeEntity>();
+            List<HomeEntity> homeEntities = new();
             foreach (var home in homes)
             {
                 homeEntities.Add(ConvertDboToEntity(home));

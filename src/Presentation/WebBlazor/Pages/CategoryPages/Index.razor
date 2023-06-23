@@ -15,6 +15,7 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject SignInManager<User> signInManager
 @inject UserManager<User> userManager
+@inject NavigationManager navigationManager
 
 @inherits AuthorizedComponentBase
 
@@ -37,11 +38,11 @@ else
 <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayCreateCategory())" />
 
 @code {
-    List<CategoryEntity> Categories { get; set; } = null;
+    List<CategoryEntity> Categories { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        GetUserSettings();
         GetList();
     }
 

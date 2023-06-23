@@ -13,11 +13,6 @@
 @inject ICategoryService categoryService
 @inject ISizeUnitService sizeUnitService
 
-@inject HomeInventoryDbContext dbContext
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject SignInManager<User> signInManager
-@inject UserManager<User> userManager
-
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 
@@ -65,19 +60,19 @@ else
             <MudTh>Bozulan Bir Şey Mi?</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Edit"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
-            <MudTd DataLabel="Item Image">
+            <MudTd DataLabel=""><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
+            <MudTd DataLabel="Görsel">
                 <MudImage Src="@(!string.IsNullOrEmpty(context.ImageName) ? $"/uploads/{UserSettings.DefaultHomeId}/{context.ImageName}" : $"/assets/s-logo-blue-white.png")"
                       Alt="@context.Name"
                       Width="64"
                       Elevation="25"
                       Class="rounded-lg" />
             </MudTd>
-            <MudTd DataLabel="Item Definition Name">@(context.Name)</MudTd>
-                <MudTd DataLabel="Description">@context.Description</MudTd>
-                <MudTd DataLabel="Category">@(context.CategoryName + (string.IsNullOrEmpty(context.CategoryFullName) ? "" : " (" + context.CategoryFullName + ")"))</MudTd>
-                <MudTd DataLabel="Size Unit">@(context.SizeUnitName)</MudTd>
-                <MudTd DataLabel="Is Expirable">@(context.IsExpirable ? "Evet" : "Hayır")</MudTd>
+            <MudTd DataLabel="Tanım adı">@(context.Name)</MudTd>
+                <MudTd DataLabel="Açıklama">@context.Description</MudTd>
+                <MudTd DataLabel="Kategori">@(context.CategoryName + (string.IsNullOrEmpty(context.CategoryFullName) ? "" : " (" + context.CategoryFullName + ")"))</MudTd>
+                <MudTd DataLabel="Ölçü">@(context.SizeUnitName)</MudTd>
+                <MudTd DataLabel="Bozulur Mu?">@(context.IsExpirable ? "Evet" : "Hayır")</MudTd>
             </RowTemplate>
         </MudTable>
 }
@@ -85,16 +80,16 @@ else
 <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
 
 @code {
-    List<ItemDefinitionEntity> ItemDefinitions { get; set; } = null;
+    List<ItemDefinitionEntity> ItemDefinitions { get; set; } = default!;
     public string SearchKeyword { get; set; } = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        GetUserSettings();
         GetList();
     }
 
-    protected async Task GetList()
+    protected void GetList()
     {
         var request = new GetAllItemDefinitionsInHomeRequest()
             {
@@ -129,7 +124,7 @@ else
         return false;
     }
 
-    async Task DisplayEditDialog(ItemDefinitionEntity entity)
+    async Task DisplayEditDialog(ItemDefinitionEntity? entity)
     {
         string title = $"Ürün tanımı güncelleme: '{entity?.Name}'";
 
@@ -159,7 +154,7 @@ else
 
         if (!result.Canceled)
         {
-            await GetList();
+            GetList();
         }
     }
 }

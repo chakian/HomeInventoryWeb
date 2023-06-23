@@ -27,7 +27,7 @@
             <ButtonTemplate>
                 <MudFab HtmlTag="label"
                         Color="Color.Primary"
-                        Icon="@Icons.Material.Filled.PhotoCamera"
+                        StartIcon="@Icons.Material.Filled.PhotoCamera"
                         Label="Fotoğraf Yükle"
                         for="uploadPhotoForItem" />
             </ButtonTemplate>
@@ -72,19 +72,19 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public ItemDefinitionEntity itemDef { get; set; } = new ItemDefinitionEntity();
-    [Parameter] public string userId { get; set; }
+    [Parameter] public string userId { get; set; } = default!;
     [Parameter] public int defHomeId { get; set; }
-    [Parameter] public List<CategoryEntity> allCategories { get; set; }
-    [Parameter] public List<SizeUnitEntity> allSizeUnits { get; set; }
+    [Parameter] public List<CategoryEntity> allCategories { get; set; } = default!;
+    [Parameter] public List<SizeUnitEntity> allSizeUnits { get; set; } = default!;
 
     [Parameter] public int selectedCategoryId { get; set; }
     [Parameter] public int selectedSizeUnitId { get; set; }
 
     long maxAllowedFileSize = 20 * 1024 * 1024;
 
-    IBrowserFile uploadedFile;
+    IBrowserFile? uploadedFile;
     private void SetUploadedFile(IBrowserFile file)
     {
         if (file.Size < maxAllowedFileSize)
@@ -188,8 +188,9 @@
         }
     }
 
-    private async Task UploadNewFile(string fileName, string oldFileName)
+    private async Task UploadNewFile(string fileName, string? oldFileName)
     {
+        if (uploadedFile == null) return;
         var path = Path.Combine(Environment.CurrentDirectory, "wwwroot", "uploads", defHomeId.ToString());
 
         if (!string.IsNullOrEmpty(oldFileName) && File.Exists(Path.Combine(path, oldFileName)))

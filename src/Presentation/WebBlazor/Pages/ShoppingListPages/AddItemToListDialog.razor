@@ -53,14 +53,14 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public int shoppingListId { get; set; }
     [Parameter] public int defHomeId { get; set; }
-    [Parameter] public string userId { get; set; }
+    [Parameter] public string userId { get; set; } = default!;
 
     ShopItem shopItem = new ShopItem();
-    List<ItemDefinitionEntity> itemDefinitions;
-    List<SizeUnitEntity> sizeUnits;
+    List<ItemDefinitionEntity> itemDefinitions = default!;
+    List<SizeUnitEntity> sizeUnits = default!;
 
     protected override void OnParametersSet()
     {
@@ -111,7 +111,7 @@
                 };
 
             dbContext.Add(shoppingListItem);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
 
             Snackbar.Add(successMessage, Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));

@@ -43,13 +43,13 @@ else
 }
 
 @code {
-    [Parameter] public CategoryEntity category { get; set; }
+    [Parameter] public CategoryEntity category { get; set; } = default!;
     [Parameter] public int indent { get; set; }
 
     [Parameter] public int homeId { get; set; }
-    [Parameter] public string userId { get; set; }
+    [Parameter] public string userId { get; set; } = default!;
 
-    [Parameter] public Func<bool> func{ get; set; }
+    [Parameter] public Func<bool> func { get; set; } = default!;
 
     async Task DisplayEditCategory()
     {
@@ -58,7 +58,7 @@ else
             {
                 HomeId = homeId
             }).Categories;
-        CategoryEntity editingCategory = tempCategoryList.SingleOrDefault(cat => cat.Id == id);
+        CategoryEntity? editingCategory = tempCategoryList.SingleOrDefault(cat => cat.Id == id);
 
         if (editingCategory != null)
         {
