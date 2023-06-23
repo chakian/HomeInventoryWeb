@@ -11,17 +11,14 @@ build:
   verbosity: minimal
 
 after_build:
-  on:
-    branches:
-      only:
-        - master
-        - staging
 - ps: >-
-    dotnet publish --self-contained -r win-x86 -o publish/WebBlazor -c Release src\Presentation\WebBlazor/WebBlazor.csproj
-
-    7z a WebBlazor.zip .\publish\WebBlazor\*
-
-    appveyor PushArtifact WebBlazor.zip
+    if ($env:APPVEYOR_REPO_BRANCH -eq "master" -And $env:APPVEYOR_REPO_BRANCH -eq "staging") {
+        dotnet publish --self-contained -r win-x86 -o publish/WebBlazor -c Release src\Presentation\WebBlazor/WebBlazor.csproj
+        
+        7z a WebBlazor.zip .\publish\WebBlazor\*
+        
+        appveyor PushArtifact WebBlazor.zip
+    }
 deploy:
  - provider: Environment
    name: Stok - Test
