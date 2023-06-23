@@ -40,9 +40,9 @@ else
 @code {
     List<CategoryEntity> Categories { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext, navigationManager);
+        GetUserSettings();
         GetList();
     }
 

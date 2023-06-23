@@ -34,8 +34,6 @@ builder.Services.AddScoped<IHomeUserService, HomeUserService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISizeUnitService, SizeUnitService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAreaService, AreaService>();
-builder.Services.AddScoped<IAreaUserService, AreaUserService>();
 builder.Services.AddScoped<IUserSettingService, UserSettingService>();
 builder.Services.AddScoped<IItemDefinitionService, ItemDefinitionService>();
 builder.Services.AddScoped<IItemStockService, ItemStockService>();

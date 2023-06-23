@@ -1,16 +1,23 @@
-﻿using HomeInv.Common.Entities;
+﻿using HomeInv.Business.Services;
+using HomeInv.Common.Entities;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 
 namespace WebBlazor.Components
 {
     public class AuthorizedComponentBase : ComponentBase
     {
+        [Inject] public HomeInventoryDbContext DbContext { get; set; } = default!;
+        [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
+        [Inject] public SignInManager<User> SignInManager { get; set; } = default!;
+        [Inject] public UserManager<User> UserManager { get; set; } = default!;
+        [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+
+        protected int DefaultAreaId { get; private set; }
         protected UserSettingEntity UserSettings { get; private set; } = default!;
         protected DialogOptions dialogOptions = new()
         {
@@ -25,20 +32,16 @@ namespace WebBlazor.Components
             return $"/uploads/{homeId}/{fileName}";
         }
 
-        protected async Task GetUserSettings(AuthenticationStateProvider authenticationStateProvider, 
-            SignInManager<User> signInManager, 
-            UserManager<User> userManager, 
-            HomeInventoryDbContext dbContext,
-            NavigationManager navigationManager)
+        protected void GetUserSettings()
         {
             string userId = "";
-            var authenticationState = await authenticationStateProvider.GetAuthenticationStateAsync();
-            if (signInManager.IsSignedIn(authenticationState.User))
+            var authenticationState = AuthenticationStateProvider.GetAuthenticationStateAsync().Result;
+            if (SignInManager.IsSignedIn(authenticationState.User))
             {
-                userId = userManager.GetUserId(authenticationState.User) ?? "";
+                userId = UserManager.GetUserId(authenticationState.User) ?? "";
                 if (!string.IsNullOrEmpty(userId))
                 {
-                    var settingDbo = await dbContext.UserSettings.SingleOrDefaultAsync(setting => setting.UserId == userId);
+                    var settingDbo = DbContext.UserSettings.SingleOrDefault(setting => setting.UserId == userId);
                     if (settingDbo != null)
                     {
                         UserSettings = new UserSettingEntity()
@@ -51,7 +54,7 @@ namespace WebBlazor.Components
                     {
                         // If the user does not have a settings record that means they haven't created a Home by themselves.
                         // check if they are part of a home
-                        var userHomes = await dbContext.HomeUsers.Where(hu => hu.UserId == userId).ToListAsync();
+                        var userHomes = DbContext.HomeUsers.Where(hu => hu.UserId == userId).ToList();
                         if (userHomes != null && userHomes.Any())
                         {
                             var _settingDbo = new UserSetting()
@@ -62,8 +65,8 @@ namespace WebBlazor.Components
                                 InsertUserId = userId,
                                 InsertTime = DateTime.UtcNow
                             };
-                            await dbContext.UserSettings.AddAsync(_settingDbo);
-                            await dbContext.SaveChangesAsync();
+                            DbContext.UserSettings.Add(_settingDbo);
+                            DbContext.SaveChanges();
 
                             UserSettings = new UserSettingEntity()
                             {
@@ -74,17 +77,38 @@ namespace WebBlazor.Components
                         else
                         {
                             UserSettings = new UserSettingEntity() { };
-                            WarnAndRedirectToHomeCreation(navigationManager);
+                            RedirectToHomeCreation();
+                            return;
                         }
+                    }
+
+                    int? _areaId = DbContext.Areas.FirstOrDefault(a => a.HomeId == UserSettings.DefaultHomeId)?.Id;
+                    if (_areaId == null)
+                    {
+                        Area defaultArea = new()
+                        {
+                            HomeId = UserSettings.DefaultHomeId,
+                            InsertTime = DateTime.UtcNow,
+                            InsertUserId= userId,
+                            IsActive= true,
+                            Name="Genel"
+                        };
+                        DbContext.Areas.Add(defaultArea);
+                        DbContext.SaveChanges();
+                        DefaultAreaId = defaultArea.Id;
+                    }
+                    else
+                    {
+                        DefaultAreaId = _areaId.Value;
                     }
                 }
             }
         }
 
-        private static void WarnAndRedirectToHomeCreation(NavigationManager navigationManager)
+        private void RedirectToHomeCreation()
         {
             string homeCreationPath = "/homes";
-            navigationManager.NavigateTo(homeCreationPath);
+            NavigationManager.NavigateTo(homeCreationPath);
         }
     }
 }

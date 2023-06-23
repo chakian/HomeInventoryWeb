@@ -1,7 +1,6 @@
 ﻿@page "/shoppinglists"
 @using HomeInv.Common.Entities;
 @using HomeInv.Common.Interfaces.Services;
-@using HomeInv.Common.ServiceContracts.Area;
 @using HomeInv.Common.ServiceContracts.Category;
 @using HomeInv.Common.ServiceContracts.Home;
 @using HomeInv.Common.ServiceContracts.ItemDefinition;
@@ -12,12 +11,6 @@
 @using WebBlazor.Components;
 
 @inject IHomeService homeService
-
-@inject HomeInventoryDbContext dbContext
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject SignInManager<User> signInManager
-@inject UserManager<User> userManager
-@inject NavigationManager navigationManager
 
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
@@ -47,10 +40,10 @@ else
                       Class="mt-0"></MudTextField>
         </ToolBarContent>
         <ColGroup>
-            <col style="width:20px;" />
             <col />
             <col />
-            <col style="width:140px;" />
+            <col />
+            <col />
         </ColGroup>
         <HeaderContent>
             <MudTh></MudTh>
@@ -59,14 +52,14 @@ else
             <MudTh></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Edit"><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
-            <MudTd DataLabel="List Name">
+            <MudTd DataLabel=""><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
+            <MudTd DataLabel="Liste adı">
                 <MudLink Href="@($"/shoppinglists/{context.Id}")">
                     @(context.Name)
                 </MudLink>
             </MudTd>
-            <MudTd DataLabel="Description">@context.Description</MudTd>
-            <MudTd DataLabel="Actions">
+            <MudTd DataLabel="Açıklama">@context.Description</MudTd>
+            <MudTd DataLabel="">
                 <MudIconButton Title="Tamamla" Icon="@Icons.Material.Filled.Check" OnClick="@(() => CompleteShoppingList(context))" />
                 <MudIconButton Title="Sil" Icon="@Icons.Material.Filled.DeleteForever" OnClick="@(() => DeleteShoppingList(context))" />
             </MudTd>
@@ -82,15 +75,15 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext, navigationManager);
+        GetUserSettings();
         await GetList();
     }
 
     protected async Task GetList()
     {
-        if (dbContext.ShoppingLists != null)
+        if (DbContext.ShoppingLists != null)
         {
-            ShoppingLists = await dbContext.ShoppingLists
+            ShoppingLists = await DbContext.ShoppingLists
                 .Where(sl => sl.HomeId == UserSettings.DefaultHomeId && sl.IsActive)
                 .Include(s => s.Items)
                 .Include(s => s.InsertUser)
@@ -99,19 +92,6 @@ else
         else
         {
             ShoppingLists = new List<ShoppingList>();
-        }
-    }
-
-    int _defaultAreaId = 0;
-    int defaultAreaId
-    {
-        get
-        {
-            if (_defaultAreaId == 0)
-            {
-                _defaultAreaId = dbContext.Areas.First(a => a.HomeId == UserSettings.DefaultHomeId).Id;
-            }
-            return _defaultAreaId;
         }
     }
 
@@ -142,34 +122,34 @@ else
             {
                 if (listItem.ItemDefinitionId != null && listItem.ItemDefinitionId > 0)
                 {
-                    var itemStock = dbContext.ItemStocks.FirstOrDefault(s => s.ItemDefinitionId == listItem.ItemDefinitionId);
+                    var itemStock = DbContext.ItemStocks.FirstOrDefault(s => s.ItemDefinitionId == listItem.ItemDefinitionId);
                     if (itemStock == null)
                     {
                         itemStock = new ItemStock()
                             {
-                                AreaId = defaultAreaId,
+                                AreaId = DefaultAreaId,
                                 InsertTime = DateTime.UtcNow,
                                 InsertUserId = UserSettings.UserId,
                                 IsActive = true,
                                 ItemDefinitionId = listItem.ItemDefinitionId.Value,
                                 RemainingAmount = listItem.Amount
                             };
-                        dbContext.Add(itemStock);
+                        DbContext.Add(itemStock);
                     }
                     else
                     {
                         itemStock.RemainingAmount += listItem.Amount;
                     }
-                    await dbContext.SaveChangesAsync();
+                    await DbContext.SaveChangesAsync();
                 }
             }
 
             entity.UpdateUserId = UserSettings.UserId;
             entity.UpdateTime = DateTime.UtcNow;
             entity.IsActive = false;
-            dbContext.Update(entity);
+            DbContext.Update(entity);
 
-            await dbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
 
             await GetList();
             StateHasChanged();
@@ -189,10 +169,10 @@ else
 
         if (!result.Canceled && (bool)result.Data == true)
         {
-            dbContext.RemoveRange(entity.Items);
-            dbContext.Remove(entity);
+            DbContext.RemoveRange(entity.Items);
+            DbContext.Remove(entity);
 
-            await dbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
 
             await GetList();
             StateHasChanged();
