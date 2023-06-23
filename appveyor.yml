@@ -12,7 +12,7 @@ build:
 
 after_build:
 - ps: >-
-    If ($env:APPVEYOR_REPO_BRANCH -eq "master" -And $env:APPVEYOR_REPO_BRANCH -eq "staging") {
+    If ($env:APPVEYOR_REPO_BRANCH -eq "master" -Or $env:APPVEYOR_REPO_BRANCH -eq "staging") {
         Write-Host "Starting publish"
     
         dotnet publish --self-contained -r win-x86 -o publish/WebBlazor -c Release src\Presentation\WebBlazor/WebBlazor.csproj
