@@ -4,7 +4,7 @@
                    Color="Color.Primary"
                    StartIcon="@Icons.Material.Filled.ManageAccounts"
                    Variant="Variant.Outlined">
-            Selam, @context.User.Identity?.Name!
+            Selam, @(context.User.Identity?.Name?.ToString().Substring(0, context.User.Identity?.Name?.ToString().IndexOf("@") ?? 0))!
         </MudButton>
         &nbsp;&nbsp;
         <form method="post" action="Identity/Account/LogOut">
