@@ -1,7 +1,6 @@
 ﻿@page "/usersettings"
 @using HomeInv.Common.Entities;
 @using HomeInv.Common.Interfaces.Services;
-@using HomeInv.Common.ServiceContracts.Area;
 @using HomeInv.Common.ServiceContracts.Category;
 @using HomeInv.Common.ServiceContracts.Home;
 @using HomeInv.Common.ServiceContracts.ItemDefinition;
@@ -53,10 +52,9 @@ else
     List<HomeEntity> HomeList { get; set; } = default!;
     int SelectedHomeId;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext, navigationManager);
-
+        GetUserSettings();
         var homeRequest = new GetHomesOfUserRequest()
             {
                 RequestUserId = UserSettings.UserId

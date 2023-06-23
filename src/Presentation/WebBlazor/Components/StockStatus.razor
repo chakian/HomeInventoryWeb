@@ -13,12 +13,7 @@
 @inject IItemDefinitionService _itemDefinitionService
 @inject IItemStockService _itemStockService
 @inject ISmartUpdateItemStockHandler _smartUpdateItemStockHandler
-
 @inject HomeInventoryDbContext dbContext
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject SignInManager<User> signInManager
-@inject UserManager<User> userManager
-@inject NavigationManager navigationManager
 
 @inherits AuthorizedComponentBase
 
@@ -36,6 +31,7 @@ else
               ReadOnly="false"
     @bind-SelectedItem="SelectedStock"
               CommitEditTooltip="Değişiklikleri Kaydet"
+              CancelEditTooltip="İptal"
               RowEditPreview="BackupItem"
               RowEditCancel="ResetItemToOriginalValues"
               RowEditCommit="ItemHasBeenCommitted"
@@ -56,7 +52,7 @@ else
                           Class="mt-0"></MudTextField>
         </ToolBarContent>
         <ColGroup>
-            <col style="width:50px;" />
+            @*<col style="width:50px;" />*@
             <col style="width:25%;" />
             <col />
             <col />
@@ -67,47 +63,34 @@ else
             <MudTh>Görsel</MudTh>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ItemStockOverview, object>(x=>x.ItemName)">Ürün Adı</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<ItemStockOverview, object>(x=>x.CategoryName)">Kategori</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<ItemStockOverview, object>(x=>x.AreaName)">Oda</MudTableSortLabel></MudTh>
             <MudTh>Stok</MudTh>
             <MudTh>Son Kullanma Tarihi</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Item Image">
+            <MudTd DataLabel="">
                 <MudImage Src="@(!string.IsNullOrEmpty(context.ImageName) ? $"/uploads/{UserSettings.DefaultHomeId}/{context.ImageName}" : $"/assets/s-logo-blue-white.png")"
                           Alt="@context.ItemName"
                           Width="64"
                           Elevation="25"
                           Class="rounded-lg" />
             </MudTd>
-            <MudTd DataLabel="Item Name">@context.ItemName</MudTd>
-            <MudTd DataLabel="Category Name">@context.CategoryName</MudTd>
-            <MudTd DataLabel="Area Name">@context.AreaName</MudTd>
-            <MudTd DataLabel="Current Stock Amount">
+            <MudTd DataLabel="Ad">@context.ItemName</MudTd>
+            <MudTd DataLabel="Kategori">@context.CategoryName</MudTd>
+            <MudTd DataLabel="Stok">
                 @(context.CurrentStockAmount + " " + context.SizeUnitName)
             </MudTd>
-            <MudTd DataLabel="Expiration Date">@(context.ExpirationDate == DateTime.MinValue ? "-" : context.ExpirationDate)</MudTd>
+            <MudTd DataLabel="Son Kullanma">@(context.ExpirationDate == DateTime.MinValue ? "-" : context.ExpirationDate)</MudTd>
             </RowTemplate>
             <RowEditingTemplate>
-                <MudTd DataLabel="Item Image">Image</MudTd>
-                <MudTd DataLabel="Item Name">
+                <MudTd DataLabel="Görsel">Image</MudTd>
+                <MudTd DataLabel="Ad">
                     <MudTextField @bind-Value="@context.ItemName" Required />
             </MudTd>
-            <MudTd DataLabel="Category Name">@context.CategoryName</MudTd>
-            <MudTd DataLabel="Area Name">
-                <MudSelect T="AreaEntity" Label="Oda" @bind-Value="context.Area" AnchorOrigin="Origin.BottomCenter">
-                    @if (AreaList != null)
-                    {
-                        foreach (var area in AreaList)
-                        {
-                            <MudSelectItem Value="area" />
-                        }
-                    }
-                </MudSelect>
-            </MudTd>
-            <MudTd DataLabel="Current Stock Amount">
+            <MudTd DataLabel="Kategori">@context.CategoryName</MudTd>
+            <MudTd DataLabel="Stok">
                 <MudNumericField @bind-Value="@context.CurrentStockAmount" Required />&nbsp;@(context.SizeUnitName)
             </MudTd>
-            <MudTd DataLabel="Expiration Date">
+            <MudTd DataLabel="Son Kullanma">
                 <MudDatePicker @bind-Date="context.ExpirationDate" Clearable="true"></MudDatePicker>
             </MudTd>
         </RowEditingTemplate>
@@ -119,21 +102,17 @@ else
 
 @code {
     List<ItemStockOverview>? OverviewList = null;
-    List<AreaEntity>? AreaList = null;
+    int AreaId = default!;
     ItemStockOverview SelectedStock = default!;
     public string SearchKeyword { get; set; } = string.Empty;
 
     private ItemStockOverview? elementBeforeEdit;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext, navigationManager);
+        GetUserSettings();
         GetList();
-        AreaList = dbContext.Areas.Where(a => a.HomeId == UserSettings.DefaultHomeId).Select(a => new AreaEntity()
-            {
-                Id = a.Id,
-                Name = a.Name
-            }).ToList();
+        AreaId = dbContext.Areas.First(a => a.HomeId == UserSettings.DefaultHomeId).Id;
     }
 
     private bool FilterFunc1(ItemStockOverview element) => FilterFunc(element, SearchKeyword);
@@ -145,7 +124,7 @@ else
             return true;
         if (element.CategoryName.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase))
             return true;
-        if ($"{element.AreaName} {element.ImageName}".Contains(searchKeyword))
+        if ($"{element.ImageName}".Contains(searchKeyword))
             return true;
         return false;
     }
@@ -156,8 +135,7 @@ else
             {
                 ItemName = ((ItemStockOverview)element).ItemName,
                 CurrentStockAmount = ((ItemStockOverview)element).CurrentStockAmount,
-                ExpirationDate = ((ItemStockOverview)element).ExpirationDate,
-                Area = ((ItemStockOverview)element).Area
+                ExpirationDate = ((ItemStockOverview)element).ExpirationDate
             };
     }
 
@@ -167,14 +145,13 @@ else
         {
             return;
         }
+
         string oldItemName = elementBeforeEdit.ItemName,
             newItemName = ((ItemStockOverview)element).ItemName;
         decimal oldStockAmount = elementBeforeEdit.CurrentStockAmount,
             newStockAmount = ((ItemStockOverview)element).CurrentStockAmount;
         DateTime? oldExpirationDate = elementBeforeEdit.ExpirationDate,
             newExpirationDate = ((ItemStockOverview)element).ExpirationDate;
-        int oldAreaId = elementBeforeEdit.AreaId,
-        newAreaId = ((ItemStockOverview)element).AreaId;
 
         int itemDefId = ((ItemStockOverview)element).ItemDefinitionId;
         int itemStockId = ((ItemStockOverview)element).StockId;
@@ -190,8 +167,7 @@ else
         }
 
         if (oldStockAmount != newStockAmount
-            || oldExpirationDate != newExpirationDate
-            || oldAreaId != newAreaId)
+            || oldExpirationDate != newExpirationDate)
         {
             var request = new SmartUpdateItemStockRequest()
                 {
@@ -202,7 +178,7 @@ else
             request.ItemStockDetail.Id = itemStockId;
             request.ItemStockDetail.RemainingAmount = newStockAmount;
             request.ItemStockDetail.ExpirationDate = newExpirationDate;
-            request.ItemStockDetail.AreaId = newAreaId;
+            request.ItemStockDetail.AreaId = AreaId;
             var response = _smartUpdateItemStockHandler.Execute(request);
 
             if (!response.IsSuccessful)
@@ -223,7 +199,6 @@ else
             ((ItemStockOverview)element).ItemName = elementBeforeEdit.ItemName;
             ((ItemStockOverview)element).CurrentStockAmount = elementBeforeEdit.CurrentStockAmount;
             ((ItemStockOverview)element).ExpirationDate = elementBeforeEdit.ExpirationDate;
-            ((ItemStockOverview)element).Area = elementBeforeEdit.Area;
         }
         else
         {
@@ -282,7 +257,6 @@ else
                 {
                     var stockOverview = overview.Clone();
                     stockOverview.StockId = stock.Id;
-                    stockOverview.Area = new AreaEntity() { Id = stock.AreaId, Name = stock.AreaName };
                     stockOverview.CurrentStockAmount = stock.Quantity;
                     stockOverview.ExpirationDate = definition.IsExpirable ? stock.ExpirationDate : DateTime.MinValue;
                     OverviewList.Add(stockOverview);
@@ -300,22 +274,6 @@ else
         public int StockId { get; set; }
         public int ItemDefinitionId { get; set; }
         public string ImageName { get; set; } = default!;
-
-        public int AreaId
-        {
-            get
-            {
-                return Area == null ? 0 : Area.Id;
-            }
-        }
-        public string AreaName
-        {
-            get
-            {
-                return Area == null ? "" : Area.Name;
-            }
-        }
-        public AreaEntity? Area { get; set; }
 
         public int SizeUnitId { get; set; }
         public string SizeUnitName { get; set; } = default!;
@@ -337,7 +295,6 @@ else
                     StockId = StockId,
                     ItemDefinitionId = ItemDefinitionId,
                     ImageName = ImageName,
-                    Area = AreaId == 0 ? null : new AreaEntity() { Id = AreaId, Name = AreaName },
                     SizeUnitId = SizeUnitId,
                     SizeUnitName = SizeUnitName,
                     ItemName = ItemName,
