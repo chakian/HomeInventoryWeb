@@ -21,6 +21,8 @@
 
 <MudText Typo="Typo.h4">Kategoriler</MudText>
 
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayCreateCategory())" />
+
 @if (Categories == null)
 {
     <MudProgressCircular Color="Color.Default" Indeterminate="true" />
