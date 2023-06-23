@@ -50,11 +50,10 @@ else
                       Class="mt-0"></MudTextField>
             </ToolBarContent>
             <ColGroup>
-                <col style="width:50px;" />
                 <col style="width:25%;" />
                 <col />
                 <col />
-                <col style="width:70px;" />
+                <col />
             </ColGroup>
             <HeaderContent>
                 <MudTh><MudTableSortLabel SortBy="new Func<ShopItem, object>(x=>x.Name)">Ürün Adı</MudTableSortLabel></MudTh>
@@ -246,12 +245,12 @@ else
                 }
                 else
                 {
-                    var sizeUnit = DbContext.SizeUnits.Find(item.SizeUnitId);
-
                     shopItem.Name = item.ItemName;
                     shopItem.Description = "";
                     shopItem.ItemDefinitionId = 0;
-                    shopItem.SizeUnitId = item.SizeUnitId ?? null;
+                    shopItem.SizeUnitId = item.SizeUnitId ?? 0;
+
+                    var sizeUnit = DbContext.SizeUnits.Find(item.SizeUnitId);
                     if (sizeUnit != null)
                     {
                         shopItem.SizeUnitName = sizeUnit.Description ?? sizeUnit.Name;
@@ -330,7 +329,7 @@ else
         public int? ItemDefinitionId { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Ölçü birimini seçmek lazım gibi görünüyor")]
-        public int? SizeUnitId { get; set; }
+        public int SizeUnitId { get; set; }
 
         public string SizeUnitName { get; set; } = "";
 

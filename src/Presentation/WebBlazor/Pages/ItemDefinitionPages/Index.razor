@@ -24,6 +24,8 @@
 }
 else
 {
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
+
     <MudTable Items="ItemDefinitions"
           Hover="true"
           Dense="true"
@@ -42,8 +44,8 @@ else
                       Class="mt-0"></MudTextField>
         </ToolBarContent>
         <ColGroup>
-            <col style="width:20px;" />
-            <col style="width:50px;" />
+            <col />
+            <col />
             <col />
             <col />
             <col />
