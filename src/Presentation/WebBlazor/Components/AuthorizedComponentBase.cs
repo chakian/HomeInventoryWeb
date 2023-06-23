@@ -4,14 +4,15 @@ using HomeInv.Persistence.Dbo;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 
 namespace WebBlazor.Components
 {
     public class AuthorizedComponentBase : ComponentBase
     {
-        protected UserSettingEntity UserSettings { get; private set; }
-        protected DialogOptions dialogOptions = new DialogOptions()
+        protected UserSettingEntity UserSettings { get; private set; } = default!;
+        protected DialogOptions dialogOptions = new()
         {
             MaxWidth = MaxWidth.Medium,
             FullWidth = true,
@@ -24,16 +25,20 @@ namespace WebBlazor.Components
             return $"/uploads/{homeId}/{fileName}";
         }
 
-        protected void GetUserSettings(AuthenticationStateProvider authenticationStateProvider, SignInManager<User> signInManager, UserManager<User> userManager, HomeInventoryDbContext dbContext)
+        protected async Task GetUserSettings(AuthenticationStateProvider authenticationStateProvider, 
+            SignInManager<User> signInManager, 
+            UserManager<User> userManager, 
+            HomeInventoryDbContext dbContext,
+            NavigationManager navigationManager)
         {
             string userId = "";
-            var authenticationState = authenticationStateProvider.GetAuthenticationStateAsync().Result;
+            var authenticationState = await authenticationStateProvider.GetAuthenticationStateAsync();
             if (signInManager.IsSignedIn(authenticationState.User))
             {
                 userId = userManager.GetUserId(authenticationState.User) ?? "";
                 if (!string.IsNullOrEmpty(userId))
                 {
-                    var settingDbo = dbContext.UserSettings.SingleOrDefault(setting => setting.UserId == userId);
+                    var settingDbo = await dbContext.UserSettings.SingleOrDefaultAsync(setting => setting.UserId == userId);
                     if (settingDbo != null)
                     {
                         UserSettings = new UserSettingEntity()
@@ -46,7 +51,7 @@ namespace WebBlazor.Components
                     {
                         // If the user does not have a settings record that means they haven't created a Home by themselves.
                         // check if they are part of a home
-                        var userHomes = dbContext.HomeUsers.Where(hu => hu.UserId == userId).ToList();
+                        var userHomes = await dbContext.HomeUsers.Where(hu => hu.UserId == userId).ToListAsync();
                         if (userHomes != null && userHomes.Any())
                         {
                             var _settingDbo = new UserSetting()
@@ -57,8 +62,8 @@ namespace WebBlazor.Components
                                 InsertUserId = userId,
                                 InsertTime = DateTime.UtcNow
                             };
-                            dbContext.UserSettings.Add(_settingDbo);
-                            dbContext.SaveChanges();
+                            await dbContext.UserSettings.AddAsync(_settingDbo);
+                            await dbContext.SaveChangesAsync();
 
                             UserSettings = new UserSettingEntity()
                             {
@@ -69,20 +74,17 @@ namespace WebBlazor.Components
                         else
                         {
                             UserSettings = new UserSettingEntity() { };
-                            WarnAndRedirectToHomeCreation();
+                            WarnAndRedirectToHomeCreation(navigationManager);
                         }
                     }
                 }
             }
         }
 
-        private void WarnAndRedirectToHomeCreation()
+        private static void WarnAndRedirectToHomeCreation(NavigationManager navigationManager)
         {
-            //string currentPath = context.ActionDescriptor.ViewEnginePath;
-            string homeCreationPath = "/Home/Create";
-
-            //SetInfoMessage(Resources.Warning_HomeNeededToUseTheApp);
-            //if (currentPath != homeCreationPath) context.Result = RedirectToPage(homeCreationPath);
+            string homeCreationPath = "/homes";
+            navigationManager.NavigateTo(homeCreationPath);
         }
     }
 }

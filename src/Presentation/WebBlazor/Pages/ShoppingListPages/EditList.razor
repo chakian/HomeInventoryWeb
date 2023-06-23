@@ -14,6 +14,7 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject SignInManager<User> signInManager
 @inject UserManager<User> userManager
+@inject NavigationManager navigationManager
 
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
@@ -117,11 +118,11 @@ else
 @code {
     [Parameter] public int Id { get; set; }
     ShoppingList? shoppingList;
-    List<ShopItem> listItems { get; set; }
-    ShopItem SelectedListItem { get; set; }
-    ShopItem elementBeforeEdit;
+    List<ShopItem> listItems { get; set; } = default!;
+    ShopItem SelectedListItem { get; set; } = default!;
+    ShopItem? elementBeforeEdit;
 
-    List<SizeUnitEntity> sizeUnitEntities { get; set; }
+    List<SizeUnitEntity> sizeUnitEntities { get; set; } = default!;
 
     protected override void OnParametersSet()
     {
@@ -135,7 +136,7 @@ else
 
     protected override void OnInitialized()
     {
-        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext, navigationManager).GetAwaiter().GetResult();
         sizeUnitEntities = sizeUnitService.GetAllSizes(new GetAllSizesRequest()
             {
                 RequestUserId = UserSettings.UserId
@@ -146,7 +147,12 @@ else
     {
         var editedElement = (ShopItem)element;
 
-        ShoppingListItem editingItem = dbContext.ShoppingListItems.Find(editedElement.Id);
+        ShoppingListItem? editingItem = dbContext.ShoppingListItems.Find(editedElement.Id);
+        if(editingItem == null)
+        {
+            return;
+        }
+
         editingItem.Amount = editedElement.Amount;
         editingItem.UpdateTime = DateTime.UtcNow;
         editingItem.UpdateUserId = UserSettings.UserId;
@@ -168,11 +174,14 @@ else
             editingItem.SizeUnitId = editedElement.SizeUnitId;
         }
 
-        dbContext.SaveChanges();
+        if (problem == false)
+        {
+            dbContext.SaveChanges();
 
-        GetList().GetAwaiter().GetResult();
+            GetList().GetAwaiter().GetResult();
 
-        Snackbar.Add($"{elementBeforeEdit.Name} başarıyla güncellendi", Severity.Success);
+            Snackbar.Add($"{elementBeforeEdit?.Name} başarıyla güncellendi", Severity.Success);
+        }
     }
     private void BackupItem(object element)
     {
@@ -189,6 +198,11 @@ else
     }
     private void ResetItemToOriginalValues(object element)
     {
+        if(elementBeforeEdit == null)
+        {
+            return;
+        }
+
         ((ShopItem)element).Id = elementBeforeEdit.Id;
         ((ShopItem)element).Name = elementBeforeEdit.Name;
         ((ShopItem)element).Description = elementBeforeEdit.Description;
@@ -216,9 +230,9 @@ else
     {
         listItems = new List<ShopItem>();
 
-        var items = dbContext.ShoppingListItems
+        var items = await dbContext.ShoppingListItems
             .Where(sli => sli.ShoppingListId == Id)
-            .Include(sli => sli.ItemDefinition).ToList();
+            .Include(sli => sli.ItemDefinition).ToListAsync();
         if (items != null && items.Count > 0)
         {
             foreach (var item in items)
@@ -232,7 +246,7 @@ else
                 {
                     shopItem.Name = item.ItemDefinition.Name;
                     shopItem.Description = item.ItemDefinition.Description;
-                    shopItem.ItemDefinitionId = item.ItemDefinitionId.Value;
+                    shopItem.ItemDefinitionId = item.ItemDefinitionId ?? null;
                     shopItem.SizeUnitId = item.ItemDefinition.SizeUnitId;
                     shopItem.SizeUnitName = item.ItemDefinition.SizeUnit.Description ?? item.ItemDefinition.SizeUnit.Name;
                 }
@@ -243,8 +257,11 @@ else
                     shopItem.Name = item.ItemName;
                     shopItem.Description = "";
                     shopItem.ItemDefinitionId = 0;
-                    shopItem.SizeUnitId = item.SizeUnitId.Value;
-                    shopItem.SizeUnitName = sizeUnit.Description ?? sizeUnit.Name;
+                    shopItem.SizeUnitId = item.SizeUnitId ?? null;
+                    if (sizeUnit != null)
+                    {
+                        shopItem.SizeUnitName = sizeUnit.Description ?? sizeUnit.Name;
+                    }
                 }
                 listItems.Add(shopItem);
             }
@@ -255,6 +272,11 @@ else
 
     async Task DisplayAddDialog()
     {
+        if(shoppingList == null)
+        {
+            return;    
+        }
+
         var parameters = new DialogParameters
             {
                 ["shoppingListId"] = shoppingList.Id,
@@ -284,14 +306,21 @@ else
         if (!result.Canceled && (bool)result.Data == true)
         {
             var realItem = dbContext.ShoppingListItems.Find(shopItem.Id);
-            dbContext.Remove(realItem);
+            if (realItem != null)
+            {
+                dbContext.Remove(realItem);
 
-            await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
 
-            GetList();
-            StateHasChanged();
+                await GetList();
+                StateHasChanged();
 
-            Snackbar.Add($"{shopItem.Name} silindi gitti", Severity.Success);
+                Snackbar.Add($"{shopItem.Name} silindi gitti", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"{shopItem.Name} silemedik, ne oldu biz de anlamadık", Severity.Error);
+            }
         }
     }
 
@@ -304,13 +333,14 @@ else
         public string Description { get; set; } = "";
 
         [Range(1, int.MaxValue, ErrorMessage = "Ürün tanımı seçmek lazım gibi görünüyor")]
-        public int ItemDefinitionId { get; set; }
+        public int? ItemDefinitionId { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Ölçü birimini seçmek lazım gibi görünüyor")]
-        public int SizeUnitId { get; set; }
+        public int? SizeUnitId { get; set; }
 
         public string SizeUnitName { get; set; } = "";
 
+        [Range(typeof(decimal), "0.01", "1000000000", ErrorMessage = "Ürün tanımı seçmek lazım gibi görünüyor")]
         public decimal Amount { get; set; }
 
         public DateTime ChangeTime { get; set; } = DateTime.UtcNow;

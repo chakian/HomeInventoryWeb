@@ -17,6 +17,7 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject SignInManager<User> signInManager
 @inject UserManager<User> userManager
+@inject NavigationManager navigationManager
 
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
@@ -85,16 +86,16 @@ else
 <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
 
 @code {
-    List<ItemDefinitionEntity> ItemDefinitions { get; set; } = null;
+    List<ItemDefinitionEntity> ItemDefinitions { get; set; } = default!;
     public string SearchKeyword { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        await GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext, navigationManager);
         GetList();
     }
 
-    protected async Task GetList()
+    protected void GetList()
     {
         var request = new GetAllItemDefinitionsInHomeRequest()
             {
@@ -129,7 +130,7 @@ else
         return false;
     }
 
-    async Task DisplayEditDialog(ItemDefinitionEntity entity)
+    async Task DisplayEditDialog(ItemDefinitionEntity? entity)
     {
         string title = $"Ürün tanımı güncelleme: '{entity?.Name}'";
 
@@ -159,7 +160,7 @@ else
 
         if (!result.Canceled)
         {
-            await GetList();
+            GetList();
         }
     }
 }

@@ -18,6 +18,7 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject SignInManager<User> signInManager
 @inject UserManager<User> userManager
+@inject NavigationManager navigationManager
 
 @inherits AuthorizedComponentBase
 
@@ -28,31 +29,31 @@
 else
 {
     <MudTable Items="OverviewList"
-          Hover="true"
-          Dense="true"
-          SortLabel="Sort By"
-          Filter="new Func<ItemStockOverview,bool>(FilterFunc1)"
-          ReadOnly="false"
-          @bind-SelectedItem="SelectedStock"
-          CommitEditTooltip="Değişiklikleri Kaydet"
-          RowEditPreview="BackupItem"
-          RowEditCancel="ResetItemToOriginalValues"
-          RowEditCommit="ItemHasBeenCommitted"
-          IsEditRowSwitchingBlocked="true"
-          ApplyButtonPosition="TableApplyButtonPosition.Start"
-          EditButtonPosition="TableEditButtonPosition.Start"
-          EditTrigger="TableEditTrigger.EditButton"
-          CanCancelEdit="true"
-          Elevation="0">
+              Hover="true"
+              Dense="true"
+              SortLabel="Sort By"
+              Filter="new Func<ItemStockOverview,bool>(FilterFunc1)"
+              ReadOnly="false"
+    @bind-SelectedItem="SelectedStock"
+              CommitEditTooltip="Değişiklikleri Kaydet"
+              RowEditPreview="BackupItem"
+              RowEditCancel="ResetItemToOriginalValues"
+              RowEditCommit="ItemHasBeenCommitted"
+              IsEditRowSwitchingBlocked="true"
+              ApplyButtonPosition="TableApplyButtonPosition.Start"
+              EditButtonPosition="TableEditButtonPosition.Start"
+              EditTrigger="TableEditTrigger.EditButton"
+              CanCancelEdit="true"
+              Elevation="0">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Stok Durumu</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="SearchKeyword"
-                      Placeholder="Arama çalışıyor"
-                      Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Filled.Search"
-                      IconSize="Size.Medium"
-                      Class="mt-0"></MudTextField>
+                          Placeholder="Arama çalışıyor"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium"
+                          Class="mt-0"></MudTextField>
         </ToolBarContent>
         <ColGroup>
             <col style="width:50px;" />
@@ -73,10 +74,10 @@ else
         <RowTemplate>
             <MudTd DataLabel="Item Image">
                 <MudImage Src="@(!string.IsNullOrEmpty(context.ImageName) ? $"/uploads/{UserSettings.DefaultHomeId}/{context.ImageName}" : $"/assets/s-logo-blue-white.png")"
-                      Alt="@context.ItemName"
-                      Width="64"
-                      Elevation="25"
-                      Class="rounded-lg" />
+                          Alt="@context.ItemName"
+                          Width="64"
+                          Elevation="25"
+                          Class="rounded-lg" />
             </MudTd>
             <MudTd DataLabel="Item Name">@context.ItemName</MudTd>
             <MudTd DataLabel="Category Name">@context.CategoryName</MudTd>
@@ -90,13 +91,16 @@ else
                 <MudTd DataLabel="Item Image">Image</MudTd>
                 <MudTd DataLabel="Item Name">
                     <MudTextField @bind-Value="@context.ItemName" Required />
-                </MudTd>
-                <MudTd DataLabel="Category Name">@context.CategoryName</MudTd>
-                <MudTd DataLabel="Area Name">
-                    <MudSelect T="AreaEntity" Label="Oda" @bind-Value="context.Area" AnchorOrigin="Origin.BottomCenter">
-                        @foreach (var area in AreaList)
+            </MudTd>
+            <MudTd DataLabel="Category Name">@context.CategoryName</MudTd>
+            <MudTd DataLabel="Area Name">
+                <MudSelect T="AreaEntity" Label="Oda" @bind-Value="context.Area" AnchorOrigin="Origin.BottomCenter">
+                    @if (AreaList != null)
                     {
-                        <MudSelectItem Value="area" />
+                        foreach (var area in AreaList)
+                        {
+                            <MudSelectItem Value="area" />
+                        }
                     }
                 </MudSelect>
             </MudTd>
@@ -114,16 +118,16 @@ else
 }
 
 @code {
-    List<ItemStockOverview> OverviewList = null;
-    List<AreaEntity> AreaList = null;
-    ItemStockOverview SelectedStock = null;
+    List<ItemStockOverview>? OverviewList = null;
+    List<AreaEntity>? AreaList = null;
+    ItemStockOverview SelectedStock = default!;
     public string SearchKeyword { get; set; } = string.Empty;
 
-    private ItemStockOverview elementBeforeEdit;
+    private ItemStockOverview? elementBeforeEdit;
 
     protected override async Task OnInitializedAsync()
     {
-        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        await GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext, navigationManager);
         GetList();
         AreaList = dbContext.Areas.Where(a => a.HomeId == UserSettings.DefaultHomeId).Select(a => new AreaEntity()
             {
@@ -159,6 +163,10 @@ else
 
     private void ItemHasBeenCommitted(object element)
     {
+        if(elementBeforeEdit == null)
+        {
+            return;
+        }
         string oldItemName = elementBeforeEdit.ItemName,
             newItemName = ((ItemStockOverview)element).ItemName;
         decimal oldStockAmount = elementBeforeEdit.CurrentStockAmount,
@@ -210,10 +218,17 @@ else
 
     private void ResetItemToOriginalValues(object element)
     {
-        ((ItemStockOverview)element).ItemName = elementBeforeEdit.ItemName;
-        ((ItemStockOverview)element).CurrentStockAmount = elementBeforeEdit.CurrentStockAmount;
-        ((ItemStockOverview)element).ExpirationDate = elementBeforeEdit.ExpirationDate;
-        ((ItemStockOverview)element).Area = elementBeforeEdit.Area;
+        if (elementBeforeEdit != null)
+        {
+            ((ItemStockOverview)element).ItemName = elementBeforeEdit.ItemName;
+            ((ItemStockOverview)element).CurrentStockAmount = elementBeforeEdit.CurrentStockAmount;
+            ((ItemStockOverview)element).ExpirationDate = elementBeforeEdit.ExpirationDate;
+            ((ItemStockOverview)element).Area = elementBeforeEdit.Area;
+        }
+        else
+        {
+            Snackbar.Add("Bir şeyler yolunda gitmedi. Değişiklikler kaydedilmedi; fakat geri de döndürülemedi... Burayı bir yenilemenizde fayda var.");
+        }
     }
 
     void GetList()
@@ -284,7 +299,7 @@ else
     {
         public int StockId { get; set; }
         public int ItemDefinitionId { get; set; }
-        public string ImageName { get; set; }
+        public string ImageName { get; set; } = default!;
 
         public int AreaId
         {
@@ -300,17 +315,17 @@ else
                 return Area == null ? "" : Area.Name;
             }
         }
-        public AreaEntity Area { get; set; } = null;
+        public AreaEntity? Area { get; set; }
 
         public int SizeUnitId { get; set; }
-        public string SizeUnitName { get; set; }
+        public string SizeUnitName { get; set; } = default!;
 
-        public string ItemName { get; set; }
-        public string ItemDescription { get; set; }
+        public string ItemName { get; set; } = default!;
+        public string ItemDescription { get; set; } = default!;
 
         public int CategoryId { get; set; }
-        public string CategoryName { get; set; }
-        public string CategoryParentNames { get; set; }
+        public string CategoryName { get; set; } = default!;
+        public string CategoryParentNames { get; set; } = default!;
 
         public DateTime? ExpirationDate { get; set; }
         public decimal CurrentStockAmount { get; set; }
@@ -322,7 +337,7 @@ else
                     StockId = StockId,
                     ItemDefinitionId = ItemDefinitionId,
                     ImageName = ImageName,
-                    Area = AreaId == null ? null : new AreaEntity() { Id = AreaId, Name = AreaName },
+                    Area = AreaId == 0 ? null : new AreaEntity() { Id = AreaId, Name = AreaName },
                     SizeUnitId = SizeUnitId,
                     SizeUnitName = SizeUnitName,
                     ItemName = ItemName,
