@@ -16,6 +16,7 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject SignInManager<User> signInManager
 @inject UserManager<User> userManager
+@inject NavigationManager navigationManager
 
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
@@ -65,18 +66,18 @@ else
 <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
 
 @code {
-    List<HomeEntity> Homes { get; set; } = null;
-    public string SearchKeyword { get; set; } = string.Empty;
+    List<HomeEntity> Homes { get; set; } = default!;
+    public string SearchKeyword { get; set; } = default!;
 
-    HomeEntity SelectedHome { get; set; } = null;
+    HomeEntity SelectedHome { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
-        await GetList();
+        await GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext, navigationManager);
+        GetList();
     }
 
-    protected async Task GetList()
+    protected void GetList()
     {
         var request = new GetHomesOfUserRequest()
             {
@@ -106,7 +107,7 @@ else
         return false;
     }
 
-    async Task DisplayEditDialog(HomeEntity home)
+    async Task DisplayEditDialog(HomeEntity? home)
     {
         string title = $"Ev Güncelleme: '{home?.Name}'";
 
@@ -127,7 +128,7 @@ else
 
         if (!result.Canceled)
         {
-            await GetList();
+            GetList();
         }
     }
 }

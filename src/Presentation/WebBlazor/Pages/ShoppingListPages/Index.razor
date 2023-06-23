@@ -17,6 +17,7 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject SignInManager<User> signInManager
 @inject UserManager<User> userManager
+@inject NavigationManager navigationManager
 
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
@@ -76,12 +77,12 @@ else
 <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
 
 @code {
-    List<ShoppingList> ShoppingLists { get; set; } = null;
-    public string SearchKeyword { get; set; } = string.Empty;
+    List<ShoppingList> ShoppingLists { get; set; } = default!;
+    public string SearchKeyword { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        await GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext, navigationManager);
         await GetList();
     }
 
@@ -200,7 +201,7 @@ else
         }
     }
 
-    async Task DisplayEditDialog(ShoppingList entity)
+    async Task DisplayEditDialog(ShoppingList? entity)
     {
         string title = $"Alışveriş Listesi Güncelleme: '{entity?.Name}'";
 

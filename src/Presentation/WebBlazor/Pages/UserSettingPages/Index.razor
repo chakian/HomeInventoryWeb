@@ -19,6 +19,7 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject SignInManager<User> signInManager
 @inject UserManager<User> userManager
+@inject NavigationManager navigationManager
 
 @inject ISnackbar Snackbar
 
@@ -49,12 +50,12 @@ else
     string[] errors = { };
     MudForm? form;
 
-    List<HomeEntity> HomeList { get; set; } = null;
+    List<HomeEntity> HomeList { get; set; } = default!;
     int SelectedHomeId;
 
     protected override async Task OnInitializedAsync()
     {
-        GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext);
+        await GetUserSettings(authenticationStateProvider, signInManager, userManager, dbContext, navigationManager);
 
         var homeRequest = new GetHomesOfUserRequest()
             {
@@ -66,7 +67,7 @@ else
         SelectedHomeId = UserSettings.DefaultHomeId;
     }
 
-    async Task SaveSettings()
+    void SaveSettings()
     {
         var updateUserSettingsRequest = new UpdateUserSettingsRequest()
             {

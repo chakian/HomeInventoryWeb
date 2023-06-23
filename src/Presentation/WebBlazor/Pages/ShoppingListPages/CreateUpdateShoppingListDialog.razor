@@ -25,10 +25,10 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public ShoppingList shoppingList { get; set; } = new ShoppingList();
     [Parameter] public int defHomeId { get; set; }
-    [Parameter] public string userId { get; set; }
+    [Parameter] public string userId { get; set; } = default!;
 
     private void Cancel()
     {

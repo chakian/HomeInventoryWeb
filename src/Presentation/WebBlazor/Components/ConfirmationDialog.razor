@@ -9,11 +9,11 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public string DialogText { get; set; } = "Onaylıyor musunuz?";
     [Parameter] public string CancelText { get; set; } = "İptal";
     [Parameter] public string SubmitText { get; set; } = "Onaylıyorum";
 
-    void Submit() => MudDialog.Close(DialogResult.Ok(true));
-    void Cancel() => MudDialog.Cancel();
+    void Submit() => MudDialog?.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog?.Cancel();
 }

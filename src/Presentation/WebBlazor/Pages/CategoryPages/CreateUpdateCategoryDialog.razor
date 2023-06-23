@@ -33,11 +33,11 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public CategoryEntity category { get; set; } = new CategoryEntity();
-    [Parameter] public List<CategoryEntity> allCategories { get; set; }
+    [Parameter] public List<CategoryEntity> allCategories { get; set; } = default!;
     [Parameter] public int homeId { get; set; }
-    [Parameter] public string userId { get; set; }
+    [Parameter] public string userId { get; set; } = default!;
     [Parameter] public int selectedParentCategoryId { get; set; }
 
     private void Cancel()
