@@ -95,19 +95,6 @@ else
         }
     }
 
-    int _defaultAreaId = 0;
-    int defaultAreaId
-    {
-        get
-        {
-            if (_defaultAreaId == 0)
-            {
-                _defaultAreaId = DbContext.Areas.First(a => a.HomeId == UserSettings.DefaultHomeId).Id;
-            }
-            return _defaultAreaId;
-        }
-    }
-
     private bool FilterFunc1(ShoppingList element) => FilterFunc(element, SearchKeyword);
     private bool FilterFunc(ShoppingList element, string searchKeyword)
     {
@@ -140,7 +127,7 @@ else
                     {
                         itemStock = new ItemStock()
                             {
-                                AreaId = defaultAreaId,
+                                AreaId = DefaultAreaId,
                                 InsertTime = DateTime.UtcNow,
                                 InsertUserId = UserSettings.UserId,
                                 IsActive = true,

@@ -16,7 +16,8 @@ namespace WebBlazor.Components
         [Inject] public SignInManager<User> SignInManager { get; set; } = default!;
         [Inject] public UserManager<User> UserManager { get; set; } = default!;
         [Inject] public NavigationManager NavigationManager { get; set; } = default!;
-        
+
+        protected int DefaultAreaId { get; private set; }
         protected UserSettingEntity UserSettings { get; private set; } = default!;
         protected DialogOptions dialogOptions = new()
         {
@@ -77,7 +78,28 @@ namespace WebBlazor.Components
                         {
                             UserSettings = new UserSettingEntity() { };
                             RedirectToHomeCreation();
+                            return;
                         }
+                    }
+
+                    int? _areaId = DbContext.Areas.FirstOrDefault(a => a.HomeId == UserSettings.DefaultHomeId)?.Id;
+                    if (_areaId == null)
+                    {
+                        Area defaultArea = new()
+                        {
+                            HomeId = UserSettings.DefaultHomeId,
+                            InsertTime = DateTime.UtcNow,
+                            InsertUserId= userId,
+                            IsActive= true,
+                            Name="Genel"
+                        };
+                        DbContext.Areas.Add(defaultArea);
+                        DbContext.SaveChanges();
+                        DefaultAreaId = defaultArea.Id;
+                    }
+                    else
+                    {
+                        DefaultAreaId = _areaId.Value;
                     }
                 }
             }

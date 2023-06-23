@@ -102,7 +102,6 @@ else
 
 @code {
     List<ItemStockOverview>? OverviewList = null;
-    int AreaId = default!;
     ItemStockOverview SelectedStock = default!;
     public string SearchKeyword { get; set; } = string.Empty;
 
@@ -112,7 +111,6 @@ else
     {
         GetUserSettings();
         GetList();
-        AreaId = dbContext.Areas.First(a => a.HomeId == UserSettings.DefaultHomeId).Id;
     }
 
     private bool FilterFunc1(ItemStockOverview element) => FilterFunc(element, SearchKeyword);
@@ -178,7 +176,7 @@ else
             request.ItemStockDetail.Id = itemStockId;
             request.ItemStockDetail.RemainingAmount = newStockAmount;
             request.ItemStockDetail.ExpirationDate = newExpirationDate;
-            request.ItemStockDetail.AreaId = AreaId;
+            request.ItemStockDetail.AreaId = DefaultAreaId;
             var response = _smartUpdateItemStockHandler.Execute(request);
 
             if (!response.IsSuccessful)
