@@ -7,6 +7,8 @@ using HomeInv.Common.Interfaces.Services;
 using HomeInv.Business.Services;
 using HomeInv.Business.Handlers;
 using MudBlazor.Services;
+using HomeInv.Common.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +42,11 @@ builder.Services.AddScoped<IItemStockService, ItemStockService>();
 builder.Services.AddScoped<IUpdateItemStockHandler, UpdateItemStockHandler>();
 builder.Services.AddScoped<IUpdateRemainingStockAmountHandler, UpdateRemainingStockAmountHandler>();
 builder.Services.AddScoped<ISmartUpdateItemStockHandler, SmartUpdateItemStockHandler>();
+
+builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
+builder.Services.Configure<EmailSenderOptions>(builder.Configuration.GetSection("EmailSenderOptions"));
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddMudServices();
 

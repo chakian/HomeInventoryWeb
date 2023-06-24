@@ -5,16 +5,24 @@ using HomeInv.Common.ServiceContracts.ItemStock;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace HomeInv.Business.Services;
 
 public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>, IItemStockService<ItemStock>
 {
-    public ItemStockService(HomeInventoryDbContext _context) : base(_context)
+    public IEmailSenderService emailSenderService { get; set; }
+    public IConfiguration configuration { get; set; }
+    public ItemStockService(HomeInventoryDbContext _context, 
+        IEmailSenderService _emailSenderService,
+        IConfiguration _configuration) : base(_context)
     {
+        emailSenderService = _emailSenderService;
+        configuration = _configuration;
     }
 
     public override ItemStockEntity ConvertDboToEntity(ItemStock dbo)
@@ -123,9 +131,61 @@ public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>
             CheckStockActionsAndDecideNeededAmount(statusList);
 
             result.Add(activeHome.Id, statusList.ToList());
+
+            if(homeId.HasValue == false && bool.TryParse(configuration.GetSection("SendSmartStockStatusEmail").Value, out bool sendMail) && sendMail)
+            {
+                StringBuilder bodyBuilder = new();
+
+                var neededList = statusList.Where(s => s.CurrentNeed == StockNeed.Needed).ToList();
+                if (neededList != null)
+                {
+                    AppendTableWithDetails(neededList, bodyBuilder, "Alınması Gerekenler", neededList.Any(s => s.NeededAmount > 0));
+                }
+                var maybeList = statusList.Where(s => s.CurrentNeed == StockNeed.NotSure).ToList();
+                if (maybeList != null)
+                {
+                    AppendTableWithDetails(maybeList, bodyBuilder, "Tam Emin Olunamayanlar", maybeList.Any(s => s.NeededAmount > 0));
+                }
+                var fineList = statusList.Where(s => s.CurrentNeed == StockNeed.Fine).ToList();
+                if (fineList != null)
+                {
+                    AppendTableWithDetails(fineList, bodyBuilder, "Yeterli Stoğu Olanlar", fineList.Any(s => s.NeededAmount > 0));
+                }
+
+                MailRequest mailRequest = new()
+                {
+                    Subject = $"{DateTime.Today.ToString("dd MMMM yyyy")} tarihli stok raporu",
+                    ToEmailList = recipientList,
+                    Body = bodyBuilder.ToString()
+                };
+                emailSenderService.SendEmailAsync(mailRequest).GetAwaiter().GetResult();
+            }
         }
 
         return result;
+    }
+
+    private static void AppendTableWithDetails(List<StockStatus> statusList, StringBuilder bodyBuilder, string header, bool includeNeededAmount)
+    {
+        bodyBuilder.AppendLine($"<h1>{header}</h1>");
+        bodyBuilder.AppendLine("<table>");
+        bodyBuilder.AppendLine("<thead>");
+        bodyBuilder.AppendLine("<th>Ürün</th>");
+        bodyBuilder.AppendLine("<th>Mevcut Stok</th>");
+        if (includeNeededAmount) bodyBuilder.AppendLine("<th>Alınması gereken miktar</th>");
+        bodyBuilder.AppendLine("<th>Not</th>");
+        bodyBuilder.AppendLine("</thead>");
+        foreach (var item in statusList)
+        {
+            bodyBuilder.AppendLine("<tr>");
+            bodyBuilder.Append($"<td>{item.ItemDefinitionName}</td>");
+            bodyBuilder.Append($"<td>{item.CurrentStock}</td>");
+            if (includeNeededAmount) bodyBuilder.Append($"<td>{item.NeededAmount} {item.SizeUnit.Description ?? item.SizeUnit.Name}</td>");
+            bodyBuilder.Append($"<td>{item.Note}</td>");
+            bodyBuilder.Append("</tr>");
+        }
+        bodyBuilder.AppendLine("</table>");
+        bodyBuilder.AppendLine("<br/><hr/><br/>");
     }
 
     private class StockChange
@@ -236,7 +296,7 @@ public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>
                 {
                     stat.CurrentNeed = StockNeed.Fine;
                     stat.NeededAmount = 0;
-                    stat.Note = $"En son {latestIncrease.ChangeDate.ToLocalTime().Date} tarihinde {latestIncrease.Amount} kadar eklenmiş ve sonra hiç tüketilmemiş. Alınması gerekiyor mu emin değilim.";
+                    stat.Note = $"En son {latestIncrease.ChangeDate.ToLocalTime().Date.ToString("dd MMMM yyyy")} tarihinde {latestIncrease.Amount} kadar eklenmiş ve sonra hiç tüketilmemiş. Alınması gerekiyor mu emin değilim.";
                 }
             }
             else
@@ -252,7 +312,7 @@ public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>
                 {
                     stat.CurrentNeed = StockNeed.NotSure;
                     stat.NeededAmount = latestDecrease.Amount;
-                    stat.Note = $"En son {latestDecrease.ChangeDate.ToLocalTime().Date} tarihinde {latestDecrease.Amount} kadar tüketilmiş. Alınması gerekiyor mu emin değilim.";
+                    stat.Note = $"En son {latestDecrease.ChangeDate.ToLocalTime().Date.ToString("dd MMMM yyyy")} tarihinde {latestDecrease.Amount} kadar tüketilmiş. Alınması gerekiyor mu emin değilim.";
                 }
             }
         }
