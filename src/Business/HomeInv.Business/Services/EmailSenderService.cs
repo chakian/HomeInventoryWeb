@@ -5,6 +5,7 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -20,33 +21,43 @@ public class EmailSenderService : IEmailSenderService
     // TODO: Sample: https://codewithmukesh.com/blog/send-emails-with-aspnet-core/
     public async Task SendEmailAsync(MailRequest mailRequest)
     {
-        var emailMessage = new MimeMessage();
-        emailMessage.Sender = MailboxAddress.Parse(_emailSenderOptions.SenderAddress);
-        emailMessage.To.Add(MailboxAddress.Parse(mailRequest.ToEmail));
-        emailMessage.Subject = mailRequest.Subject;
-        var builder = new BodyBuilder();
-        if (mailRequest.Attachments != null)
+        try
         {
-            byte[] fileBytes;
-            foreach (var file in mailRequest.Attachments)
+            var emailMessage = new MimeMessage();
+            emailMessage.Sender = MailboxAddress.Parse(_emailSenderOptions.SenderAddress);
+            foreach (var toEmail in mailRequest.ToEmailList)
             {
-                if (file.Length > 0)
+                emailMessage.To.Add(MailboxAddress.Parse(toEmail));
+            }
+            emailMessage.Subject = mailRequest.Subject;
+            var builder = new BodyBuilder();
+            if (mailRequest.Attachments != null)
+            {
+                byte[] fileBytes;
+                foreach (var file in mailRequest.Attachments)
                 {
-                    using (var ms = new MemoryStream())
+                    if (file.Length > 0)
                     {
-                        file.CopyTo(ms);
-                        fileBytes = ms.ToArray();
+                        using (var ms = new MemoryStream())
+                        {
+                            file.CopyTo(ms);
+                            fileBytes = ms.ToArray();
+                        }
+                        builder.Attachments.Add(file.FileName, fileBytes, MimeKit.ContentType.Parse(file.ContentType));
                     }
-                    builder.Attachments.Add(file.FileName, fileBytes, MimeKit.ContentType.Parse(file.ContentType));
                 }
             }
+            builder.HtmlBody = mailRequest.Body;
+            emailMessage.Body = builder.ToMessageBody();
+            using var smtp = new SmtpClient();
+            smtp.Connect(_emailSenderOptions.SmtpServer, _emailSenderOptions.SmtpPort, SecureSocketOptions.StartTls);
+            smtp.Authenticate(_emailSenderOptions.SenderAddress, _emailSenderOptions.SenderPassword);
+            await smtp.SendAsync(emailMessage);
+            smtp.Disconnect(true);
         }
-        builder.HtmlBody = mailRequest.Body;
-        emailMessage.Body = builder.ToMessageBody();
-        using var smtp = new SmtpClient();
-        smtp.Connect(_emailSenderOptions.SmtpServer, _emailSenderOptions.SmtpPort, SecureSocketOptions.StartTls);
-        smtp.Authenticate(_emailSenderOptions.SenderAddress, _emailSenderOptions.SenderPassword);
-        await smtp.SendAsync(emailMessage);
-        smtp.Disconnect(true);
+        catch(Exception ex)
+        {
+            string error = ex.Message;
+        }
     }
 }
