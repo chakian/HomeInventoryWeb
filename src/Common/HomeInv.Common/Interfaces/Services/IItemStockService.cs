@@ -1,4 +1,6 @@
-﻿using HomeInv.Common.ServiceContracts.ItemStock;
+﻿using HomeInv.Common.Models;
+using HomeInv.Common.ServiceContracts.ItemStock;
+using System.Collections.Generic;
 
 namespace HomeInv.Common.Interfaces.Services
 {
@@ -11,5 +13,6 @@ namespace HomeInv.Common.Interfaces.Services
     {
         GetItemStocksByItemDefinitionIdsResponse GetItemStocksByItemDefinitionIds(GetItemStocksByItemDefinitionIdsRequest request);
         GetSingleItemStockResponse GetSingleItemStock(GetSingleItemStockRequest request);
+        Dictionary<int, List<StockStatus>> CheckStocksPrepareShoppingListAndSendEmail(int? homeId);
     }
 }

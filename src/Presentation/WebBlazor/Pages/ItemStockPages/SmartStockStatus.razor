@@ -1,0 +1,97 @@
+﻿@page "/smartstockstatus"
+@using HomeInv.Common.Interfaces.Services;
+@using WebBlazor.Components;
+
+@inject IHttpContextAccessor httpContextAccessor
+@inject IConfiguration configuration
+
+@inject IItemStockService _itemStockService
+
+@inherits AuthorizedComponentBase
+
+@if (SmartStock == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    if (SmartStock.Any(s => s.CurrentNeed == HomeInv.Common.Models.StockNeed.Needed))
+    {
+        <MudTable Items="SmartStock.Where(s => s.CurrentNeed == HomeInv.Common.Models.StockNeed.Needed)"
+                  Hover="true"
+                  ReadOnly="true"
+                  Elevation="0">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Almak Lazım</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Ürün</MudTh>
+                <MudTh>Mevcut stok</MudTh>
+                <MudTh>Alınacak</MudTh>
+                <MudTh>Not</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Ürün">@(context.ItemDefinitionName)</MudTd>
+                <MudTd DataLabel="Mevcut stok">@(context.CurrentStock)</MudTd>
+                <MudTd DataLabel="Alınacak">@($"{context.NeededAmount} {context.SizeUnit.Description ?? context.SizeUnit.Name}")</MudTd>
+                <MudTd DataLabel="Not">@(context.Note)</MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+    if (SmartStock.Any(s => s.CurrentNeed == HomeInv.Common.Models.StockNeed.NotSure))
+    {
+        <MudTable Items="SmartStock.Where(s => s.CurrentNeed == HomeInv.Common.Models.StockNeed.NotSure)"
+                  Hover="true"
+                  ReadOnly="true"
+                  Elevation="0">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Emin Değiliz</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Ürün</MudTh>
+                <MudTh>Mevcut stok</MudTh>
+                <MudTh>Alınacak</MudTh>
+                <MudTh>Not</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Ürün">@(context.ItemDefinitionName)</MudTd>
+                    <MudTd DataLabel="Mevcut stok">@(context.CurrentStock)</MudTd>
+                    <MudTd DataLabel="Alınacak">@($"{context.NeededAmount} {context.SizeUnit.Description ?? context.SizeUnit.Name}")</MudTd>
+                    <MudTd DataLabel="Not">@(context.Note)</MudTd>
+                </RowTemplate>
+            </MudTable>
+    }
+    if (SmartStock.Any(s => s.CurrentNeed == HomeInv.Common.Models.StockNeed.Fine))
+    {
+        <MudTable Items="SmartStock.Where(s => s.CurrentNeed == HomeInv.Common.Models.StockNeed.Fine)"
+                  Hover="true"
+                  ReadOnly="true"
+                  Elevation="0">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">İyi</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Ürün</MudTh>
+                <MudTh>Mevcut stok</MudTh>
+                <MudTh>Alınacak</MudTh>
+                <MudTh>Not</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Ürün">@(context.ItemDefinitionName)</MudTd>
+                    <MudTd DataLabel="Mevcut stok">@(context.CurrentStock)</MudTd>
+                    <MudTd DataLabel="Alınacak">@($"{context.NeededAmount} {context.SizeUnit.Description ?? context.SizeUnit.Name}")</MudTd>
+                    <MudTd DataLabel="Not">@(context.Note)</MudTd>
+                </RowTemplate>
+            </MudTable>
+    }
+}
+
+@code {
+    public List<HomeInv.Common.Models.StockStatus>? SmartStock { get; set; }
+
+    protected override void OnInitialized()
+    {
+        GetUserSettings();
+        SmartStock = _itemStockService.CheckStocksPrepareShoppingListAndSendEmail(UserSettings.DefaultHomeId)[UserSettings.DefaultHomeId];
+    }
+}
