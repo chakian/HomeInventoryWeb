@@ -1,0 +1,26 @@
+﻿@page "/stockchecker"
+@using HomeInv.Common.Interfaces.Services;
+@using HomeInv.Common.Models;
+@using System.Text;
+
+@inject IHttpContextAccessor httpContextAccessor
+@inject IConfiguration configuration
+
+@inject IItemStockService _itemStockService
+@inject IEmailSenderService _emailSenderService
+
+@code {
+    private string? headerKey { get; set; }
+
+    protected override void OnInitialized()
+    {
+        headerKey = httpContextAccessor.HttpContext?.Request.Headers["headerKey"];
+        string configHeaderKey = configuration.GetSection("HeaderKey").Value;
+        if (string.IsNullOrEmpty(headerKey) || headerKey != configHeaderKey)
+        {
+            return;
+        }
+
+        _itemStockService.CheckStocksPrepareShoppingListAndSendEmail(null);
+    }
+}
