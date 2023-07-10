@@ -1,3 +1,8 @@
+using HomeInv.Business.Handlers;
+using HomeInv.Business.Services;
+using HomeInv.Common.Configuration;
+using HomeInv.Common.Interfaces.Handlers;
+using HomeInv.Common.Interfaces.Services;
 using HomeInv.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -45,6 +50,23 @@ builder.Services.AddVersionedApiExplorer(setup =>
     setup.GroupNameFormat = "'v'VVV";
     setup.SubstituteApiVersionInUrl = true;
 });
+
+/// Application service injections
+builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<IHomeUserService, HomeUserService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+//builder.Services.AddScoped<ISizeUnitService, SizeUnitService>(); // TODO: Throws an error about a MemoryCache dependency
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserSettingService, UserSettingService>();
+builder.Services.AddScoped<IItemDefinitionService, ItemDefinitionService>();
+builder.Services.AddScoped<IItemStockService, ItemStockService>();
+builder.Services.AddScoped<IUpdateItemStockHandler, UpdateItemStockHandler>();
+builder.Services.AddScoped<IUpdateRemainingStockAmountHandler, UpdateRemainingStockAmountHandler>();
+builder.Services.AddScoped<ISmartUpdateItemStockHandler, SmartUpdateItemStockHandler>();
+
+builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
+builder.Services.Configure<EmailSenderOptions>(builder.Configuration.GetSection("EmailSenderOptions"));
+/// Application service injections
 
 var app = builder.Build();
 
