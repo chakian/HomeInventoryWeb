@@ -6,7 +6,7 @@ namespace WebAPI.Extensions;
 
 public static class MapsterConfigurationExtension
 {
-    public static void RegisterMapsterConfiguration(this IServiceCollection services)
+    public static void RegisterMapsterConfiguration()
     {
         TypeAdapterConfig<User, UserRegistrationDto>
             .ForType();

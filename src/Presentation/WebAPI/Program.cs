@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.Middlewares;
+using WebAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +25,8 @@ builder.Services.AddIdentity<HomeInv.Persistence.Dbo.User, IdentityRole>(options
 })
     .AddEntityFrameworkStores<HomeInventoryDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.ConfigureJWT(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -74,13 +76,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseWhen(
-    context => context.Request.Path.StartsWithSegments("/api"),
-    appBuilder =>
-    {
-        appBuilder.UseMiddleware<ApiKeyMiddleware>();
-    }
-    );
 
 app.Run();
