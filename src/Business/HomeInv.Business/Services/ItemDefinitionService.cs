@@ -1,4 +1,5 @@
-﻿using HomeInv.Common.Entities;
+﻿using HomeInv.Business.Extensions;
+using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.ItemDefinition;
 using HomeInv.Language;
@@ -7,6 +8,7 @@ using HomeInv.Persistence.Dbo;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HomeInv.Business.Services
 {
@@ -46,6 +48,7 @@ namespace HomeInv.Business.Services
                     entity.CategoryFullName = parentsNames;
                 }
             }
+            entity.IsActive = dbo.IsActive;
             return entity;
         }
 
@@ -130,7 +133,7 @@ namespace HomeInv.Business.Services
             var queryableList = context.ItemDefinitions
                 .Include(item => item.Category)
                 .Include(item => item.SizeUnit)
-                .Where(item => item.Category.HomeId == request.HomeId)
+                .Where(item => item.IsActive && item.Category.HomeId == request.HomeId)
                 .AsQueryable();
             if (request.AreaId > 0)
             {
@@ -218,6 +221,26 @@ namespace HomeInv.Business.Services
                 }
 
                 context.SaveChanges();
+            }
+
+            return response;
+        }
+
+        public async Task<DeleteItemDefinitionResponse> DeleteItemDefinition(DeleteItemDefinitionRequest request)
+        {
+            var response = new DeleteItemDefinitionResponse();
+
+            if (request.ItemDefinitionId <= 0)
+            {
+                response.AddError("Ürün tanımı olmadan item tanımı silişi yapılamaz!");
+            }
+
+            if (response.IsSuccessful)
+            {
+                var item = await context.ItemDefinitions.FindAsync(request.ItemDefinitionId);
+                item.IsActive = false;
+                item.SetUpdateAuditValues(request);
+                await context.SaveChangesAsync();
             }
 
             return response;

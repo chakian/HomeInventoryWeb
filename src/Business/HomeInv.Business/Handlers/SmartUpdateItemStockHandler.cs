@@ -1,15 +1,11 @@
-﻿using HomeInv.Common.Constants;
+﻿using HomeInv.Business.Extensions;
+using HomeInv.Common.Constants;
 using HomeInv.Common.Interfaces.Handlers;
-using HomeInv.Common.ServiceContracts;
 using HomeInv.Common.ServiceContracts.ItemStock;
-using HomeInv.Language;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeInv.Business.Handlers
 {
@@ -62,10 +58,7 @@ namespace HomeInv.Business.Handlers
                     IsExpirable = request.ItemDefinitionDetail.IsExpirable,
                     ImageName = request.ItemDefinitionDetail.ImageName,
                     SizeUnitId = request.ItemDefinitionDetail.SizeUnitId,
-                    IsActive = true,
-                    InsertTime = DateTime.UtcNow,
-                    InsertUserId = request.RequestUserId
-                };
+                }.SetCreateAuditValues(request);
                 _context.ItemDefinitions.Add(itemDefinition);
                 _context.SaveChanges();
             }
@@ -106,14 +99,11 @@ namespace HomeInv.Business.Handlers
 
             if (_context.Entry(itemStock).State == Microsoft.EntityFrameworkCore.EntityState.Added)
             {
-                itemStock.IsActive = true;
-                itemStock.InsertTime = DateTime.UtcNow;
-                itemStock.InsertUserId = request.RequestUserId;
+                itemStock.SetCreateAuditValues(request);
             }
             else
             {
-                itemStock.UpdateUserId = request.RequestUserId;
-                itemStock.UpdateTime = DateTime.UtcNow;
+                itemStock.SetUpdateAuditValues(request);
             }
             _context.SaveChanges();
 
@@ -137,10 +127,7 @@ namespace HomeInv.Business.Handlers
                 ActionDate = request.ActionDate,
                 ActionTarget = request.ActionTarget,
                 Price = request.Price,
-                IsActive = true,
-                InsertUserId = request.RequestUserId,
-                InsertTime = DateTime.UtcNow
-            };
+            }.SetCreateAuditValues(request);
             _context.ItemStockActions.Add(action);
             _context.SaveChanges();
 
