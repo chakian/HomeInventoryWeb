@@ -68,6 +68,7 @@
     <DialogActions>
         <MudButton OnClick="Cancel">İptal</MudButton>
         <MudButton Color="Color.Primary" OnClick="SaveInfo">Kaydet</MudButton>
+        <MudButton Color="Color.Error" OnClick="DeleteItemDefinition" Disabled="itemDef.Id == 0">Sil</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -202,5 +203,52 @@
 
         await using FileStream fs = new(Path.Combine(path, fileName), FileMode.Create);
         await uploadedFile.OpenReadStream(maxAllowedFileSize).CopyToAsync(fs);
+    }
+
+    private async Task DeleteItemDefinition()
+    {
+        string entityDisplayName = "Ürün tanımı";
+        BaseResponse response = new BaseResponse();
+        string successMessage;
+
+        string imageFileExtension = "";
+        if (uploadedFile != null && uploadedFile.Size > 0 && !string.IsNullOrEmpty(uploadedFile.Name))
+        {
+            imageFileExtension = uploadedFile.Name.Substring(uploadedFile.Name.LastIndexOf("."));
+        }
+
+        if (itemDef.Id > 0)
+        {
+            var deleteRequest = new DeleteItemDefinitionRequest()
+                {
+                    ItemDefinitionId = itemDef.Id,
+                    HomeId = defHomeId,
+                    RequestUserId = userId
+                };
+            response = await itemDefinitionService.DeleteItemDefinition(deleteRequest);
+
+            successMessage = $"{entityDisplayName} silindi";
+
+            if (response.IsSuccessful)
+            {
+                Snackbar.Add(successMessage, Severity.Success);
+                if (response.Result.Messages.Count > 0)
+                {
+                    foreach (var msg in response.Result.Messages)
+                    {
+                        Snackbar.Add(msg.Text, (msg.Type == BaseResponse.OperationResult.OperationalMessage.MessageType.Info ? Severity.Info : Severity.Warning));
+                    }
+                }
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Snackbar.Add($"Silerken hata oldu: {response.Result.ToString()}", Severity.Error);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Bunun asla olmaması gerekirdi. Var olmayan ürün tanımı silinmeye çalışıldı. Neyse ki yakaladık, şu an sorun yok.", Severity.Error);
+        }
     }
 }

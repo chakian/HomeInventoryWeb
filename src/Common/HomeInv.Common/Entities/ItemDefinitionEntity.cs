@@ -20,5 +20,7 @@ namespace HomeInv.Common.Entities
 
         public int SizeUnitId { get; set; }
         public string SizeUnitName { get; set; }
+
+        public bool IsActive { get; set; }
     }
 }

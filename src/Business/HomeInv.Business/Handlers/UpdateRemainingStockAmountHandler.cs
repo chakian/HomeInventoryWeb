@@ -1,4 +1,5 @@
-﻿using HomeInv.Common.Constants;
+﻿using HomeInv.Business.Extensions;
+using HomeInv.Common.Constants;
 using HomeInv.Common.Interfaces.Handlers;
 using HomeInv.Common.ServiceContracts.ItemStock;
 using HomeInv.Persistence;
@@ -76,8 +77,7 @@ namespace HomeInv.Business.Handlers
                 }
 
                 currentStock.RemainingAmount = _remainingAmount;
-                currentStock.UpdateUserId = request.RequestUserId;
-                currentStock.UpdateTime = DateTime.UtcNow;
+                currentStock.SetUpdateAuditValues(request);
 
                 _context.Entry(currentStock).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             }
@@ -91,10 +91,7 @@ namespace HomeInv.Business.Handlers
                 ActionDate = request.ActionDate,
                 ActionTarget = request.ActionTarget,
                 //Price = request.Price,
-                IsActive = true,
-                InsertUserId = request.RequestUserId,
-                InsertTime = DateTime.UtcNow
-            };
+            }.SetCreateAuditValues(request);
             _context.ItemStockActions.Add(action);
             _context.SaveChanges();
 
