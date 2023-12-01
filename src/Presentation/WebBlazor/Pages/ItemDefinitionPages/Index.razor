@@ -26,6 +26,8 @@ else
 {
     <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
 
+    <MudCheckBox T="bool" Checked="IncludeInactives" CheckedChanged="@(e => HandleCheck((bool)e))">Pasifleri de getir</MudCheckBox>
+
     <MudTable Items="ItemDefinitions"
           Hover="true"
           Dense="true"
@@ -51,6 +53,10 @@ else
             <col />
             <col />
             <col />
+            @if (IncludeInactives)
+            {
+                <col />
+            }
         </ColGroup>
         <HeaderContent>
             <MudTh></MudTh>
@@ -60,34 +66,49 @@ else
             <MudTh><MudTableSortLabel SortBy="new Func<ItemDefinitionEntity, object>(x=>x.CategoryName)">Kategori</MudTableSortLabel></MudTh>
             <MudTh>Ölçü Birimi</MudTh>
             <MudTh>Bozulan Bir Şey Mi?</MudTh>
+            @if (IncludeInactives)
+            {
+                <MudTh>Aktif?</MudTh>
+            }
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel=""><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
             <MudTd DataLabel="Görsel">
-                <MudImage Src="@(!string.IsNullOrEmpty(context.ImageName) ? $"/uploads/{UserSettings.DefaultHomeId}/{context.ImageName}" : $"/assets/s-logo-blue-white.png")"
-                      Alt="@context.Name"
-                      Width="64"
-                      Elevation="25"
-                      Class="rounded-lg" />
+            <MudImage Src="@(!string.IsNullOrEmpty(context.ImageName) ? $"/uploads/{UserSettings.DefaultHomeId}/{context.ImageName}" : $"/assets/s-logo-blue-white.png")"
+                    Alt="@context.Name"
+                    Width="64"
+                    Elevation="25"
+                    Class="rounded-lg" />
             </MudTd>
             <MudTd DataLabel="Tanım adı">@(context.Name)</MudTd>
-                <MudTd DataLabel="Açıklama">@context.Description</MudTd>
-                <MudTd DataLabel="Kategori">@(context.CategoryName + (string.IsNullOrEmpty(context.CategoryFullName) ? "" : " (" + context.CategoryFullName + ")"))</MudTd>
-                <MudTd DataLabel="Ölçü">@(context.SizeUnitName)</MudTd>
-                <MudTd DataLabel="Bozulur Mu?">@(context.IsExpirable ? "Evet" : "Hayır")</MudTd>
-            </RowTemplate>
-        </MudTable>
+            <MudTd DataLabel="Açıklama">@context.Description</MudTd>
+            <MudTd DataLabel="Kategori">@(context.CategoryName + (string.IsNullOrEmpty(context.CategoryFullName) ? "" : " (" + context.CategoryFullName + ")"))</MudTd>
+            <MudTd DataLabel="Ölçü">@(context.SizeUnitName)</MudTd>
+            <MudTd DataLabel="Bozulur Mu?">@(context.IsExpirable ? "Evet" : "Hayır")</MudTd>
+                @if (IncludeInactives)
+            {
+                <MudTd DataLabel="Aktif?">@(context.IsActive ? "Evet" : "Hayır")</MudTd>
+            }
+        </RowTemplate>
+    </MudTable>
 }
 
 <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@((e) => DisplayEditDialog(null))" />
 
 @code {
     List<ItemDefinitionEntity> ItemDefinitions { get; set; } = default!;
+    bool IncludeInactives { get; set; } = false;
     public string SearchKeyword { get; set; } = string.Empty;
 
     protected override void OnInitialized()
     {
         GetUserSettings();
+        GetList();
+    }
+
+    private void HandleCheck(bool value)
+    {
+        IncludeInactives = value;
         GetList();
     }
 
@@ -98,7 +119,7 @@ else
                 HomeId = UserSettings.DefaultHomeId,
                 RequestUserId = UserSettings.UserId
             };
-        var response = itemDefinitionService.GetAllItemDefinitionsInHome(request, true);
+        var response = itemDefinitionService.GetAllItemDefinitionsInHome(request, IncludeInactives);
 
         if (!response.IsSuccessful)
         {
