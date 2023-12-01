@@ -1,15 +1,12 @@
-﻿using HomeInv.Common.Constants;
+﻿using HomeInv.Business.Extensions;
+using HomeInv.Common.Constants;
 using HomeInv.Common.Interfaces.Handlers;
-using HomeInv.Common.ServiceContracts;
 using HomeInv.Common.ServiceContracts.ItemStock;
 using HomeInv.Language;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeInv.Business.Handlers
 {
@@ -62,19 +59,14 @@ namespace HomeInv.Business.Handlers
                         AreaId = request.AreaId,
                         ExpirationDate = request.ExpirationDate,
                         RemainingAmount = request.Size,
-                        IsActive = true,
-                        InsertUserId = request.RequestUserId,
-                        InsertTime = DateTime.UtcNow
-                    };
-
+                    }.SetCreateAuditValues(request);
                     _context.ItemStocks.Add(currentStock);
                     _context.SaveChanges();
                 }
                 else
                 {
                     currentStock.RemainingAmount += request.Size;
-                    currentStock.UpdateUserId = request.RequestUserId;
-                    currentStock.UpdateTime = DateTime.UtcNow;
+                    currentStock.SetUpdateAuditValues(request);
 
                     _context.Entry(currentStock).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                 }
@@ -88,8 +80,7 @@ namespace HomeInv.Business.Handlers
                 else
                 {
                     currentStock.RemainingAmount -= request.Size;
-                    currentStock.UpdateUserId = request.RequestUserId;
-                    currentStock.UpdateTime = DateTime.UtcNow;
+                    currentStock.SetUpdateAuditValues(request);
 
                     _context.Entry(currentStock).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                 }
