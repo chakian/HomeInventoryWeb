@@ -95,10 +95,7 @@ namespace HomeInv.Business.Handlers
                 ActionDate = request.ActionDate,
                 ActionTarget= request.ActionTarget,
                 Price= request.Price,
-                IsActive=true,
-                InsertUserId = request.RequestUserId,
-                InsertTime = DateTime.UtcNow
-            };
+            }.SetCreateAuditValues(request);
             _context.ItemStockActions.Add(action);
             _context.SaveChanges();
 
