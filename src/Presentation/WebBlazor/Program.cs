@@ -8,7 +8,6 @@ using HomeInv.Business.Services;
 using HomeInv.Business.Handlers;
 using MudBlazor.Services;
 using HomeInv.Common.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +25,13 @@ builder.Services.AddDefaultIdentity<HomeInv.Persistence.Dbo.User>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
 }).AddEntityFrameworkStores<HomeInventoryDbContext>();
+
+builder.Services.AddAuthentication()
+    .AddGoogle(googleOptions =>
+    {
+        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    });
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
