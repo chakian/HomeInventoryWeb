@@ -42,10 +42,11 @@ else
 @code {
     List<CategoryEntity> Categories { get; set; } = default!;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        GetUserSettings();
+        await GetUserSettingsAsync();
         GetList();
+        await base.OnInitializedAsync();
     }
 
     protected bool GetList()

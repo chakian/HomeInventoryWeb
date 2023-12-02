@@ -107,10 +107,11 @@ else
 
     private ItemStockOverview? elementBeforeEdit;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        GetUserSettings();
+        await GetUserSettingsAsync();
         GetList();
+        await base.OnInitializedAsync();
     }
 
     private bool FilterFunc1(ItemStockOverview element) => FilterFunc(element, SearchKeyword);

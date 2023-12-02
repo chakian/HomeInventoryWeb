@@ -85,10 +85,11 @@ else
     List<ItemDefinitionEntity> ItemDefinitions { get; set; } = default!;
     public string SearchKeyword { get; set; } = string.Empty;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        GetUserSettings();
+        await GetUserSettingsAsync();
         GetList();
+        await base.OnInitializedAsync();
     }
 
     protected void GetList()

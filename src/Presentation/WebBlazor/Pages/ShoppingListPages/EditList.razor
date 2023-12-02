@@ -127,13 +127,14 @@ else
         }
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        GetUserSettings();
+        await GetUserSettingsAsync();
         sizeUnitEntities = sizeUnitService.GetAllSizes(new GetAllSizesRequest()
             {
                 RequestUserId = UserSettings.UserId
             }).SizeUnits;
+        await base.OnInitializedAsync();
     }
 
     private void ItemHasBeenCommitted(object element)
