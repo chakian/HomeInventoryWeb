@@ -52,9 +52,10 @@ else
     List<HomeEntity> HomeList { get; set; } = default!;
     int SelectedHomeId;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        GetUserSettings();
+        await GetUserSettingsAsync();
+
         var homeRequest = new GetHomesOfUserRequest()
             {
                 RequestUserId = UserSettings.UserId
@@ -63,6 +64,8 @@ else
         HomeList = homesResponse.Homes;
 
         SelectedHomeId = UserSettings.DefaultHomeId;
+
+        await base.OnInitializedAsync();
     }
 
     void SaveSettings()

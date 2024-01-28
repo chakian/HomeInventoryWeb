@@ -1,10 +1,10 @@
-﻿using HomeInv.Business.Services;
-using HomeInv.Common.Entities;
+﻿using HomeInv.Common.Entities;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 
 namespace WebBlazor.Components
@@ -32,16 +32,17 @@ namespace WebBlazor.Components
             return $"/uploads/{homeId}/{fileName}";
         }
 
-        protected void GetUserSettings()
+        protected async Task GetUserSettingsAsync()
         {
             string userId = "";
-            var authenticationState = AuthenticationStateProvider.GetAuthenticationStateAsync().Result;
+            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             if (SignInManager.IsSignedIn(authenticationState.User))
             {
-                userId = UserManager.GetUserId(authenticationState.User) ?? "";
+                var user = await UserManager.GetUserAsync(authenticationState.User);
+                userId = await UserManager.GetUserIdAsync(user) ?? "";
                 if (!string.IsNullOrEmpty(userId))
                 {
-                    var settingDbo = DbContext.UserSettings.SingleOrDefault(setting => setting.UserId == userId);
+                    var settingDbo = await DbContext.UserSettings.SingleOrDefaultAsync(setting => setting.UserId == userId);
                     if (settingDbo != null)
                     {
                         UserSettings = new UserSettingEntity()
@@ -54,7 +55,7 @@ namespace WebBlazor.Components
                     {
                         // If the user does not have a settings record that means they haven't created a Home by themselves.
                         // check if they are part of a home
-                        var userHomes = DbContext.HomeUsers.Where(hu => hu.UserId == userId).ToList();
+                        var userHomes = await DbContext.HomeUsers.Where(hu => hu.UserId == userId).ToListAsync();
                         if (userHomes != null && userHomes.Any())
                         {
                             var _settingDbo = new UserSetting()
@@ -65,8 +66,8 @@ namespace WebBlazor.Components
                                 InsertUserId = userId,
                                 InsertTime = DateTime.UtcNow
                             };
-                            DbContext.UserSettings.Add(_settingDbo);
-                            DbContext.SaveChanges();
+                            await DbContext.UserSettings.AddAsync(_settingDbo);
+                            await DbContext.SaveChangesAsync();
 
                             UserSettings = new UserSettingEntity()
                             {
@@ -77,24 +78,24 @@ namespace WebBlazor.Components
                         else
                         {
                             UserSettings = new UserSettingEntity() { };
-                            RedirectToHomeCreation();
+                            await RedirectToHomeCreationAsync();
                             return;
                         }
                     }
 
-                    int? _areaId = DbContext.Areas.FirstOrDefault(a => a.HomeId == UserSettings.DefaultHomeId)?.Id;
+                    int? _areaId = (await DbContext.Areas.FirstOrDefaultAsync(a => a.HomeId == UserSettings.DefaultHomeId))?.Id;
                     if (_areaId == null)
                     {
                         Area defaultArea = new()
                         {
                             HomeId = UserSettings.DefaultHomeId,
                             InsertTime = DateTime.UtcNow,
-                            InsertUserId= userId,
-                            IsActive= true,
-                            Name="Genel"
+                            InsertUserId = userId,
+                            IsActive = true,
+                            Name = "Genel"
                         };
-                        DbContext.Areas.Add(defaultArea);
-                        DbContext.SaveChanges();
+                        await DbContext.Areas.AddAsync(defaultArea);
+                        await DbContext.SaveChangesAsync();
                         DefaultAreaId = defaultArea.Id;
                     }
                     else
@@ -105,10 +106,14 @@ namespace WebBlazor.Components
             }
         }
 
-        private void RedirectToHomeCreation()
+        private async Task RedirectToHomeCreationAsync()
         {
-            string homeCreationPath = "/homes";
-            NavigationManager.NavigateTo(homeCreationPath);
+            if (!NavigationManager.Uri.Contains("/homes"))
+            {
+                string homeCreationPath = "/homes";
+                NavigationManager.NavigateTo(homeCreationPath);
+            }
+            await Task.Yield();
         }
     }
 }
