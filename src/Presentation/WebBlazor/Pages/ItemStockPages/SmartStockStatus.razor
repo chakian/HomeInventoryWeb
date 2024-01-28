@@ -89,9 +89,10 @@ else
 @code {
     public List<HomeInv.Common.Models.StockStatus>? SmartStock { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        GetUserSettings();
+        await GetUserSettingsAsync();
         SmartStock = _itemStockService.CheckStocksPrepareShoppingListAndSendEmail(UserSettings.DefaultHomeId)[UserSettings.DefaultHomeId];
+        await base.OnInitializedAsync();
     }
 }

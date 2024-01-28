@@ -100,10 +100,11 @@ else
     bool IncludeInactives { get; set; } = false;
     public string SearchKeyword { get; set; } = string.Empty;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        GetUserSettings();
+        await GetUserSettingsAsync();
         GetList();
+        await base.OnInitializedAsync();
     }
 
     private void HandleCheck(bool value)
