@@ -95,8 +95,6 @@ public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>
         {
             // Clear status list
             statusList = new();
-            // Get recipient list of the home
-            List<string> recipientList = context.HomeUsers.Where(hu => hu.IsActive && hu.HomeId == activeHome.Id).Select(hu => hu.User.Email).ToList();
 
             // Find all item definitions in the home
             context.ItemDefinitions
@@ -152,6 +150,9 @@ public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>
                     AppendTableWithDetails(fineList, bodyBuilder, "Yeterli Stoğu Olanlar", fineList.Any(s => s.NeededAmount > 0));
                 }
 
+                // Get recipient list of the home
+                List<string> recipientList = context.HomeUsers.Where(hu => hu.IsActive && hu.HomeId == activeHome.Id).Select(hu => hu.User.Email).ToList();
+                // Send the mail
                 MailRequest mailRequest = new()
                 {
                     Subject = $"{DateTime.Today.ToString("dd MMMM yyyy")} tarihli stok raporu",
