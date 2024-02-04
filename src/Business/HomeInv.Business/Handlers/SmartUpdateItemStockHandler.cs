@@ -56,7 +56,6 @@ namespace HomeInv.Business.Handlers
                     CategoryId = request.ItemDefinitionDetail.CategoryId,
                     Description = request.ItemDefinitionDetail.Description,
                     IsExpirable = request.ItemDefinitionDetail.IsExpirable,
-                    ImageName = request.ItemDefinitionDetail.ImageName,
                     SizeUnitId = request.ItemDefinitionDetail.SizeUnitId,
                 }.SetCreateAuditValues(request);
                 _context.ItemDefinitions.Add(itemDefinition);

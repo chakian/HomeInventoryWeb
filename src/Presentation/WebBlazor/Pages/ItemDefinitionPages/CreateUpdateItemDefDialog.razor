@@ -1,8 +1,9 @@
 ﻿@using HomeInv.Common.Entities;
 @using HomeInv.Common.Interfaces.Services;
 @using HomeInv.Common.ServiceContracts;
-@using HomeInv.Common.ServiceContracts.Home;
 @using HomeInv.Common.ServiceContracts.ItemDefinition;
+@using HomeInv.Common.Utils
+@using HomeInv.Common.Constants
 
 @inject IItemDefinitionService itemDefinitionService
 @inject ISnackbar Snackbar
@@ -14,12 +15,11 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        @if (!string.IsNullOrEmpty(itemDef.ImageName))
+        @if (!string.IsNullOrEmpty(itemDef.ImageUrl))
         {
-            string imageSource = $"/uploads/{defHomeId}/{itemDef.ImageName}";
-            <MudImage Src="@(imageSource)"
+            <MudImage Src="@(itemDef.ImageUrl)"
                   Alt="@itemDef.Name"
-                  Width="512"
+                  Width="125"
                   Elevation="25"
                   Class="rounded-lg" />
         }
@@ -83,12 +83,10 @@
     [Parameter] public int selectedCategoryId { get; set; }
     [Parameter] public int selectedSizeUnitId { get; set; }
 
-    long maxAllowedFileSize = 20 * 1024 * 1024;
-
     IBrowserFile? uploadedFile;
     private void SetUploadedFile(IBrowserFile file)
     {
-        if (file.Size < maxAllowedFileSize)
+        if (file.Size < GlobalConstants.MaxAllowedFileSize)
         {
             uploadedFile = file;
         }
@@ -113,10 +111,13 @@
         BaseResponse response = new BaseResponse();
         string successMessage;
 
-        string imageFileExtension = "";
         if (uploadedFile != null && uploadedFile.Size > 0 && !string.IsNullOrEmpty(uploadedFile.Name))
         {
-            imageFileExtension = uploadedFile.Name.Substring(uploadedFile.Name.LastIndexOf("."));
+            if (!GlobalConstants.AllowedImageExtensions.Contains(uploadedFile.Name.Substring(uploadedFile.Name.LastIndexOf("."))))
+            {
+                response.AddWarning("Seçilen dosya yüklenemedi. Dosya uzantısı bunlardan biri olmalı: '" + string.Join("; ", GlobalConstants.AllowedImageExtensions) + "'");
+                // item.ImageName = string.Concat("item_", item.Id.ToString(), request.NewImageFileExtension);
+            }
         }
 
         if (itemDef.Id > 0)
@@ -130,7 +131,6 @@
                     Description = itemDef.Description,
                     CategoryId = itemDef.CategoryId,
                     IsExpirable = itemDef.IsExpirable,
-                    NewImageFileExtension = imageFileExtension,
                     HomeId = defHomeId,
                     RequestUserId = userId
                 };
@@ -138,11 +138,7 @@
 
             if (response.IsSuccessful && uploadedFile != null)
             {
-                string fileName = ((UpdateItemDefinitionResponse)response).ImageFileName;
-                if (!string.IsNullOrEmpty(fileName))
-                {
-                    await UploadNewFile(fileName, itemDef.ImageName);
-                }
+                await UploadNewFile(itemDef.Id);
             }
         }
         else
@@ -155,7 +151,6 @@
             var createRequest = new CreateItemDefinitionRequest()
                 {
                     ItemEntity = itemDef,
-                    ImageFileExtension = imageFileExtension,
                     HomeId = defHomeId,
                     RequestUserId = userId
                 };
@@ -163,11 +158,7 @@
 
             if (response.IsSuccessful && uploadedFile != null)
             {
-                string fileName = ((CreateItemDefinitionResponse)response).ImageFileName;
-                if (!string.IsNullOrEmpty(fileName))
-                {
-                    await UploadNewFile(fileName, null);
-                }
+                await UploadNewFile(((CreateItemDefinitionResponse)response).ItemDefinitionId);
             }
         }
 
@@ -189,20 +180,12 @@
         }
     }
 
-    private async Task UploadNewFile(string fileName, string? oldFileName)
+    private async Task UploadNewFile(int itemDefinitionId)
     {
         if (uploadedFile == null) return;
-        var path = Path.Combine(Environment.CurrentDirectory, "wwwroot", "uploads", defHomeId.ToString());
 
-        if (!string.IsNullOrEmpty(oldFileName) && File.Exists(Path.Combine(path, oldFileName)))
-        {
-            File.Delete(Path.Combine(path, oldFileName));
-        }
-
-        Directory.CreateDirectory(path);
-
-        await using FileStream fs = new(Path.Combine(path, fileName), FileMode.Create);
-        await uploadedFile.OpenReadStream(maxAllowedFileSize).CopyToAsync(fs);
+        var imageUtility = new ImageUtility(defHomeId, itemDefinitionId);
+        await imageUtility.HandleFileUpload(uploadedFile);
     }
 
     private async Task DeleteItemDefinition()
