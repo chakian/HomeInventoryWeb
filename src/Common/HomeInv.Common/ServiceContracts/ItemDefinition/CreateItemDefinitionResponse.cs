@@ -2,6 +2,6 @@
 {
     public class CreateItemDefinitionResponse : BaseResponse
     {
-        public string ImageFileName { get; set; }
+        public int ItemDefinitionId { get; set; }
     }
 }

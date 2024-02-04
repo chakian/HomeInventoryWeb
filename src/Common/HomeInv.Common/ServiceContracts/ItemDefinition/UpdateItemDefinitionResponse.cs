@@ -2,6 +2,5 @@
 {
     public class UpdateItemDefinitionResponse : BaseResponse
     {
-        public string ImageFileName { get; set; }
     }
 }

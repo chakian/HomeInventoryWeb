@@ -74,7 +74,7 @@ else
         <RowTemplate>
             <MudTd DataLabel=""><MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="@(() => DisplayEditDialog(context))" /></MudTd>
             <MudTd DataLabel="Görsel">
-            <MudImage Src="@(!string.IsNullOrEmpty(context.ImageName) ? $"/uploads/{UserSettings.DefaultHomeId}/{context.ImageName}" : $"/assets/s-logo-blue-white.png")"
+            <MudImage Src="@(context.ImageUrl)"
                     Alt="@context.Name"
                     Width="64"
                     Elevation="25"

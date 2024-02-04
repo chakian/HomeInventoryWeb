@@ -1,0 +1,14 @@
+@if (!Context.Request.Cookies.ContainsKey("CookieConsent"))
+{
+    <div id="cookie-consent-banner" class="cookie-consent-banner">
+        <p>This website uses cookies to ensure you get the best experience on our website.</p>
+        <button id="accept-cookies-btn" class="btn btn-primary" onclick="acceptCookies()">Accept Cookies</button>
+    </div>
+
+    <script>
+        function acceptCookies() {
+            document.getElementById("cookie-consent-banner").style.display = "none";
+            document.cookie = "CookieConsent=true; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/";
+        }
+    </script>
+}

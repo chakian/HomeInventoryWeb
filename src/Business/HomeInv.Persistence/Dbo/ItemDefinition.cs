@@ -26,8 +26,6 @@ namespace HomeInv.Persistence.Dbo
         public bool IsExpirable { get; set; }
         #endregion
 
-        public string ImageName { get; set; }
-
         public virtual IEnumerable<ItemStock> ItemStocks { get; set; }
         //TODO: Add "Brand" and "Model"
     }
