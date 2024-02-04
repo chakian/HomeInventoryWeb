@@ -2,6 +2,7 @@
 using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.ItemDefinition;
+using HomeInv.Common.Utils;
 using HomeInv.Language;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
@@ -14,7 +15,7 @@ namespace HomeInv.Business.Services
 {
     public class ItemDefinitionService : AuditableServiceBase<ItemDefinition, ItemDefinitionEntity>, IItemDefinitionService<ItemDefinition>
     {
-        public ItemDefinitionService(HomeInventoryDbContext _context) : base(_context)
+        public ItemDefinitionService(HomeInventoryDbContext context) : base(context)
         {
         }
 
@@ -24,7 +25,6 @@ namespace HomeInv.Business.Services
             ItemDefinitionEntity entity = ConvertBaseDboToEntityBase(dbo);
             entity.Name = dbo.Name;
             entity.Description = dbo.Description;
-            entity.ImageName = dbo.ImageName;
             entity.SizeUnitId = dbo.SizeUnitId;
             entity.SizeUnitName = string.IsNullOrEmpty(dbo.SizeUnit.Description) ? dbo.SizeUnit.Name : dbo.SizeUnit.Description;
             entity.IsExpirable = dbo.IsExpirable;
@@ -48,6 +48,8 @@ namespace HomeInv.Business.Services
                     entity.CategoryFullName = parentsNames;
                 }
             }
+            entity.ImageUrl = new ImageUtility(dbo.Category.HomeId, dbo.Id).GetImageDisplayLink(Common.Constants.GlobalConstants.ImageSize.Minimum);
+
             entity.IsActive = dbo.IsActive;
             return entity;
         }
@@ -78,7 +80,6 @@ namespace HomeInv.Business.Services
                 ItemDefinition item = CreateNewAuditableObject(request);
                 item.Name = request.ItemEntity.Name;
                 item.Description = request.ItemEntity.Description;
-                item.ImageName = request.ItemEntity.ImageName;
                 item.CategoryId = request.ItemEntity.CategoryId;
                 item.IsExpirable = request.ItemEntity.IsExpirable;
                 item.SizeUnitId = request.ItemEntity.SizeUnitId;
@@ -86,25 +87,11 @@ namespace HomeInv.Business.Services
                 context.ItemDefinitions.Add(item);
                 context.SaveChanges();
 
-                if (!string.IsNullOrEmpty(request.ImageFileExtension))
-                {
-                    if (allowedImageExtensions.Contains(request.ImageFileExtension))
-                    {
-                        item.ImageName = string.Concat("item_", item.Id.ToString(), request.ImageFileExtension);
-                        context.SaveChanges();
-                        response.ImageFileName = item.ImageName;
-                    }
-                    else
-                    {
-                        response.AddWarning("Seçilen dosya yüklenemedi. Dosya uzantısı bunlardan biri olmalı: '" + string.Join(',', allowedImageExtensions) + "'");
-                    }
-                }
+                response.ItemDefinitionId = item.Id;
             }
 
             return response;
         }
-
-        string[] allowedImageExtensions = new string[] { ".png", ".jpg", ".jpeg", ".gif", ".tiff", ".bmp", ".svg" };
 
         public GetAllItemDefinitionsInHomeResponse GetAllItemDefinitionsInHome(GetAllItemDefinitionsInHomeRequest request, bool includeInactive = false)
         {
@@ -206,19 +193,6 @@ namespace HomeInv.Business.Services
                 item.Description = request.Description;
                 item.CategoryId = request.CategoryId;
                 item.IsExpirable = request.IsExpirable;
-
-                if (!string.IsNullOrEmpty(request.NewImageFileExtension))
-                {
-                    if (allowedImageExtensions.Contains(request.NewImageFileExtension))
-                    {
-                        item.ImageName = string.Concat("item_", item.Id.ToString(), request.NewImageFileExtension);
-                        response.ImageFileName = item.ImageName;
-                    }
-                    else
-                    {
-                        response.AddWarning("Seçilen dosya yüklenemedi. Dosya uzantısı bunlardan biri olmalı: '" + string.Join("; ", allowedImageExtensions) + "'");
-                    }
-                }
 
                 context.SaveChanges();
             }
