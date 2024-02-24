@@ -36,10 +36,8 @@ namespace HomeInv.Business.Services
 
                 if (dbo.Category.ParentCategoryId != null)
                 {
-                    var parentsNames = "";
-
                     var parent = queryableCategories.Single(c => c.Id == dbo.Category.ParentCategoryId);
-                    parentsNames = parent.Name;
+                    var parentsNames = parent.Name;
                     if (parent.ParentCategoryId != null)
                     {
                         var grandparent = queryableCategories.Single(c => c.Id == parent.ParentCategoryId);
@@ -48,14 +46,15 @@ namespace HomeInv.Business.Services
 
                     entity.CategoryFullName = parentsNames;
                 }
-            }
-            entity.ImageUrl = new ImageUtility(dbo.Category.HomeId, dbo.Id).GetImageDisplayLink(Common.Constants.GlobalConstants.ImageSize.Minimum);
 
+                entity.ImageUrl = new ImageUtility(dbo.Category.HomeId, dbo.Id).GetImageDisplayLink(Common.Constants.GlobalConstants.ImageSize.Minimum);
+            }
+            
             entity.IsActive = dbo.IsActive;
             return entity;
         }
 
-        public CreateItemDefinitionResponse CreateItemDefinition(CreateItemDefinitionRequest request)
+        public async Task<CreateItemDefinitionResponse> CreateItemDefinitionAsync(CreateItemDefinitionRequest request, CancellationToken ct)
         {
             var response = new CreateItemDefinitionResponse();
 
@@ -71,7 +70,7 @@ namespace HomeInv.Business.Services
             {
                 response.AddError("İsim boş olamaz!");
             }
-            if (context.ItemDefinitions.Any(q => q.Category.HomeId == request.HomeId && q.Name == request.ItemEntity.Name))
+            if (await context.ItemDefinitions.AnyAsync(q => q.Category.HomeId == request.HomeId && q.Name == request.ItemEntity.Name, ct))
             {
                 response.AddError(Resources.ItemNameExists);
             }
@@ -86,7 +85,7 @@ namespace HomeInv.Business.Services
                 item.SizeUnitId = request.ItemEntity.SizeUnitId;
 
                 context.ItemDefinitions.Add(item);
-                context.SaveChanges();
+                await context.SaveChangesAsync(ct);
 
                 response.ItemDefinitionId = item.Id;
             }
@@ -94,15 +93,15 @@ namespace HomeInv.Business.Services
             return response;
         }
 
-        public GetAllItemDefinitionsInHomeResponse GetAllItemDefinitionsInHome(GetAllItemDefinitionsInHomeRequest request, bool includeInactive = false)
+        public async Task<GetAllItemDefinitionsInHomeResponse> GetAllItemDefinitionsInHomeAsync(GetAllItemDefinitionsInHomeRequest request, CancellationToken ct)
         {
             var response = new GetAllItemDefinitionsInHomeResponse();
 
-            var dbItemList = context.ItemDefinitions
+            var dbItemList = await context.ItemDefinitions
                 .Include(itemDef => itemDef.Category)
                 .Include(itemDef => itemDef.SizeUnit)
-                .Where(item => (includeInactive || item.IsActive) && item.Category.HomeId == request.HomeId)
-                .ToList();
+                .Where(item => (request.IncludeInactive || item.IsActive) && item.Category.HomeId == request.HomeId)
+                .ToListAsync(ct);
             var itemList = new List<ItemDefinitionEntity>();
             foreach (var item in dbItemList)
             {
@@ -114,7 +113,7 @@ namespace HomeInv.Business.Services
             return response;
         }
 
-        public GetFilteredItemDefinitionsInHomeResponse GetFilteredItemDefinitionsInHome(GetFilteredItemDefinitionsInHomeRequest request)
+        public async Task<GetFilteredItemDefinitionsInHomeResponse> GetFilteredItemDefinitionsInHomeAsync(GetFilteredItemDefinitionsInHomeRequest request, CancellationToken ct)
         {
             var response = new GetFilteredItemDefinitionsInHomeResponse() { Items = new List<ItemDefinitionEntity>() };
 
@@ -125,13 +124,11 @@ namespace HomeInv.Business.Services
                 .AsQueryable();
             if (request.AreaId > 0)
             {
-                //var joinedQuery = context.ItemStocks.Join(queryableList, stock => stock.ItemDefinitionId, item => item.Id, )
                 queryableList.Join(context.ItemStocks, item => item.Id, stock => stock.ItemDefinitionId, (item, stock) => new
                 {
                     ItemDef = item,
                     Stock = stock
                 });
-                //queryableList.Include(item => item.ItemStocks).Where(item => item.ItemStocks.Any(itemStock => itemStock.AreaId == request.AreaId));
             }
             if (request.CategoryId > 0)
             {
@@ -140,7 +137,7 @@ namespace HomeInv.Business.Services
                 || (item.Category.ParentCategory == null || item.Category.ParentCategory.ParentCategoryId == request.CategoryId));
             }
 
-            foreach (var item in queryableList.ToList())
+            foreach (var item in await queryableList.ToListAsync(ct))
             {
                 response.Items.Add(ConvertDboToEntity(item));
             }
@@ -148,27 +145,7 @@ namespace HomeInv.Business.Services
             return response;
         }
 
-        public GetItemDefinitionResponse GetItemDefinition(GetItemDefinitionRequest request)
-        {
-            var response = new GetItemDefinitionResponse() { };
-
-            var item = context.ItemDefinitions
-                .Include(item => item.Category)
-                .Include(item => item.SizeUnit)
-                .SingleOrDefault(i => i.Id == request.ItemDefinitionId);
-            if (item == null)
-            {
-                response.AddError("Urun tanimi bulunamadi");
-            }
-            else
-            {
-                response.ItemDefinition = ConvertDboToEntity(item);
-            }
-
-            return response;
-        }
-
-        public UpdateItemDefinitionResponse UpdateItemDefinition(UpdateItemDefinitionRequest request)
+        public async Task<UpdateItemDefinitionResponse> UpdateItemDefinitionAsync(UpdateItemDefinitionRequest request, CancellationToken ct)
         {
             var response = new UpdateItemDefinitionResponse();
 
@@ -189,19 +166,26 @@ namespace HomeInv.Business.Services
 
             if (response.IsSuccessful)
             {
-                var item = context.ItemDefinitions.Find(request.ItemDefinitionId);
-                item.Name = request.Name;
-                item.Description = request.Description;
-                item.CategoryId = request.CategoryId;
-                item.IsExpirable = request.IsExpirable;
+                var item = await context.ItemDefinitions.FindAsync(new object[] { request.ItemDefinitionId }, ct);
+                if (item != null)
+                {
+                    item.Name = request.Name;
+                    item.Description = request.Description;
+                    item.CategoryId = request.CategoryId;
+                    item.IsExpirable = request.IsExpirable;
 
-                context.SaveChanges();
+                    await context.SaveChangesAsync(ct);
+                }
+                else
+                {
+                    response.AddWarning("Ürünü bulamadık malesef");
+                }
             }
 
             return response;
         }
 
-        public async Task<DeleteItemDefinitionResponse> DeleteItemDefinition(DeleteItemDefinitionRequest request)//, CancellationToken ct)
+        public async Task<DeleteItemDefinitionResponse> DeleteItemDefinitionAsync(DeleteItemDefinitionRequest request, CancellationToken ct)
         {
             var response = new DeleteItemDefinitionResponse();
 
@@ -212,10 +196,17 @@ namespace HomeInv.Business.Services
 
             if (response.IsSuccessful)
             {
-                var item = await context.ItemDefinitions.FindAsync(new object[] { request.ItemDefinitionId });//, ct);
-                item.IsActive = false;
-                item.SetUpdateAuditValues(request);
-                await context.SaveChangesAsync();//ct);
+                var item = await context.ItemDefinitions.FindAsync(new object[] { request.ItemDefinitionId }, ct);
+                if (item != null)
+                {
+                    item.IsActive = false;
+                    item.SetUpdateAuditValues(request);
+                    await context.SaveChangesAsync(ct);
+                }
+                else
+                {
+                    response.AddWarning("Ürünü bulamadık malesef");
+                }
             }
 
             return response;

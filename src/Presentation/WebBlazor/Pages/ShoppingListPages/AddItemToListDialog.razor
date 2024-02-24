@@ -65,11 +65,11 @@
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        itemDefinitions = itemDefinitionService.GetAllItemDefinitionsInHome(new GetAllItemDefinitionsInHomeRequest()
+        itemDefinitions = itemDefinitionService.GetAllItemDefinitionsInHomeAsync(new GetAllItemDefinitionsInHomeRequest()
             {
                 HomeId = defHomeId,
                 RequestUserId = userId
-            }).Items;
+            }, CancellationToken.None).Result.Items;
         sizeUnits = sizeUnitService.GetAllSizes(new GetAllSizesRequest()
             {
                 RequestUserId = userId

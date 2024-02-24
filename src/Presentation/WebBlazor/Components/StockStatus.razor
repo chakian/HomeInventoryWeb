@@ -205,13 +205,13 @@ else
 
     void GetList()
     {
-        var definitions = _itemDefinitionService.GetFilteredItemDefinitionsInHome(new GetFilteredItemDefinitionsInHomeRequest()
+        var definitions = _itemDefinitionService.GetFilteredItemDefinitionsInHomeAsync(new GetFilteredItemDefinitionsInHomeRequest()
             {
                 HomeId = UserSettings.DefaultHomeId,
                 AreaId = 0,
                 CategoryId = 0,
                 RequestUserId = UserSettings.UserId
-            });
+            }, CancellationToken.None).Result;
 
         if (!string.IsNullOrEmpty(SearchKeyword) && SearchKeyword.Length > 1)
         {

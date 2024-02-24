@@ -1,4 +1,5 @@
-﻿using HomeInv.Common.ServiceContracts.ItemDefinition;
+﻿using System.Threading;
+using HomeInv.Common.ServiceContracts.ItemDefinition;
 using System.Threading.Tasks;
 
 namespace HomeInv.Common.Interfaces.Services
@@ -10,16 +11,14 @@ namespace HomeInv.Common.Interfaces.Services
 
     public interface IItemDefinitionService : IServiceBase
     {
-        GetAllItemDefinitionsInHomeResponse GetAllItemDefinitionsInHome(GetAllItemDefinitionsInHomeRequest request, bool includeInactive = false);
+        Task<GetAllItemDefinitionsInHomeResponse> GetAllItemDefinitionsInHomeAsync(GetAllItemDefinitionsInHomeRequest request, CancellationToken ct);
 
-        GetFilteredItemDefinitionsInHomeResponse GetFilteredItemDefinitionsInHome(GetFilteredItemDefinitionsInHomeRequest request);
+        Task<GetFilteredItemDefinitionsInHomeResponse> GetFilteredItemDefinitionsInHomeAsync(GetFilteredItemDefinitionsInHomeRequest request, CancellationToken ct);
 
-        GetItemDefinitionResponse GetItemDefinition(GetItemDefinitionRequest request);
+        Task<CreateItemDefinitionResponse> CreateItemDefinitionAsync(CreateItemDefinitionRequest request, CancellationToken ct);
 
-        CreateItemDefinitionResponse CreateItemDefinition(CreateItemDefinitionRequest request);
+        Task<UpdateItemDefinitionResponse> UpdateItemDefinitionAsync(UpdateItemDefinitionRequest request, CancellationToken ct);
 
-        UpdateItemDefinitionResponse UpdateItemDefinition(UpdateItemDefinitionRequest request);
-
-        Task<DeleteItemDefinitionResponse> DeleteItemDefinition(DeleteItemDefinitionRequest request);
+        Task<DeleteItemDefinitionResponse> DeleteItemDefinitionAsync(DeleteItemDefinitionRequest request, CancellationToken ct);
     }
 }

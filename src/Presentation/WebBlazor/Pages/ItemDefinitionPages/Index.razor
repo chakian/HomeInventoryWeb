@@ -117,10 +117,11 @@ else
     {
         var request = new GetAllItemDefinitionsInHomeRequest()
             {
+                IncludeInactive = IncludeInactives,
                 HomeId = UserSettings.DefaultHomeId,
                 RequestUserId = UserSettings.UserId
             };
-        var response = itemDefinitionService.GetAllItemDefinitionsInHome(request, IncludeInactives);
+        var response = itemDefinitionService.GetAllItemDefinitionsInHomeAsync(request, CancellationToken.None).Result;
 
         if (!response.IsSuccessful)
         {

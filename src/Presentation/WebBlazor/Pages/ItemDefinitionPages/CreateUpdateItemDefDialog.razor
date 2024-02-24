@@ -134,7 +134,7 @@
                     HomeId = defHomeId,
                     RequestUserId = userId
                 };
-            response = itemDefinitionService.UpdateItemDefinition(updateRequest);
+            response = await itemDefinitionService.UpdateItemDefinitionAsync(updateRequest, CancellationToken.None);
 
             if (response.IsSuccessful && uploadedFile != null)
             {
@@ -154,7 +154,7 @@
                     HomeId = defHomeId,
                     RequestUserId = userId
                 };
-            response = itemDefinitionService.CreateItemDefinition(createRequest);
+            response = await itemDefinitionService.CreateItemDefinitionAsync(createRequest, CancellationToken.None);
 
             if (response.IsSuccessful && uploadedFile != null)
             {
@@ -208,7 +208,7 @@
                     HomeId = defHomeId,
                     RequestUserId = userId
                 };
-            response = await itemDefinitionService.DeleteItemDefinition(deleteRequest);
+            response = await itemDefinitionService.DeleteItemDefinitionAsync(deleteRequest, CancellationToken.None);
 
             successMessage = $"{entityDisplayName} silindi";
 
