@@ -10,19 +10,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HomeInv.Business.Services;
 
 public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>, IItemStockService<ItemStock>
 {
-    public IEmailSenderService emailSenderService { get; set; }
-    public IConfiguration configuration { get; set; }
-    public ItemStockService(HomeInventoryDbContext _context, 
-        IEmailSenderService _emailSenderService,
-        IConfiguration _configuration) : base(_context)
+    private readonly IEmailSenderService _emailSenderService;
+    private readonly IConfiguration _configuration;
+    
+    public ItemStockService(HomeInventoryDbContext context, 
+        IEmailSenderService emailSenderService,
+        IConfiguration configuration) : base(context)
     {
-        emailSenderService = _emailSenderService;
-        configuration = _configuration;
+        _emailSenderService = emailSenderService;
+        _configuration = configuration;
     }
 
     public override ItemStockEntity ConvertDboToEntity(ItemStock dbo)
@@ -39,13 +42,13 @@ public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>
         return entity;
     }
 
-    public GetItemStocksByItemDefinitionIdsResponse GetItemStocksByItemDefinitionIds(GetItemStocksByItemDefinitionIdsRequest request)
+    public async Task<GetItemStocksByItemDefinitionIdsResponse> GetItemStocksByItemDefinitionIdsAsync(GetItemStocksByItemDefinitionIdsRequest request, CancellationToken ct)
     {
         var response = new GetItemStocksByItemDefinitionIdsResponse() { ItemStocks = new List<ItemStockEntity>() };
 
-        var stocks = context.ItemStocks
+        var stocks = await context.ItemStocks
             .Include(stock => stock.Area)
-            .Where(stock => request.ItemDefinitionIdList.Contains(stock.ItemDefinitionId));
+            .Where(stock => request.ItemDefinitionIdList.Contains(stock.ItemDefinitionId)).ToListAsync(ct);
 
         foreach (var stock in stocks)
         {
@@ -55,36 +58,21 @@ public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>
         return response;
     }
 
-    public GetSingleItemStockResponse GetSingleItemStock(GetSingleItemStockRequest request)
-    {
-        var response = new GetSingleItemStockResponse() { Stock = new ItemStockEntity() };
-
-        var stock = context.ItemStocks
-            .SingleOrDefault(stock => stock.Id == request.ItemStockId);
-
-        if (stock != null)
-        {
-            response.Stock = ConvertDboToEntity(stock);
-        }
-
-        return response;
-    }
-
-    public Dictionary<int, List<StockStatus>> CheckStocksPrepareShoppingListAndSendEmail(int? homeId)
+    public async Task<Dictionary<int, List<StockStatus>>> CheckStocksPrepareShoppingListAndSendEmailAsync(int? homeId, CancellationToken ct)
     {
         Dictionary<int, List<StockStatus>> result = new();
 
         List<Home> activeHomes;
         if (homeId.HasValue)
         {
-            activeHomes = context.Homes.Where(h => h.IsActive && h.Id == homeId.Value).ToList();
+            activeHomes = await context.Homes.Where(h => h.IsActive && h.Id == homeId.Value).ToListAsync(ct);
         }
         else
         {
             // Find active homes
-            activeHomes = context.Homes.Where(h => h.IsActive).ToList();
+            activeHomes = await context.Homes.Where(h => h.IsActive).ToListAsync(ct);
             // Find homes that are set as default by users
-            var defaultHomes = context.UserSettings.Where(us => us.IsActive).Select(us => us.DefaultHomeId).ToList();
+            var defaultHomes = await context.UserSettings.Where(us => us.IsActive).Select(us => us.DefaultHomeId).ToListAsync(ct);
             // Filter active homes by default usages
             activeHomes = activeHomes.Where(ah => defaultHomes.Contains(ah.Id)).ToList();
         }
@@ -96,14 +84,14 @@ public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>
             // Clear status list
             statusList = new();
             // Get recipient list of the home
-            List<string> recipientList = context.HomeUsers.Where(hu => hu.IsActive && hu.HomeId == activeHome.Id).Select(hu => hu.User.Email).ToList();
+            var recipientList = await context.HomeUsers.Where(hu => hu.IsActive && hu.HomeId == activeHome.Id).Select(hu => hu.User.Email).ToListAsync(ct);
 
             // Find all item definitions in the home
-            context.ItemDefinitions
+            var itemDefinitionList = await context.ItemDefinitions
                 .Where(x => x.IsActive && x.Category.HomeId == activeHome.Id)
                 .Include(x => x.SizeUnit)
-                .ToList()
-                .ForEach(x =>
+                .ToListAsync(ct);
+            itemDefinitionList.ForEach(x =>
             {
                 statusList.Add(new StockStatus()
                 {
@@ -121,7 +109,10 @@ public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>
             });
 
             // Set current stock amounts of all item definitions
-            context.ItemStocks.Where(x => x.IsActive && statusList.Select(sl => sl.ItemDefinitionId).Contains(x.ItemDefinitionId)).ToList().ForEach(x =>
+            var itemStocks = await context.ItemStocks
+                .Where(x => x.IsActive && statusList.Select(sl => sl.ItemDefinitionId).Contains(x.ItemDefinitionId))
+                .ToListAsync(ct);
+            itemStocks.ForEach(x =>
             {
                 statusList.Single(sl => sl.ItemDefinitionId == x.ItemDefinitionId).CurrentStock = x.RemainingAmount;
                 statusList.Single(sl => sl.ItemDefinitionId == x.ItemDefinitionId).ItemStockId = x.Id;
@@ -132,7 +123,7 @@ public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>
 
             result.Add(activeHome.Id, statusList.ToList());
 
-            if(homeId.HasValue == false && bool.TryParse(configuration.GetSection("SendSmartStockStatusEmail").Value, out bool sendMail) && sendMail)
+            if(homeId.HasValue == false && bool.TryParse(_configuration.GetSection("SendSmartStockStatusEmail").Value, out bool sendMail) && sendMail)
             {
                 StringBuilder bodyBuilder = new();
 
@@ -154,11 +145,11 @@ public class ItemStockService : AuditableServiceBase<ItemStock, ItemStockEntity>
 
                 MailRequest mailRequest = new()
                 {
-                    Subject = $"{DateTime.Today.ToString("dd MMMM yyyy")} tarihli stok raporu",
+                    Subject = $"{DateTime.Today:dd MMMM yyyy} tarihli stok raporu",
                     ToEmailList = recipientList,
                     Body = bodyBuilder.ToString()
                 };
-                emailSenderService.SendEmailAsync(mailRequest).GetAwaiter().GetResult();
+                await _emailSenderService.SendEmailAsync(mailRequest);
             }
         }
 

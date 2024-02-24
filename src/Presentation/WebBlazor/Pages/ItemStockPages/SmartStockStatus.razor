@@ -92,7 +92,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await GetUserSettingsAsync();
-        SmartStock = _itemStockService.CheckStocksPrepareShoppingListAndSendEmail(UserSettings.DefaultHomeId)[UserSettings.DefaultHomeId];
+        SmartStock = (await _itemStockService.CheckStocksPrepareShoppingListAndSendEmailAsync(UserSettings.DefaultHomeId, CancellationToken.None))[UserSettings.DefaultHomeId];
         await base.OnInitializedAsync();
     }
 }

@@ -21,6 +21,6 @@
             return;
         }
 
-        _itemStockService.CheckStocksPrepareShoppingListAndSendEmail(null);
+        _itemStockService.CheckStocksPrepareShoppingListAndSendEmailAsync(null, CancellationToken.None);
     }
 }

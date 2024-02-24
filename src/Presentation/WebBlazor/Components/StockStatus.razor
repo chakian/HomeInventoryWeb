@@ -224,12 +224,12 @@ else
             ).ToList();
         }
 
-        var stocks = _itemStockService.GetItemStocksByItemDefinitionIds(new GetItemStocksByItemDefinitionIdsRequest()
+        var stocks = _itemStockService.GetItemStocksByItemDefinitionIdsAsync(new GetItemStocksByItemDefinitionIdsRequest()
             {
                 HomeId = UserSettings.DefaultHomeId,
                 ItemDefinitionIdList = definitions.Items.Select(def => def.Id).ToList(),
                 RequestUserId = UserSettings.UserId
-            }).ItemStocks;
+            }, CancellationToken.None).Result.ItemStocks;
 
         OverviewList = new List<ItemStockOverview>();
 

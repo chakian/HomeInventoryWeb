@@ -1,6 +1,8 @@
 ﻿using HomeInv.Common.Models;
 using HomeInv.Common.ServiceContracts.ItemStock;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HomeInv.Common.Interfaces.Services
 {
@@ -11,8 +13,7 @@ namespace HomeInv.Common.Interfaces.Services
 
     public interface IItemStockService : IServiceBase
     {
-        GetItemStocksByItemDefinitionIdsResponse GetItemStocksByItemDefinitionIds(GetItemStocksByItemDefinitionIdsRequest request);
-        GetSingleItemStockResponse GetSingleItemStock(GetSingleItemStockRequest request);
-        Dictionary<int, List<StockStatus>> CheckStocksPrepareShoppingListAndSendEmail(int? homeId);
+        Task<GetItemStocksByItemDefinitionIdsResponse> GetItemStocksByItemDefinitionIdsAsync(GetItemStocksByItemDefinitionIdsRequest request, CancellationToken ct);
+        Task<Dictionary<int, List<StockStatus>>> CheckStocksPrepareShoppingListAndSendEmailAsync(int? homeId, CancellationToken ct);
     }
 }
