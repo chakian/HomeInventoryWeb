@@ -1,4 +1,5 @@
-﻿using HomeInv.Common.Interfaces.Services;
+﻿using HomeInv.Common.Entities;
+using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.WebApi.Contracts.Home;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +18,24 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateAsync()
+    public async Task<ActionResult> CreateAsync(CreateRequest request)
     {
-        return new JsonResult(string.Empty);
+        var createHomeRequest = new CreateHomeRequest()
+        {
+            HomeEntity = new HomeEntity()
+            {
+                Name = request.Name,
+                Description = request.Description,
+            },
+            RequestUserId = request.UserId,
+        };
+        var serviceResponse = await _homeService.CreateHomeAsync(createHomeRequest, CancellationToken.None);
+        if (!serviceResponse.IsSuccessful)
+        {
+            return new BadRequestObjectResult(serviceResponse.Result.Messages);
+        }
+
+        return new OkResult();
     }
 
     [HttpGet("get-all")]
@@ -37,15 +53,25 @@ public class HomeController : Controller
         return new JsonResult(response);
     }
 
-    [HttpGet]
-    public async Task<ActionResult> GetAsync()
-    {
-        return new JsonResult(string.Empty);
-    }
-
     [HttpPut]
-    public async Task<ActionResult> UpdateAsync()
+    public async Task<ActionResult> UpdateAsync(UpdateRequest request)
     {
-        return new JsonResult(string.Empty);
+        var updateHomeRequest = new UpdateHomeRequest()
+        {
+            HomeEntity = new HomeEntity()
+            {
+                Id = request.Id,
+                Name = request.Name,
+                Description = request.Description,
+            },
+            RequestUserId = request.UserId,
+        };
+        var serviceResponse = await _homeService.UpdateHomeAsync(updateHomeRequest, CancellationToken.None);
+        if (!serviceResponse.IsSuccessful)
+        {
+            return new BadRequestObjectResult(serviceResponse.Result.Messages);
+        }
+
+        return new OkResult();
     }
 }
