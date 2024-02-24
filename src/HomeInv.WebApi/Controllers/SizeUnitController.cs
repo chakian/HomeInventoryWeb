@@ -3,7 +3,7 @@
 namespace HomeInv.WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("size-unit")]
 public class SizeUnitController : Controller
 {
     [HttpGet]

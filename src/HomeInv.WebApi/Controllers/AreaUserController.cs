@@ -3,7 +3,7 @@
 namespace HomeInv.WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("area-user")]
 public class AreaUserController : Controller
 {
     [HttpPost]

@@ -3,7 +3,7 @@
 namespace HomeInv.WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("home")]
 public class HomeController : Controller
 {
     [HttpPost]
@@ -12,8 +12,7 @@ public class HomeController : Controller
         return View();
     }
 
-    [HttpGet]
-    [Route("[controller]/Get_All")]
+    [HttpGet("get-all")]
     public IActionResult GetAll()
     {
         return View();

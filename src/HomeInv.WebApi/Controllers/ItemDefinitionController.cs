@@ -3,7 +3,7 @@
 namespace HomeInv.WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("item-definition")]
 public class ItemDefinitionController : Controller
 {
     [HttpPost]
@@ -12,15 +12,13 @@ public class ItemDefinitionController : Controller
         return View();
     }
 
-    [HttpGet]
-    [Route("[controller]/Get_All")]
+    [HttpGet("get-all")]
     public IActionResult GetAll()
     {
         return View();
     }
 
-    [HttpGet]
-    [Route("[controller]/Get_Filtered")]
+    [HttpGet("get-filtered")]
     public IActionResult GetFiltered()
     {
         return View();

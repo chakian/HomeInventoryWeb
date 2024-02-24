@@ -3,7 +3,7 @@
 namespace HomeInv.WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("item-stock")]
 public class ItemStockController : Controller
 {
     [HttpGet]
@@ -12,8 +12,7 @@ public class ItemStockController : Controller
         return View();
     }
 
-    [HttpGet]
-    [Route("[controller]/Get_ByDefIds")]
+    [HttpGet("get-by-definition-ids")]
     public IActionResult GetByDefinitionIds()
     {
         return View();

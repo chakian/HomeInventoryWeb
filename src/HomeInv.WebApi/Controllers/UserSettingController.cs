@@ -3,7 +3,7 @@
 namespace HomeInv.WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("user-setting")]
 public class UserSettingController : Controller
 {
     [HttpGet]

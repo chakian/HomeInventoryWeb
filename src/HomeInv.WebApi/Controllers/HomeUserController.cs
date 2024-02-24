@@ -3,7 +3,7 @@
 namespace HomeInv.WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("home-user")]
 public class HomeUserController : Controller
 {
     [HttpPost]

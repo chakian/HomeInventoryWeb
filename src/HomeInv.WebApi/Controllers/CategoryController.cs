@@ -3,7 +3,7 @@
 namespace HomeInv.WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("category")]
 public class CategoryController : Controller
 {
     [HttpPost]
@@ -12,15 +12,13 @@ public class CategoryController : Controller
         return View();
     }
 
-    [HttpGet]
-    [Route("[controller]/Get_Hierarchial")]
+    [HttpGet("get-hierarchial")]
     public IActionResult GetHierarchial()
     {
         return View();
     }
 
-    [HttpGet]
-    [Route("[controller]/Get_Ordered")]
+    [HttpGet("get-ordered")]
     public IActionResult GetOrdered()
     {
         return View();
