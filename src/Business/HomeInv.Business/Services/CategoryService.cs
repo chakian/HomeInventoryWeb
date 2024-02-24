@@ -53,10 +53,10 @@ namespace HomeInv.Business.Services
                 //Prevent creating level 3 children
                 if (request.CategoryEntity.ParentCategoryId != null && request.CategoryEntity.ParentCategoryId > 0)
                 {
-                    var parent = await context.Categories.FindAsync(request.CategoryEntity.ParentCategoryId, ct);
+                    var parent = await context.Categories.FindAsync(new object[] { request.CategoryEntity.ParentCategoryId }, ct);
                     if (parent != null && (parent.ParentCategoryId ?? 0) > 0)
                     {
-                        var grandparent = await context.Categories.FindAsync(parent.ParentCategoryId, ct);
+                        var grandparent = await context.Categories.FindAsync(new object[] { parent.ParentCategoryId }, ct);
                         if (grandparent != null && (grandparent.ParentCategoryId ?? 0) > 0)
                         {
                             response.AddError("Üçüncü seviyede kategori eklenemez.");
@@ -216,17 +216,17 @@ namespace HomeInv.Business.Services
             }
             if (request.ParentCategoryId != null && request.ParentCategoryId > 0)
             {
-                var parent = await context.Categories.FindAsync(request.ParentCategoryId, ct);
+                var parent = await context.Categories.FindAsync(new object[] { request.ParentCategoryId }, ct);
                 if (parent != null && (parent.ParentCategoryId ?? 0) > 0)
                 {
-                    var grandparent = context.Categories.Find(parent.ParentCategoryId);
+                    var grandparent = await context.Categories.FindAsync(new object[] { parent.ParentCategoryId }, ct);
                     if (grandparent != null && (grandparent.ParentCategoryId ?? 0) > 0)
                     {
                         response.AddError("Üçüncü seviyede kategori olamıyor maalesef.");
                     }
                 }
             }
-            var category = await context.Categories.FindAsync(request.CategoryId, ct);
+            var category = await context.Categories.FindAsync(new object[] { request.CategoryId }, cancellationToken: ct);
             if (category == null)
             {
                 response.AddError("Buraya normalde gelememiş olmanız gerekirdi. Lütfen gider misiniz?");

@@ -19,10 +19,10 @@ public sealed class HomeController : BaseController
 
     [HttpPost]
     public async Task<ActionResult> CreateAsync(
-        CreateRequest request,
+        Contracts.Home.CreateHomeRequest request,
         CancellationToken ct)
     {
-        var createHomeRequest = new CreateHomeRequest()
+        var createHomeRequest = new Common.ServiceContracts.Home.CreateHomeRequest()
         {
             HomeEntity = new HomeEntity()
             {
@@ -37,10 +37,10 @@ public sealed class HomeController : BaseController
 
     [HttpGet("get-all")]
     public async Task<ActionResult> GetAllAsync(
-        [FromQuery]GetAllRequest request,
+        [FromQuery]GetHomesRequest request,
         CancellationToken ct)
     {
-        var response = new GetAllResponse();
+        var response = new GetHomesResponse();
         var serviceRequest = new GetHomesOfUserRequest()
         {
             RequestUserId = request.UserId
@@ -52,10 +52,10 @@ public sealed class HomeController : BaseController
 
     [HttpPut]
     public async Task<ActionResult> UpdateAsync(
-        UpdateRequest request,
+        Contracts.Home.UpdateHomeRequest request,
         CancellationToken ct)
     {
-        var updateHomeRequest = new UpdateHomeRequest()
+        var updateHomeRequest = new Common.ServiceContracts.Home.UpdateHomeRequest()
         {
             HomeEntity = new HomeEntity()
             {

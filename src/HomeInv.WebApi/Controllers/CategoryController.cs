@@ -1,4 +1,5 @@
-﻿using HomeInv.Common.Interfaces.Services;
+﻿using HomeInv.Common.Entities;
+using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Category;
 using HomeInv.WebApi.Contracts.Category;
 using Microsoft.AspNetCore.Mvc;
@@ -17,14 +18,28 @@ public sealed class CategoryController : BaseController
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateAsync()
+    public async Task<ActionResult> CreateAsync(
+        Contracts.Category.CreateCategoryRequest request,
+        CancellationToken ct)
     {
-        return new JsonResult(string.Empty);
+        var createCategoryRequest = new Common.ServiceContracts.Category.CreateCategoryRequest()
+        {
+            CategoryEntity = new CategoryEntity()
+            {
+                Name = request.Name,
+                Description = request.Description,
+                ParentCategoryId = request.ParentCategoryId,
+            },
+            HomeId = request.HomeId,
+            RequestUserId = request.UserId,
+        };
+        var serviceResponse = await _categoryService.CreateCategoryAsync(createCategoryRequest, ct);
+        return CheckErrorForOkResult(serviceResponse);
     }
 
     [HttpGet("get-hierarchical")]
     public async Task<ActionResult> GetHierarchicalAsync(
-        GetAllRequest request, 
+        [FromQuery] GetCategoriesRequest request, 
         CancellationToken ct)
     {
         var serviceRequest = new GetCategoriesOfHomeRequest()
@@ -33,28 +48,43 @@ public sealed class CategoryController : BaseController
             RequestUserId = request.UserId,
         };
         var categoriesResponse = _categoryService.GetCategoriesOfHome_HierarchicalAsync(serviceRequest, ct).Result;
-        return new OkObjectResult(new GetAllResponse()
+        var response = new GetCategoriesResponse()
         {
             Categories = categoriesResponse.Categories,
-        });
+        };
+        return CheckErrorForOkResult(categoriesResponse, response);
     }
 
     [HttpGet("get-ordered")]
     public async Task<ActionResult> GetOrderedAsync(
-        GetAllRequest request,
+        [FromQuery] GetCategoriesRequest request,
         CancellationToken ct)
     {
         var serviceResponse = await _categoryService.GetCategoriesOfHome_OrderedAsync(new GetCategoriesOfHomeRequest()
         {
             HomeId = request.HomeId
         }, ct);
-        var categoryList = serviceResponse.Categories;
-        return new JsonResult(string.Empty);
+        var response = new GetCategoriesResponse()
+        {
+            Categories = serviceResponse.Categories,
+        };
+        return CheckErrorForOkResult(serviceResponse, response);
     }
 
     [HttpPut]
-    public async Task<ActionResult> UpdateAsync()
+    public async Task<ActionResult> UpdateAsync(
+        [FromBody] Contracts.Category.UpdateCategoryRequest request,
+        CancellationToken ct)
     {
-        return new JsonResult(string.Empty);
+        var updateCategoryRequest = new Common.ServiceContracts.Category.UpdateCategoryRequest()
+        {
+            CategoryId = request.Id,
+            Name = request.Name,
+            Description = request.Description,
+            ParentCategoryId = request.ParentCategoryId,
+            RequestUserId = request.UserId
+        };
+        var serviceResponse = await _categoryService.UpdateCategoryAsync(updateCategoryRequest, ct);
+        return CheckErrorForOkResult(serviceResponse);
     }
 }
