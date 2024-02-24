@@ -112,13 +112,19 @@ public sealed class ImageUtility
 
     public string GetImageDisplayLink(ImageSize imageSize)
     {
+        if (!Directory.Exists(_basePath))
+        {
+            return DefaultItemDefinitionImage;
+        }
+
         var files = Directory.GetFiles(_basePath, $"{_baseFileName}_*");
         if (files.Length <= 0) return DefaultItemDefinitionImage;
 
         var bestSize = (int)imageSize;
 
-        if (!files.Any(f => f.Equals($"{_baseFileName}_{(int)imageSize}.{extension}"))) bestSize = (int)ImageSize.Minimum;
-        
+        if (!files.Any(f => f.Equals($"{_baseFileName}_{(int)imageSize}.{extension}")))
+            bestSize = (int)ImageSize.Minimum;
+
         return string.Format(_imageUrlTemplate, bestSize);
     }
 }

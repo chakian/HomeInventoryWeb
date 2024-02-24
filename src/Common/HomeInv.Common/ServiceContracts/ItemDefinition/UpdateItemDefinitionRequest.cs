@@ -8,5 +8,6 @@
         public string Description { get; init; }
         public int CategoryId { get; init; }
         public bool IsExpirable { get; init; }
+        public string ImageBase64 { get; init; }
     }
 }
