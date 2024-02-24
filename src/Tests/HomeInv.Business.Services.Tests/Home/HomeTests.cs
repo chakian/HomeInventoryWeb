@@ -4,6 +4,7 @@ using HomeInv.Common.ServiceContracts.Home;
 using HomeInv.Language;
 using System;
 using System.Linq;
+using System.Threading;
 using Xunit;
 
 namespace HomeInv.Business.Services.Tests
@@ -32,7 +33,7 @@ namespace HomeInv.Business.Services.Tests
 
             // act
             var request = new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[0] };
-            var actual = homeService.CreateHome(request);
+            var actual = homeService.CreateHomeAsync(request, CancellationToken.None).Result;
             var expected = context.Homes.Find(4);
             string actualInsertUserId = expected.InsertUserId;
 
@@ -81,7 +82,7 @@ namespace HomeInv.Business.Services.Tests
                 (home, homeUser) => new { Home = home, HomeUser = homeUser })
                 .Where(homeAndUser => homeAndUser.HomeUser.UserId == userIds[0]);
             var request = new GetHomesOfUserRequest() { RequestUserId = userIds[0] };
-            var actual = homeService.GetHomesOfUser(request);
+            var actual = homeService.GetHomesOfUserAsync(request, CancellationToken.None).Result;
 
             // assert
             Assert.Equal(expected.Count(), actual.Homes.Count());
@@ -98,7 +99,7 @@ namespace HomeInv.Business.Services.Tests
 
             // act
             var request = new GetHomesOfUserRequest() { RequestUserId = userIds[0] };
-            var actual = homeService.GetHomesOfUser(request);
+            var actual = homeService.GetHomesOfUserAsync(request, CancellationToken.None).Result;
 
             // assert
             Assert.Empty(actual.Homes);
@@ -132,7 +133,7 @@ namespace HomeInv.Business.Services.Tests
 
             // act
             var request = new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[0] };
-            var actual = homeService.CreateHome(request);
+            var actual = homeService.CreateHomeAsync(request, CancellationToken.None).Result;
 
             var expected = Resources.Home_Error_SameNameExists;
 
@@ -168,7 +169,7 @@ namespace HomeInv.Business.Services.Tests
 
             // act
             var request = new CreateHomeRequest() { HomeEntity = homeEntity, RequestUserId = userIds[1] };
-            var actual = homeService.CreateHome(request);
+            var actual = homeService.CreateHomeAsync(request, CancellationToken.None).Result;
 
             var expected = Resources.Success_Generic;
 

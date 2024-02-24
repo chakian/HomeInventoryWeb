@@ -46,7 +46,7 @@
                     HomeEntity = home,
                     RequestUserId = userId
                 };
-            response = homeService.UpdateHome(updateHomeRequest);
+            response = homeService.UpdateHomeAsync(updateHomeRequest, CancellationToken.None).Result;
         }
         else
         {
@@ -57,7 +57,7 @@
                     HomeEntity = home,
                     RequestUserId = userId
                 };
-            response = homeService.CreateHome(createHomeRequest);
+            response = homeService.CreateHomeAsync(createHomeRequest, CancellationToken.None).Result;
         }
         
         if (response.IsSuccessful)

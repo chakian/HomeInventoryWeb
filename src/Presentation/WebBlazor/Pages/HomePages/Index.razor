@@ -77,7 +77,7 @@ else
             {
                 RequestUserId = UserSettings.UserId
             };
-        var response = homeService.GetHomesOfUser(request);
+        var response = homeService.GetHomesOfUserAsync(request, CancellationToken.None).Result;
 
         if (!response.IsSuccessful)
         {

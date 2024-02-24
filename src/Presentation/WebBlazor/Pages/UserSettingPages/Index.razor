@@ -60,7 +60,7 @@ else
             {
                 RequestUserId = UserSettings.UserId
             };
-        var homesResponse = homeService.GetHomesOfUser(homeRequest);
+        var homesResponse = homeService.GetHomesOfUserAsync(homeRequest, CancellationToken.None).Result;
         HomeList = homesResponse.Homes;
 
         SelectedHomeId = UserSettings.DefaultHomeId;
@@ -79,6 +79,6 @@ else
                 },
                 RequestUserId = UserSettings.UserId
             };
-        var response = userSettingService.UpdateUserSettings(updateUserSettingsRequest);
+        var response = userSettingService.UpdateUserSettingsAsync(updateUserSettingsRequest, CancellationToken.None).Result;
     }
 }

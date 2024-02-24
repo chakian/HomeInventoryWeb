@@ -9,6 +9,8 @@ using HomeInv.Persistence.Dbo;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HomeInv.Business.Services
 {
@@ -29,15 +31,15 @@ namespace HomeInv.Business.Services
             return homes.Select(homeAndUser => homeAndUser.Home);
         }
 
-        private Home GetSingleHomeOfUserInternal(string userId, int homeId)
+        private async Task<Home> GetSingleHomeOfUserInternalAsync(string userId, int homeId, CancellationToken ct)
         {
             //TODO: Checking if this user belongs to requested home could be done better
             var homes = GetHomesOfUserInternal(userId);
-            var home = homes.SingleOrDefault(home => home.Id == homeId);
+            var home = await homes.SingleOrDefaultAsync(home => home.Id == homeId, ct);
             return home;
         }
 
-        public CreateHomeResponse CreateHome(CreateHomeRequest request)
+        public async Task<CreateHomeResponse> CreateHomeAsync(CreateHomeRequest request, CancellationToken ct)
         {
             CreateHomeResponse response = new();
 
@@ -48,12 +50,12 @@ namespace HomeInv.Business.Services
                 return response;
             }
 
-            Home home = CreateNewAuditableObject(request);
+            var home = CreateNewAuditableObject(request);
             home.Name = request.HomeEntity.Name;
             home.Description = request.HomeEntity.Description;
 
             context.Homes.Add(home);
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
 
             var insertHomeUserRequest = new InsertHomeUserRequest()
             {
@@ -62,20 +64,20 @@ namespace HomeInv.Business.Services
                 Role = "owner",
                 RequestUserId = request.RequestUserId,
             };
-            var _userService = new HomeUserService(context);
-            var insertHomeUserResponse = _userService.InsertHomeUser(insertHomeUserRequest);
+            var userService = new HomeUserService(context);
+            var insertHomeUserResponse = await userService.InsertHomeUserAsync(insertHomeUserRequest, ct);
             if (insertHomeUserResponse != null && !insertHomeUserResponse.IsSuccessful)
             {
                 response.Result.Messages.AddRange(insertHomeUserResponse.Result.Messages);
             }
 
-            var _settingService = new UserSettingService(context);
+            var settingService = new UserSettingService(context);
             var getUserSettingsRequest = new GetUserSettingsRequest()
             {
                 UserId = request.RequestUserId,
                 RequestUserId = request.RequestUserId
             };
-            var getUserSettingsResponse = _settingService.GetUserSettings(getUserSettingsRequest);
+            var getUserSettingsResponse = await settingService.GetUserSettingsAsync(getUserSettingsRequest, ct);
             if (getUserSettingsResponse.UserSetting.DefaultHomeId <= 0)
             {
                 var insertOrUpdateForDefaultHomeRequest = new InsertOrUpdateForDefaultHomeRequest()
@@ -85,7 +87,7 @@ namespace HomeInv.Business.Services
                     RequestUserId = request.RequestUserId
                 };
 
-                var insertOrUpdateForDefaultHomeResponse = _settingService.InsertOrUpdateForDefaultHome(insertOrUpdateForDefaultHomeRequest);
+                var insertOrUpdateForDefaultHomeResponse = await settingService.InsertOrUpdateForDefaultHomeAsync(insertOrUpdateForDefaultHomeRequest, ct);
                 if (insertOrUpdateForDefaultHomeResponse != null && !insertOrUpdateForDefaultHomeResponse.IsSuccessful)
                 {
                     response.Result.Messages.AddRange(insertOrUpdateForDefaultHomeResponse.Result.Messages);
@@ -106,10 +108,10 @@ namespace HomeInv.Business.Services
             };
         }
 
-        public GetHomesOfUserResponse GetHomesOfUser(GetHomesOfUserRequest request)
+        public async Task<GetHomesOfUserResponse> GetHomesOfUserAsync(GetHomesOfUserRequest request, CancellationToken ct)
         {
             var response = new GetHomesOfUserResponse();
-            var homes = GetHomesOfUserInternal(request.RequestUserId);
+            var homes = await GetHomesOfUserInternal(request.RequestUserId).ToListAsync(ct);
             List<HomeEntity> homeEntities = new();
             foreach (var home in homes)
             {
@@ -119,25 +121,17 @@ namespace HomeInv.Business.Services
             return response;
         }
 
-        public GetSingleHomeOfUserResponse GetSingleHomeOfUser(GetSingleHomeOfUserRequest request)
-        {
-            var response = new GetSingleHomeOfUserResponse();
-            var home = GetSingleHomeOfUserInternal(request.RequestUserId, request.HomeId);
-            response.Home = ConvertDboToEntity(home);
-            return response;
-        }
-
-        public UpdateHomeResponse UpdateHome(UpdateHomeRequest request)
+        public async Task<UpdateHomeResponse> UpdateHomeAsync(UpdateHomeRequest request, CancellationToken ct)
         {
             var response = new UpdateHomeResponse();
-            Home home = GetSingleHomeOfUserInternal(request.RequestUserId, request.HomeEntity.Id);
+            var home = await GetSingleHomeOfUserInternalAsync(request.RequestUserId, request.HomeEntity.Id, ct);
             UpdateAuditableObject(home, request.RequestUserId);
 
             home.Name = request.HomeEntity.Name;
             home.Description = request.HomeEntity.Description;
 
             context.Entry(home).State = EntityState.Modified;
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
 
             response.HomeEntity = ConvertDboToEntity(home);
             return response;

@@ -3,6 +3,7 @@ using HomeInv.Common.ServiceContracts.HomeUser;
 using HomeInv.Language;
 using System;
 using System.Linq;
+using System.Threading;
 using Xunit;
 
 namespace HomeInv.Business.Services.Tests
@@ -35,7 +36,7 @@ namespace HomeInv.Business.Services.Tests
             var role = "owner";
 
             // act
-            var actual = homeUserService.InsertHomeUser(new InsertHomeUserRequest() { HomeId = homeId, UserId = userId, Role = role, RequestUserId = userIds[0] });
+            var actual = homeUserService.InsertHomeUserAsync(new InsertHomeUserRequest() { HomeId = homeId, UserId = userId, Role = role, RequestUserId = userIds[0] }, CancellationToken.None).Result;
 
             // assert
             Assert.True(actual.IsSuccessful);
@@ -52,7 +53,7 @@ namespace HomeInv.Business.Services.Tests
             var role = "owner";
 
             // act
-            var actual = homeUserService.InsertHomeUser(new InsertHomeUserRequest() { HomeId = homeId, UserId = userId, Role = role, RequestUserId = userIds[0] });
+            var actual = homeUserService.InsertHomeUserAsync(new InsertHomeUserRequest() { HomeId = homeId, UserId = userId, Role = role, RequestUserId = userIds[0] }, CancellationToken.None).Result;
 
             // assert
             Assert.False(actual.IsSuccessful);

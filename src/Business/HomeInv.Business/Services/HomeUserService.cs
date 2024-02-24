@@ -7,6 +7,8 @@ using HomeInv.Persistence.Dbo;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HomeInv.Business.Services
 {
@@ -28,13 +30,13 @@ namespace HomeInv.Business.Services
             };
         }
 
-        public GetUsersOfHomeResponse GetUsersOfHome(GetUsersOfHomeRequest request)
+        public async Task<GetUsersOfHomeResponse> GetUsersOfHomeAsync(GetUsersOfHomeRequest request, CancellationToken ct)
         {
             var response = new GetUsersOfHomeResponse();
 
-            var homeUsers = context.HomeUsers
+            var homeUsers = await context.HomeUsers
                 .Where(homeUser => homeUser.HomeId == request.HomeId)
-                .Include(user => user.User).ToList();
+                .Include(user => user.User).ToListAsync(ct);
             var homeUserEntities = new List<HomeUserEntity>();
             foreach (var homeUser in homeUsers)
             {
@@ -46,22 +48,22 @@ namespace HomeInv.Business.Services
             return response;
         }
 
-        public InsertHomeUserResponse InsertHomeUser(InsertHomeUserRequest request)
+        public async Task<InsertHomeUserResponse> InsertHomeUserAsync(InsertHomeUserRequest request, CancellationToken ct)
         {
             var response = new InsertHomeUserResponse();
-            if (context.HomeUsers.Any(q => q.HomeId == request.HomeId && q.UserId == request.UserId))
+            if (await context.HomeUsers.AnyAsync(q => q.HomeId == request.HomeId && q.UserId == request.UserId, ct))
             {
                 response.AddError(Resources.UserIsAlreadyInThatHome);
                 return response;
             }
 
-            HomeUser homeUser = CreateNewAuditableObject(request);
+            var homeUser = CreateNewAuditableObject(request);
             homeUser.HomeId = request.HomeId;
             homeUser.UserId = request.UserId;
             homeUser.Role = request.Role;
 
             context.HomeUsers.Add(homeUser);
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
 
             return response;
         }

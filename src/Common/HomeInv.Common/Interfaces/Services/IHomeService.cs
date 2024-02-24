@@ -1,4 +1,6 @@
-﻿using HomeInv.Common.ServiceContracts.Home;
+﻿using System.Threading;
+using HomeInv.Common.ServiceContracts.Home;
+using System.Threading.Tasks;
 
 namespace HomeInv.Common.Interfaces.Services
 {
@@ -9,10 +11,10 @@ namespace HomeInv.Common.Interfaces.Services
 
     public interface IHomeService : IServiceBase
     {
-        //HomeEntity GetHomeById(int id);
-        CreateHomeResponse CreateHome(CreateHomeRequest request);
-        GetHomesOfUserResponse GetHomesOfUser(GetHomesOfUserRequest request);
-        GetSingleHomeOfUserResponse GetSingleHomeOfUser(GetSingleHomeOfUserRequest request);
-        UpdateHomeResponse UpdateHome(UpdateHomeRequest request);
+        Task<CreateHomeResponse> CreateHomeAsync(CreateHomeRequest request, CancellationToken ct);
+
+        Task<GetHomesOfUserResponse> GetHomesOfUserAsync(GetHomesOfUserRequest request, CancellationToken ct);
+        
+        Task<UpdateHomeResponse> UpdateHomeAsync(UpdateHomeRequest request, CancellationToken ct);
     }
 }

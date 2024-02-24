@@ -6,6 +6,8 @@ using HomeInv.Persistence.Dbo;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HomeInv.Business.Services
 {
@@ -31,11 +33,11 @@ namespace HomeInv.Business.Services
             };
         }
 
-        public GetUserSettingsResponse GetUserSettings(GetUserSettingsRequest request)
+        public async Task<GetUserSettingsResponse> GetUserSettingsAsync(GetUserSettingsRequest request, CancellationToken ct)
         {
             var response = new GetUserSettingsResponse();
 
-            var dbo = context.UserSettings.Include(setting => setting.DefaultHome).SingleOrDefault(setting => setting.UserId == request.UserId);
+            var dbo = await context.UserSettings.Include(setting => setting.DefaultHome).SingleOrDefaultAsync(setting => setting.UserId == request.UserId, ct);
             if (dbo != null)
             {
                 response.UserSetting = ConvertDboToEntity(dbo);
@@ -51,11 +53,11 @@ namespace HomeInv.Business.Services
             return response;
         }
 
-        public InsertOrUpdateForDefaultHomeResponse InsertOrUpdateForDefaultHome(InsertOrUpdateForDefaultHomeRequest request)
+        public async Task<InsertOrUpdateForDefaultHomeResponse> InsertOrUpdateForDefaultHomeAsync(InsertOrUpdateForDefaultHomeRequest request, CancellationToken ct)
         {
             var response = new InsertOrUpdateForDefaultHomeResponse();
 
-            var settingDbo = context.UserSettings.SingleOrDefault(setting => setting.UserId == request.UserId);
+            var settingDbo = await context.UserSettings.SingleOrDefaultAsync(setting => setting.UserId == request.UserId, ct);
             if (settingDbo != null)
             {
                 settingDbo.DefaultHomeId = request.DefaultHomeId;
@@ -67,16 +69,16 @@ namespace HomeInv.Business.Services
                 settingDbo.DefaultHomeId = request.DefaultHomeId;
                 context.UserSettings.Add(settingDbo);
             }
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
 
             return response;
         }
 
-        public UpdateUserSettingsResponse UpdateUserSettings(UpdateUserSettingsRequest request)
+        public async Task<UpdateUserSettingsResponse> UpdateUserSettingsAsync(UpdateUserSettingsRequest request, CancellationToken ct)
         {
             var response = new UpdateUserSettingsResponse();
 
-            var settingDbo = context.UserSettings.SingleOrDefault(setting => setting.UserId == request.UserSettingEntity.UserId);
+            var settingDbo = await context.UserSettings.SingleOrDefaultAsync(setting => setting.UserId == request.UserSettingEntity.UserId, ct);
             if (settingDbo != null)
             {
                 settingDbo.DefaultHomeId = request.UserSettingEntity.DefaultHomeId;
@@ -88,7 +90,7 @@ namespace HomeInv.Business.Services
                 settingDbo.DefaultHomeId = request.UserSettingEntity.DefaultHomeId;
                 context.UserSettings.Add(settingDbo);
             }
-            context.SaveChanges();
+            await context.SaveChangesAsync(ct);
 
             return response;
         }
