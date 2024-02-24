@@ -169,7 +169,7 @@
             {
                 foreach (var msg in response.Result.Messages)
                 {
-                    Snackbar.Add(msg.Text, (msg.Type == BaseResponse.OperationResult.OperationalMessage.MessageType.Info ? Severity.Info : Severity.Warning));
+                    Snackbar.Add(msg.Text, (msg.Type == BaseResponse.OperationResult.OperationalMessage.MessageTypeEnum.Info ? Severity.Info : Severity.Warning));
                 }
             }
             MudDialog.Close(DialogResult.Ok(true));
@@ -219,7 +219,7 @@
                 {
                     foreach (var msg in response.Result.Messages)
                     {
-                        Snackbar.Add(msg.Text, (msg.Type == BaseResponse.OperationResult.OperationalMessage.MessageType.Info ? Severity.Info : Severity.Warning));
+                        Snackbar.Add(msg.Text, (msg.Type == BaseResponse.OperationResult.OperationalMessage.MessageTypeEnum.Info ? Severity.Info : Severity.Warning));
                     }
                 }
                 MudDialog.Close(DialogResult.Ok(true));

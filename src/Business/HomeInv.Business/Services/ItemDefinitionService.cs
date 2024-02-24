@@ -9,6 +9,7 @@ using HomeInv.Persistence.Dbo;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HomeInv.Business.Services
@@ -200,7 +201,7 @@ namespace HomeInv.Business.Services
             return response;
         }
 
-        public async Task<DeleteItemDefinitionResponse> DeleteItemDefinition(DeleteItemDefinitionRequest request)
+        public async Task<DeleteItemDefinitionResponse> DeleteItemDefinition(DeleteItemDefinitionRequest request)//, CancellationToken ct)
         {
             var response = new DeleteItemDefinitionResponse();
 
@@ -211,10 +212,10 @@ namespace HomeInv.Business.Services
 
             if (response.IsSuccessful)
             {
-                var item = await context.ItemDefinitions.FindAsync(request.ItemDefinitionId);
+                var item = await context.ItemDefinitions.FindAsync(new object[] { request.ItemDefinitionId });//, ct);
                 item.IsActive = false;
                 item.SetUpdateAuditValues(request);
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync();//ct);
             }
 
             return response;
