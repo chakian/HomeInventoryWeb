@@ -54,18 +54,18 @@ else
     async Task DisplayEditCategory()
     {
         int id = category.Id;
-        var tempCategoryList = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest()
+        var tempCategoryList = categoryService.GetCategoriesOfHome_OrderedAsync(new GetCategoriesOfHomeRequest()
             {
                 HomeId = homeId
-            }).Categories;
+            }, CancellationToken.None).Result.Categories;
         CategoryEntity? editingCategory = tempCategoryList.SingleOrDefault(cat => cat.Id == id);
 
         if (editingCategory != null)
         {
-            var categoryList = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest()
+            var categoryList = categoryService.GetCategoriesOfHome_OrderedAsync(new GetCategoriesOfHomeRequest()
                 {
                     HomeId = homeId
-                }).Categories;
+                }, CancellationToken.None).Result.Categories;
 
             var parameters = new DialogParameters
                 {

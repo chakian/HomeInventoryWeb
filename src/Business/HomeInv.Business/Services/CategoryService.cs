@@ -1,19 +1,21 @@
 ﻿using HomeInv.Common.Entities;
 using HomeInv.Common.Interfaces.Services;
 using HomeInv.Common.ServiceContracts.Category;
-using HomeInv.Common.ServiceContracts.ItemDefinition;
-using HomeInv.Language;
 using HomeInv.Persistence;
 using HomeInv.Persistence.Dbo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using HomeInv.Common.ServiceContracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomeInv.Business.Services
 {
     public class CategoryService : ServiceBase<Category, CategoryEntity>, ICategoryService<Category>
     {
-        public CategoryService(HomeInventoryDbContext _context) : base(_context)
+        public CategoryService(HomeInventoryDbContext context) : base(context)
         {
         }
 
@@ -22,7 +24,7 @@ namespace HomeInv.Business.Services
             throw new NotImplementedException();
         }
 
-        public CreateCategoryResponse CreateCategory(CreateCategoryRequest request)
+        public async Task<CreateCategoryResponse> CreateCategoryAsync(CreateCategoryRequest request, CancellationToken ct)
         {
             var response = new CreateCategoryResponse();
 
@@ -37,8 +39,13 @@ namespace HomeInv.Business.Services
             else
             {
                 //Prevent creating categories under the same parent with the same name
-                var existingCategory = context.Categories.Where(category => category.HomeId == request.HomeId && category.Name == request.CategoryEntity.Name && category.ParentCategoryId == request.CategoryEntity.ParentCategoryId);
-                if (existingCategory != null && existingCategory.Count() > 0)
+                var existingCategory = await context.Categories
+                    .Where(category => 
+                        category.HomeId == request.HomeId && 
+                        category.Name == request.CategoryEntity.Name && 
+                        category.ParentCategoryId == request.CategoryEntity.ParentCategoryId)
+                    .ToListAsync(ct);
+                if (existingCategory.Any())
                 {
                     response.AddError(Language.Resources.Category_SameNameExists);
                 }
@@ -46,10 +53,10 @@ namespace HomeInv.Business.Services
                 //Prevent creating level 3 children
                 if (request.CategoryEntity.ParentCategoryId != null && request.CategoryEntity.ParentCategoryId > 0)
                 {
-                    var parent = context.Categories.Find(request.CategoryEntity.ParentCategoryId);
+                    var parent = await context.Categories.FindAsync(request.CategoryEntity.ParentCategoryId, ct);
                     if (parent != null && (parent.ParentCategoryId ?? 0) > 0)
                     {
-                        var grandparent = context.Categories.Find(parent.ParentCategoryId);
+                        var grandparent = await context.Categories.FindAsync(parent.ParentCategoryId, ct);
                         if (grandparent != null && (grandparent.ParentCategoryId ?? 0) > 0)
                         {
                             response.AddError("Üçüncü seviyede kategori eklenemez.");
@@ -67,13 +74,13 @@ namespace HomeInv.Business.Services
                 category.HomeId = request.HomeId;
 
                 context.Categories.Add(category);
-                context.SaveChanges();
+                await context.SaveChangesAsync(ct);
             }
 
             return response;
         }
 
-        private GetCategoriesOfHomeResponse Do_GetCategoriesOfHome_Validation(GetCategoriesOfHomeRequest request)
+        private static GetCategoriesOfHomeResponse Do_GetCategoriesOfHome_Validation(BaseHomeRelatedRequest request)
         {
             var response = new GetCategoriesOfHomeResponse();
 
@@ -85,17 +92,17 @@ namespace HomeInv.Business.Services
             return response;
         }
 
-        public GetCategoriesOfHomeResponse GetCategoriesOfHome_Hierarchial(GetCategoriesOfHomeRequest request)
+        public async Task<GetCategoriesOfHomeResponse> GetCategoriesOfHome_HierarchicalAsync(GetCategoriesOfHomeRequest request, CancellationToken ct)
         {
             var response = Do_GetCategoriesOfHome_Validation(request);
 
             if (response.IsSuccessful)
             {
-                var dbCategoryList = context.Categories
+                var dbCategoryList = await context.Categories
                     .Where(category => category.HomeId == request.HomeId && category.IsActive)
                     .OrderBy(cat => cat.ParentCategoryId)
                     .ThenBy(cat => cat.Id)
-                    .ToList();
+                    .ToListAsync(ct);
                 var categoryList = new List<CategoryEntity>();
                 foreach (var dbCategory in dbCategoryList.Where(cat => !cat.ParentCategoryId.HasValue || cat.ParentCategoryId == 0).ToList())
                 {
@@ -147,17 +154,17 @@ namespace HomeInv.Business.Services
             }
         }
 
-        public GetCategoriesOfHomeResponse GetCategoriesOfHome_Ordered(GetCategoriesOfHomeRequest request)
+        public async Task<GetCategoriesOfHomeResponse> GetCategoriesOfHome_OrderedAsync(GetCategoriesOfHomeRequest request, CancellationToken ct)
         {
             var response = Do_GetCategoriesOfHome_Validation(request);
 
             if (response.IsSuccessful)
             {
-                var dbCategoryList = context.Categories
+                var dbCategoryList = await context.Categories
                     .Where(category => category.HomeId == request.HomeId && category.IsActive)
                     .OrderBy(cat => cat.ParentCategoryId)
                     .ThenBy(cat => cat.Id)
-                    .ToList();
+                    .ToListAsync(ct);
                 var categoryList = OrderCategories(dbCategoryList);
 
                 response.Categories = categoryList;
@@ -188,7 +195,7 @@ namespace HomeInv.Business.Services
             return categoryEntities;
         }
 
-        public UpdateCategoryResponse UpdateCategory(UpdateCategoryRequest request)
+        public async Task<UpdateCategoryResponse> UpdateCategoryAsync(UpdateCategoryRequest request, CancellationToken ct)
         {
             var response = new UpdateCategoryResponse();
 
@@ -200,16 +207,16 @@ namespace HomeInv.Business.Services
             {
                 response.AddError("İsim boş olamaz!");
             }
-            if (context.Categories.Any(category => category.Id != request.CategoryId
+            if (await context.Categories.AnyAsync(category => category.Id != request.CategoryId
                 && category.HomeId == request.HomeId
                 && category.Name == request.Name
-                && category.ParentCategoryId == request.ParentCategoryId))
+                && category.ParentCategoryId == request.ParentCategoryId, ct))
             {
                 response.AddError(Language.Resources.Category_SameNameExists);
             }
             if (request.ParentCategoryId != null && request.ParentCategoryId > 0)
             {
-                var parent = context.Categories.Find(request.ParentCategoryId);
+                var parent = await context.Categories.FindAsync(request.ParentCategoryId, ct);
                 if (parent != null && (parent.ParentCategoryId ?? 0) > 0)
                 {
                     var grandparent = context.Categories.Find(parent.ParentCategoryId);
@@ -219,7 +226,7 @@ namespace HomeInv.Business.Services
                     }
                 }
             }
-            var category = context.Categories.Find(request.CategoryId);
+            var category = await context.Categories.FindAsync(request.CategoryId, ct);
             if (category == null)
             {
                 response.AddError("Buraya normalde gelememiş olmanız gerekirdi. Lütfen gider misiniz?");
@@ -228,14 +235,13 @@ namespace HomeInv.Business.Services
             {
                 response.AddError("Bu kategorinin mevcutta alt kategorileri bulunmakta. Önce alt kategorileri taşımalısınız.");
             }
-
-            if (response.IsSuccessful)
+            else
             {
                 category.Name = request.Name;
                 category.Description = request.Description;
                 category.ParentCategoryId = request.ParentCategoryId;
 
-                context.SaveChanges();
+                await context.SaveChangesAsync(ct);
             }
 
             return response;

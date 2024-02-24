@@ -56,7 +56,7 @@ else
                 HomeId = UserSettings.DefaultHomeId,
                 RequestUserId = UserSettings.UserId
             };
-        var categoriesResponse = categoryService.GetCategoriesOfHome_Hierarchial(request);
+        var categoriesResponse = categoryService.GetCategoriesOfHome_HierarchicalAsync(request, CancellationToken.None).Result;
         if (categoriesResponse.IsSuccessful)
         {
             Categories = categoriesResponse.Categories;
@@ -72,10 +72,10 @@ else
     async Task DisplayCreateCategory()
     {
         CategoryEntity category = new CategoryEntity();
-        var categoryList = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest()
+        var categoryList = categoryService.GetCategoriesOfHome_OrderedAsync(new GetCategoriesOfHomeRequest()
             {
                 HomeId = UserSettings.DefaultHomeId
-            }).Categories;
+            }, CancellationToken.None).Result.Categories;
 
         var parameters = new DialogParameters
             {

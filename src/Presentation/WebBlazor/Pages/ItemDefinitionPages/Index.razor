@@ -158,7 +158,7 @@ else
             title = "Yeni ürün tanımı";
         }
 
-        var allCategories = categoryService.GetCategoriesOfHome_Ordered(new GetCategoriesOfHomeRequest() { HomeId = UserSettings.DefaultHomeId }).Categories;
+        var allCategories = categoryService.GetCategoriesOfHome_OrderedAsync(new GetCategoriesOfHomeRequest() { HomeId = UserSettings.DefaultHomeId }, CancellationToken.None).Result.Categories;
 
         var allSizeUnits = sizeUnitService.GetAllSizes(new GetAllSizesRequest() { RequestUserId = UserSettings.UserId }).SizeUnits;
 

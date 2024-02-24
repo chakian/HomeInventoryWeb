@@ -1,4 +1,6 @@
-﻿using HomeInv.Common.ServiceContracts.Category;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using HomeInv.Common.ServiceContracts.Category;
 
 namespace HomeInv.Common.Interfaces.Services
 {
@@ -9,9 +11,9 @@ namespace HomeInv.Common.Interfaces.Services
 
     public interface ICategoryService : IServiceBase
     {
-        CreateCategoryResponse CreateCategory(CreateCategoryRequest request);
-        GetCategoriesOfHomeResponse GetCategoriesOfHome_Hierarchial(GetCategoriesOfHomeRequest request);
-        GetCategoriesOfHomeResponse GetCategoriesOfHome_Ordered(GetCategoriesOfHomeRequest request);
-        UpdateCategoryResponse UpdateCategory(UpdateCategoryRequest request);
+        Task<CreateCategoryResponse> CreateCategoryAsync(CreateCategoryRequest request, CancellationToken ct);
+        Task<GetCategoriesOfHomeResponse> GetCategoriesOfHome_HierarchicalAsync(GetCategoriesOfHomeRequest request, CancellationToken ct);
+        Task<GetCategoriesOfHomeResponse> GetCategoriesOfHome_OrderedAsync(GetCategoriesOfHomeRequest request, CancellationToken ct);
+        Task<UpdateCategoryResponse> UpdateCategoryAsync(UpdateCategoryRequest request, CancellationToken ct);
     }
 }

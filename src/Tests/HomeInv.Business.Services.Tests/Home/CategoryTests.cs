@@ -4,6 +4,7 @@ using HomeInv.Common.ServiceContracts.Category;
 using HomeInv.Persistence.Dbo;
 using System;
 using System.Linq;
+using System.Threading;
 using Xunit;
 
 namespace HomeInv.Business.Services.Tests
@@ -40,7 +41,7 @@ namespace HomeInv.Business.Services.Tests
                 HomeId = homeId,
                 RequestUserId = userIds[0]
             };
-            var actual = categoryService.CreateCategory(request);
+            var actual = categoryService.CreateCategoryAsync(request, CancellationToken.None).Result;
             var expected = context.Categories.First();
 
             // assert
@@ -80,7 +81,7 @@ namespace HomeInv.Business.Services.Tests
                 HomeId = homeId,
                 RequestUserId = userIds[0]
             };
-            var actual = categoryService.CreateCategory(request);
+            var actual = categoryService.CreateCategoryAsync(request, CancellationToken.None).Result;
 
             // assert
             Assert.False(actual.IsSuccessful);
@@ -106,7 +107,7 @@ namespace HomeInv.Business.Services.Tests
                 },
                 RequestUserId = userIds[0]
             };
-            var actual = categoryService.CreateCategory(request);
+            var actual = categoryService.CreateCategoryAsync(request, CancellationToken.None).Result;
 
             // assert
             Assert.False(actual.IsSuccessful);
@@ -163,7 +164,7 @@ namespace HomeInv.Business.Services.Tests
                 HomeId = homeId,
                 RequestUserId = userIds[0]
             };
-            var actual = categoryService.CreateCategory(request);
+            var actual = categoryService.CreateCategoryAsync(request, CancellationToken.None).Result;
 
             // assert
             Assert.False(actual.IsSuccessful);
@@ -199,7 +200,7 @@ namespace HomeInv.Business.Services.Tests
                 HomeId = homeId,
                 RequestUserId = userIds[0]
             };
-            var actual = categoryService.GetCategoriesOfHome_Ordered(request);
+            var actual = categoryService.GetCategoriesOfHome_OrderedAsync(request, CancellationToken.None).Result;
 
             // assert
             Assert.NotNull(actual);
@@ -235,7 +236,7 @@ namespace HomeInv.Business.Services.Tests
                 HomeId = homeId,
                 RequestUserId = userIds[0]
             };
-            var actual = categoryService.GetCategoriesOfHome_Ordered(request);
+            var actual = categoryService.GetCategoriesOfHome_OrderedAsync(request, CancellationToken.None).Result;
 
             // assert
             Assert.NotNull(actual);

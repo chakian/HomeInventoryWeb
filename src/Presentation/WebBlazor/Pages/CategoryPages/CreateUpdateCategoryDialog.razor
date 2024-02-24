@@ -63,7 +63,7 @@
                     ParentCategoryId = category.ParentCategoryId,
                     RequestUserId = userId
                 };
-            response = categoryService.UpdateCategory(updateCategoryRequest);
+            response = categoryService.UpdateCategoryAsync(updateCategoryRequest, CancellationToken.None).Result;
         }
         else
         {
@@ -76,7 +76,7 @@
                     HomeId = homeId,
                     RequestUserId = userId
                 };
-            response = categoryService.CreateCategory(createCategoryRequest);
+            response = categoryService.CreateCategoryAsync(createCategoryRequest, CancellationToken.None).Result;
         }
         
         if (response.IsSuccessful)
