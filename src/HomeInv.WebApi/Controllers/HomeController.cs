@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HomeInv.Common.Interfaces.Services;
+using HomeInv.Common.ServiceContracts.Home;
+using HomeInv.WebApi.Contracts.Home;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HomeInv.WebApi.Controllers;
 
@@ -6,6 +9,13 @@ namespace HomeInv.WebApi.Controllers;
 [Route("home")]
 public class HomeController : Controller
 {
+    private readonly IHomeService _homeService;
+
+    public HomeController(IHomeService homeService)
+    {
+        _homeService = homeService;
+    }
+
     [HttpPost]
     public async Task<ActionResult> CreateAsync()
     {
@@ -13,9 +23,18 @@ public class HomeController : Controller
     }
 
     [HttpGet("get-all")]
-    public async Task<ActionResult> GetAllAsync()
+    public async Task<ActionResult> GetAllAsync(
+        [FromQuery]GetAllRequest request,
+        CancellationToken ct)
     {
-        return new JsonResult(string.Empty);
+        var response = new GetAllResponse();
+        var serviceRequest = new GetHomesOfUserRequest()
+        {
+            RequestUserId = request.UserId
+        };
+        var serviceResponse = await _homeService.GetHomesOfUserAsync(serviceRequest, ct);
+        response.Homes = serviceResponse.Homes;
+        return new JsonResult(response);
     }
 
     [HttpGet]

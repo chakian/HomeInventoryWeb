@@ -7,7 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.23" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Business\HomeInv.Business\HomeInv.Business.csproj" />
+    <ProjectReference Include="..\Common\HomeInv.Common\HomeInv.Common.csproj" />
   </ItemGroup>
 
 </Project>
