@@ -1,4 +1,6 @@
-﻿using HomeInv.Common.ServiceContracts.SizeUnit;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using HomeInv.Common.ServiceContracts.SizeUnit;
 
 namespace HomeInv.Common.Interfaces.Services
 {
@@ -9,6 +11,6 @@ namespace HomeInv.Common.Interfaces.Services
 
     public interface ISizeUnitService : IServiceBase
     {
-        GetAllSizesResponse GetAllSizes(GetAllSizesRequest request);
+        Task<GetAllSizesResponse> GetAllSizesAsync(GetAllSizesRequest request, CancellationToken ct);
     }
 }

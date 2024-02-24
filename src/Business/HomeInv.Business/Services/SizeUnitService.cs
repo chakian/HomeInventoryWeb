@@ -8,13 +8,16 @@ using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomeInv.Business.Services
 {
     public class SizeUnitService : ServiceBase<SizeUnit, SizeUnitEntity>, ISizeUnitService<SizeUnit>
     {
-        readonly IMemoryCache _memoryCache;
-        public SizeUnitService(HomeInventoryDbContext _context, IMemoryCache memoryCache) : base(_context)
+        private readonly IMemoryCache _memoryCache;
+        public SizeUnitService(HomeInventoryDbContext context, IMemoryCache memoryCache) : base(context)
         {
             _memoryCache = memoryCache;
         }
@@ -29,7 +32,7 @@ namespace HomeInv.Business.Services
             return sizeUnit;
         }
 
-        public GetAllSizesResponse GetAllSizes(GetAllSizesRequest request)
+        public async Task<GetAllSizesResponse> GetAllSizesAsync(GetAllSizesRequest request, CancellationToken ct)
         {
             var response = new GetAllSizesResponse();
 
@@ -37,7 +40,7 @@ namespace HomeInv.Business.Services
 
             if (!_memoryCache.TryGetValue(CacheKeys.ALL_SIZE_UNITS, out allSizes))
             {
-                allSizes = context.SizeUnits.ToList();
+                allSizes = await context.SizeUnits.ToListAsync(ct);
 
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(30));
