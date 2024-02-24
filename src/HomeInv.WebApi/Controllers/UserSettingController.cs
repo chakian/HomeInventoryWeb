@@ -1,26 +1,36 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HomeInv.Common.Entities;
+using HomeInv.Common.Interfaces.Services;
+using HomeInv.WebApi.Contracts.UserSetting;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HomeInv.WebApi.Controllers;
 
 [ApiController]
 [Route("user-setting")]
-public class UserSettingController : Controller
+public class UserSettingController : BaseController
 {
-    [HttpGet]
-    public async Task<ActionResult> GetAsync()
-    {
-        return new JsonResult(string.Empty);
-    }
+    private readonly IUserSettingService _userSettingService;
 
-    [HttpPost]
-    public async Task<ActionResult> InsertOrUpdateForDefaultHomeAsync()
+    public UserSettingController(IUserSettingService userSettingService)
     {
-        return new JsonResult(string.Empty);
+        _userSettingService = userSettingService;
     }
 
     [HttpPut]
-    public async Task<ActionResult> UpdateAsync()
+    public async Task<ActionResult> UpdateAsync(
+        UpdateUserSettingsRequest request,
+        CancellationToken ct)
     {
-        return new JsonResult(string.Empty);
+        var updateUserSettingsRequest = new Common.ServiceContracts.UserSetting.UpdateUserSettingsRequest()
+        {
+            UserSettingEntity = new UserSettingEntity()
+            {
+                DefaultHomeId = request.DefaultHomeId,
+                UserId = request.UserId
+            },
+            RequestUserId = request.UserId
+        };
+        var serviceResponse = await _userSettingService.UpdateUserSettingsAsync(updateUserSettingsRequest, ct);
+        return CheckErrorForOkResult(serviceResponse);
     }
 }
