@@ -1,5 +1,5 @@
 ﻿namespace HomeInv.WebApi.Contracts.Home;
 
-public class CreateResponse
+public class CreateResponse : BaseResponse
 {
 }

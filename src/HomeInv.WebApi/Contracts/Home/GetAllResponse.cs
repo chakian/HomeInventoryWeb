@@ -2,7 +2,7 @@
 
 namespace HomeInv.WebApi.Contracts.Home;
 
-public sealed class GetAllResponse
+public sealed class GetAllResponse : BaseResponse
 {
     public List<HomeEntity> Homes { get; set; }
 }

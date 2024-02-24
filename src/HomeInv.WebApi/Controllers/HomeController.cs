@@ -8,7 +8,7 @@ namespace HomeInv.WebApi.Controllers;
 
 [ApiController]
 [Route("home")]
-public class HomeController : Controller
+public sealed class HomeController : BaseController
 {
     private readonly IHomeService _homeService;
 
@@ -18,7 +18,9 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateAsync(CreateRequest request)
+    public async Task<ActionResult> CreateAsync(
+        CreateRequest request,
+        CancellationToken ct)
     {
         var createHomeRequest = new CreateHomeRequest()
         {
@@ -29,13 +31,8 @@ public class HomeController : Controller
             },
             RequestUserId = request.UserId,
         };
-        var serviceResponse = await _homeService.CreateHomeAsync(createHomeRequest, CancellationToken.None);
-        if (!serviceResponse.IsSuccessful)
-        {
-            return new BadRequestObjectResult(serviceResponse.Result.Messages);
-        }
-
-        return new OkResult();
+        var serviceResponse = await _homeService.CreateHomeAsync(createHomeRequest, ct);
+        return CheckErrorForOkResult(serviceResponse);
     }
 
     [HttpGet("get-all")]
@@ -50,11 +47,13 @@ public class HomeController : Controller
         };
         var serviceResponse = await _homeService.GetHomesOfUserAsync(serviceRequest, ct);
         response.Homes = serviceResponse.Homes;
-        return new JsonResult(response);
+        return CheckErrorForOkResult(serviceResponse, response);
     }
 
     [HttpPut]
-    public async Task<ActionResult> UpdateAsync(UpdateRequest request)
+    public async Task<ActionResult> UpdateAsync(
+        UpdateRequest request,
+        CancellationToken ct)
     {
         var updateHomeRequest = new UpdateHomeRequest()
         {
@@ -66,12 +65,7 @@ public class HomeController : Controller
             },
             RequestUserId = request.UserId,
         };
-        var serviceResponse = await _homeService.UpdateHomeAsync(updateHomeRequest, CancellationToken.None);
-        if (!serviceResponse.IsSuccessful)
-        {
-            return new BadRequestObjectResult(serviceResponse.Result.Messages);
-        }
-
-        return new OkResult();
+        var serviceResponse = await _homeService.UpdateHomeAsync(updateHomeRequest, ct);
+        return CheckErrorForOkResult(serviceResponse);
     }
 }
