@@ -7,38 +7,38 @@ namespace HomeInv.WebApi.Controllers;
 public class ItemDefinitionController : Controller
 {
     [HttpPost]
-    public IActionResult Create()
+    public async Task<ActionResult> CreateAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpGet("get-all")]
-    public IActionResult GetAll()
+    public async Task<ActionResult> GetAllAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpGet("get-filtered")]
-    public IActionResult GetFiltered()
+    public async Task<ActionResult> GetFilteredAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpGet]
-    public IActionResult Get()
+    public async Task<ActionResult> GetAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpPut]
-    public IActionResult Update()
+    public async Task<ActionResult> UpdateAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpDelete]
-    public IActionResult Delete()
+    public async Task<ActionResult> DeleteAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 }

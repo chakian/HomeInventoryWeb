@@ -7,14 +7,14 @@ namespace HomeInv.WebApi.Controllers;
 public class ItemStockController : Controller
 {
     [HttpGet]
-    public IActionResult Get()
+    public async Task<ActionResult> GetAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpGet("get-by-definition-ids")]
-    public IActionResult GetByDefinitionIds()
+    public async Task<ActionResult> GetByDefinitionIdsAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 }

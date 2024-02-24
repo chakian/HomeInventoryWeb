@@ -7,8 +7,8 @@ namespace HomeInv.WebApi.Controllers;
 public class UserController : Controller
 {
     [HttpGet]
-    public IActionResult Search()
+    public async Task<ActionResult> SearchAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 }

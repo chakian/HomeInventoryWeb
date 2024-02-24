@@ -7,26 +7,26 @@ namespace HomeInv.WebApi.Controllers;
 public class CategoryController : Controller
 {
     [HttpPost]
-    public IActionResult Create()
+    public async Task<ActionResult> CreateAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpGet("get-hierarchial")]
-    public IActionResult GetHierarchial()
+    public async Task<ActionResult> GetHierarchialAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpGet("get-ordered")]
-    public IActionResult GetOrdered()
+    public async Task<ActionResult> GetOrderedAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpPut]
-    public IActionResult Update()
+    public async Task<ActionResult> UpdateAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 }

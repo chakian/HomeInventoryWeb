@@ -7,8 +7,8 @@ namespace HomeInv.WebApi.Controllers;
 public class AreaUserController : Controller
 {
     [HttpPost]
-    public IActionResult InsertAreaUser()
+    public async Task<ActionResult> InsertAreaUserAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 }

@@ -7,14 +7,14 @@ namespace HomeInv.WebApi.Controllers;
 public class AreaController : Controller
 {
     [HttpPost]
-    public IActionResult Create()
+    public async Task<ActionResult> CreateAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpGet]
-    public IActionResult GetAreasOfHome()
+    public async Task<ActionResult> GetAreasOfHomeAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 }

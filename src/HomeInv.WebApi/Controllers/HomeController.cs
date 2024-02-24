@@ -7,26 +7,26 @@ namespace HomeInv.WebApi.Controllers;
 public class HomeController : Controller
 {
     [HttpPost]
-    public IActionResult Create()
+    public async Task<ActionResult> CreateAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpGet("get-all")]
-    public IActionResult GetAll()
+    public async Task<ActionResult> GetAllAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpGet]
-    public IActionResult Get()
+    public async Task<ActionResult> GetAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpPut]
-    public IActionResult Update()
+    public async Task<ActionResult> UpdateAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 }

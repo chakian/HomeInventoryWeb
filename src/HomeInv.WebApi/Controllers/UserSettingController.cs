@@ -7,20 +7,20 @@ namespace HomeInv.WebApi.Controllers;
 public class UserSettingController : Controller
 {
     [HttpGet]
-    public IActionResult Get()
+    public async Task<ActionResult> GetAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpPost]
-    public IActionResult InsertOrUpdateForDefaultHome()
+    public async Task<ActionResult> InsertOrUpdateForDefaultHomeAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpPut]
-    public IActionResult Update()
+    public async Task<ActionResult> UpdateAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 }

@@ -7,14 +7,14 @@ namespace HomeInv.WebApi.Controllers;
 public class HomeUserController : Controller
 {
     [HttpPost]
-    public IActionResult Create()
+    public async Task<ActionResult> CreateAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 
     [HttpGet]
-    public IActionResult GetUsers()
+    public async Task<ActionResult> GetUsersAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 }

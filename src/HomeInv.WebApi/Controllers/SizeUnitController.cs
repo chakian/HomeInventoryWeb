@@ -7,8 +7,8 @@ namespace HomeInv.WebApi.Controllers;
 public class SizeUnitController : Controller
 {
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<ActionResult> GetAllAsync()
     {
-        return View();
+        return new JsonResult(string.Empty);
     }
 }
