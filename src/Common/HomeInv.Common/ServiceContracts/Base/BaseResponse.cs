@@ -1,91 +1,83 @@
 ﻿using HomeInv.Language;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
-namespace HomeInv.Common.ServiceContracts
+namespace HomeInv.Common.ServiceContracts;
+
+public class BaseResponse
 {
-    public class BaseResponse
+    public OperationResult Result { get; set; } = new();
+
+    public bool IsSuccessful
     {
-        public BaseResponse()
+        get
         {
-            Result = new OperationResult();
+            return Result.Messages.All(q => q.Type != OperationResult.OperationalMessage.MessageTypeEnum.Error);
+        }
+    }
+
+    #region Helper Functions
+    private void AddMessage(OperationResult.OperationalMessage.MessageTypeEnum type, string message)
+    {
+        Result.Messages.Add(new OperationResult.OperationalMessage()
+        {
+            Type = type,
+            Text = message
+        });
+    }
+    public void AddInfo(string message)
+    {
+        AddMessage(OperationResult.OperationalMessage.MessageTypeEnum.Info, message);
+    }
+    public void AddWarning(string message)
+    {
+        AddMessage(OperationResult.OperationalMessage.MessageTypeEnum.Warning, message);
+    }
+    public void AddError(string message)
+    {
+        AddMessage(OperationResult.OperationalMessage.MessageTypeEnum.Error, message);
+    }
+    #endregion Helper Functions
+
+    #region OperationResult
+    public class OperationResult
+    {
+        internal OperationResult()
+        {
+            Messages = new List<OperationalMessage>();
         }
 
-        public OperationResult Result { get; set; }
+        public List<OperationalMessage> Messages { get; set; }
 
-        public bool IsSuccessful
+        public class OperationalMessage
         {
-            get
+            internal OperationalMessage() { }
+
+            [JsonIgnore]
+            public MessageTypeEnum Type { get; set; }
+
+            public string MessageType => Type.ToString();
+
+            public string Text { get; set; }
+
+            public enum MessageTypeEnum
             {
-                return !Result.Messages.Any(q => q.Type == OperationResult.OperationalMessage.MessageType.Error);
-            }
-        }
-
-        #region Helper Functions
-        private void AddMessage(OperationResult.OperationalMessage.MessageType type, string message)
-        {
-            Result.Messages.Add(new OperationResult.OperationalMessage()
-            {
-                Type = type,
-                Text = message
-            });
-        }
-        public void AddInfo(string message)
-        {
-            AddMessage(OperationResult.OperationalMessage.MessageType.Info, message);
-        }
-        public void AddWarning(string message)
-        {
-            AddMessage(OperationResult.OperationalMessage.MessageType.Warning, message);
-        }
-        public void AddError(string message)
-        {
-            AddMessage(OperationResult.OperationalMessage.MessageType.Error, message);
-        }
-        #endregion Helper Functions
-
-        #region OperationResult
-        public class OperationResult
-        {
-            internal OperationResult()
-            {
-                Messages = new List<OperationalMessage>();
-            }
-
-            public List<OperationalMessage> Messages { get; set; }
-
-            public class OperationalMessage
-            {
-                internal OperationalMessage() { }
-
-                public MessageType Type { get; set; }
-                public string Text { get; set; }
-
-                public enum MessageType
-                {
-                    Info = 1,
-                    Warning = 2,
-                    Error = 3
-                }
-
-                public override string ToString()
-                {
-                    return Text;
-                }
+                Info = 1,
+                Warning = 2,
+                Error = 3,
             }
 
             public override string ToString()
             {
-                if(Messages.Count == 0)
-                {
-                    return Resources.Success_Generic;
-                }
-                else
-                {
-                    return string.Concat(Messages);
-                }
+                return Text;
             }
         }
-        #endregion OperationResult
+
+        public override string ToString()
+        {
+            return Messages.Count == 0 ? Resources.Success_Generic : string.Join(". ", Messages);
+        }
     }
+    #endregion OperationResult
 }
